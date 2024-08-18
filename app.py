@@ -4,11 +4,6 @@ import pandas as pd
 from snowflake.snowpark import Session
 from snowflake.snowpark.functions import col
 
-# Ensure secrets are correctly configured
-if "snowflake" not in st.secrets:
-    st.error("Snowflake credentials are missing from the secrets configuration.")
-    st.stop()
-
 # Set up Snowflake connection parameters
 connection_parameters = {
     "account": st.secrets["snowflake"]["account"],
@@ -56,8 +51,21 @@ def save_to_snowflake(df):
     # Close the session
     session.close()
 
+# Function to retrieve data from Snowflake
+def load_from_snowflake():
+    # Create a Snowflake session
+    session = Session.builder.configs(connection_parameters).create()
+
+    # Retrieve the data from Snowflake
+    df = session.table("SAFETY_CRITERION_RESULTS").to_pandas()
+
+    # Close the session
+    session.close()
+
+    return df
+
 # Streamlit UI
-st.title("Criteria Data Generator")
+st.title("Criteria Data Generator and Viewer")
 
 # Criterion selection (extend this list as you add more criteria)
 criterion = st.selectbox("Select Criterion", ["Safety"])
@@ -77,3 +85,15 @@ if st.button("Generate and Save Data"):
         st.write("Saving data to Snowflake...")
         save_to_snowflake(df)
         st.write("Data saved to Snowflake successfully!")
+
+# Add a button to view data from Snowflake
+if st.button("View Data from Snowflake"):
+    st.write("Loading data from Snowflake...")
+    
+    # Load data from Snowflake
+    df = load_from_snowflake()
+    st.write("Data loaded successfully!")
+
+    # Show the data
+    st.dataframe(df)
+
