@@ -47,8 +47,6 @@ def test_snowflake_save():
     })
     save_to_snowflake(simple_df)
 
-test_snowflake_save()
-
 # Function to save data to Snowflake
 def save_to_snowflake(df):
     # Create a Snowflake session
@@ -59,6 +57,8 @@ def save_to_snowflake(df):
     
     # Close the session
     session.close()
+
+test_snowflake_save()    
 
 # Function to retrieve data from Snowflake
 def load_from_snowflake():
