@@ -72,7 +72,7 @@ def save_to_snowflake_csv(df):
         
         session.close()
 
-"""
+
 
 # Function to save data to Snowflake
 def save_to_snowflake(df):
@@ -85,7 +85,6 @@ def save_to_snowflake(df):
     # Close the session
     session.close() 
 
-"""
 
 # Function to retrieve data from Snowflake
 def load_from_snowflake():
@@ -119,7 +118,7 @@ if st.button("Generate and Save Data"):
 
         # Save the data to Snowflake
         st.write("Saving data to Snowflake...")
-        save_to_snowflake(df)
+        save_to_snowflake_csv(df)
         st.write("Data saved to Snowflake successfully!")
 
 # Add a button to view data from Snowflake
