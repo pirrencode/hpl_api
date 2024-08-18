@@ -63,14 +63,34 @@ def save_to_snowflake_csv(df):
     with tempfile.NamedTemporaryFile(delete=False, suffix=".csv") as tmp:
         csv_file = tmp.name
         df.to_csv(csv_file, index=False)
-        
-        session = Session.builder.configs(connection_parameters).create()
-        
-        # Use PUT command to upload the CSV file
-        session.file.put(local_path=csv_file, stage_location="@~")
-        session.sql(f"COPY INTO SAFETY_CRITERION_RESULTS FROM @~/{csv_file.split('/')[-1]} FILE_FORMAT = (type = csv field_optionally_enclosed_by='\"')").collect()
-        
-        session.close()
+
+    session = Session.builder.configs(connection_parameters).create()
+
+    # Define the stage name and file path
+    stage_name = "@my_stage"
+    file_name = os.path.basename(csv_file)
+
+    # Create a stage (temporary storage in Snowflake) if it doesn't exist
+    session.sql(f"CREATE TEMPORARY STAGE IF NOT EXISTS {stage_name}").collect()
+
+    # Upload the CSV file to the stage
+    session.file.put(f"file://{csv_file}", stage_name)
+
+    # Copy the data from the stage into the Snowflake table
+    session.sql(f"""
+        COPY INTO SAFETY_CRITERION_RESULTS
+        FROM {stage_name}/{file_name}
+        FILE_FORMAT = (TYPE = 'CSV' FIELD_OPTIONALLY_ENCLOSED_BY='"' SKIP_HEADER=1)
+    """).collect()
+
+    # Clean up: Remove the file from the stage
+    session.sql(f"REMOVE {stage_name}/{file_name}").collect()
+
+    # Close the session
+    session.close()
+
+    # Optionally remove the temporary file from the local filesystem
+    os.remove(csv_file)
 
 
 
