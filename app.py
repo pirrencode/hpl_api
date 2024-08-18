@@ -1,61 +1,74 @@
 import streamlit as st
+import numpy as np
 import pandas as pd
+from snowflake.snowpark import Session
+from snowflake.snowpark.functions import col
 
-# Load data files (assuming the CSVs are in the same directory)
-files = {
-    "economic_viability": "economic_viability_dynamics.csv",
-    "reliability": "reliability_curve_dynamics.csv",
-    "scalability": "scalability_curve_dynamics.csv",
-    "infrastructure_integration": "infrastructure_integration_dynamics.csv",
-    # Add other criteria files here
+# Set up Snowflake connection parameters
+connection_parameters = {
+    "account": "your_account_name",
+    "user": "your_username",
+    "password": "your_password",
+    "role": "your_role",
+    "warehouse": "your_warehouse",
+    "database": "HPL_SYSTEM_DYNAMICS",
+    "schema": "SYSTEM_DYNAMICS"
 }
 
-def serve_csv(criterion):
-    if criterion in files:
-        data = pd.read_csv(files[criterion])
-        return data.to_csv(index=False)
-    else:
-        return "Criterion not found!"
+# Function to generate Safety criterion data
+def generate_safety_data():
+    time_steps = 100
+    risk_scores = np.random.rand(time_steps, 5)  # Simulate risk scores for 5 components
+    min_risks = risk_scores.min(axis=0)
+    max_risks = risk_scores.max(axis=0)
+
+    # Calculate Safety Criterion
+    safety_criterion = np.zeros(time_steps)
+    for t in range(time_steps):
+        safety_criterion[t] = 1 / np.sum((risk_scores[t, :] - min_risks) / (max_risks - min_risks))
+
+    # Create a DataFrame
+    df = pd.DataFrame({
+        "TIME": np.arange(time_steps),
+        "RISK_SCORE_COMPONENT_1": risk_scores[:, 0],
+        "RISK_SCORE_COMPONENT_2": risk_scores[:, 1],
+        "RISK_SCORE_COMPONENT_3": risk_scores[:, 2],
+        "RISK_SCORE_COMPONENT_4": risk_scores[:, 3],
+        "RISK_SCORE_COMPONENT_5": risk_scores[:, 4],
+        "SAFETY_CRITERION": safety_criterion
+    })
+    
+    return df
+
+# Function to save data to Snowflake
+def save_to_snowflake(df):
+    # Create a Snowflake session
+    session = Session.builder.configs(connection_parameters).create()
+
+    # Write the DataFrame to the Snowflake table, overwriting existing data
+    session.write_pandas(df, "SAFETY_CRITERION_RESULTS", mode="overwrite")
+    
+    # Close the session
+    session.close()
 
 # Streamlit UI
-st.title("Criteria Data API")
+st.title("Criteria Data Generator")
 
-# Check if the URL has the 'criterion' parameter
-query_params = st.experimental_get_query_params()
-criterion = query_params.get("criterion", [None])[0]
-raw = query_params.get("raw", ["false"])[0].lower()
+# Criterion selection (extend this list as you add more criteria)
+criterion = st.selectbox("Select Criterion", ["Safety"])
 
-if criterion:
-    if raw == "true":
-        # Serve raw CSV data without rendering the Streamlit UI
-        csv_data = serve_csv(criterion)
-        st.write(csv_data)
-    else:
-        # Display UI for downloading the CSV
-        st.write(f"Fetching data for: **{criterion.replace('_', ' ').title()}**")
-        csv_data = serve_csv(criterion)
-        st.download_button(
-            label=f"Download {criterion.replace('_', ' ').title()} CSV",
-            data=csv_data,
-            file_name=f"{criterion}.csv",
-            mime="text/csv"
-        )
-else:
-    st.write("Please select a criterion from the dropdown below.")
-    selected_criterion = st.selectbox("Select Criterion", list(files.keys()))
-    if st.button("Get Data"):
-        st.write(f"Fetching data for: **{selected_criterion.replace('_', ' ').title()}**")
-        csv_data = serve_csv(selected_criterion)
-        st.download_button(
-            label=f"Download {selected_criterion.replace('_', ' ').title()} CSV",
-            data=csv_data,
-            file_name=f"{selected_criterion}.csv",
-            mime="text/csv"
-        )
+if st.button("Generate and Save Data"):
+    if criterion == "Safety":
+        st.write("Generating data for Safety criterion...")
+        
+        # Generate the data
+        df = generate_safety_data()
+        st.write("Data generated successfully!")
 
-# Instructions for the user
-st.write("### API Access")
-st.write("You can access the CSV data by adding a criterion query parameter to the URL.")
-st.write("Example: ")
-st.code("https://your-app-name.streamlit.app/?criterion=economic_viability&raw=true", language="markdown")
+        # Show a preview of the data
+        st.dataframe(df.head())
 
+        # Save the data to Snowflake
+        st.write("Saving data to Snowflake...")
+        save_to_snowflake(df)
+        st.write("Data saved to Snowflake successfully!")
