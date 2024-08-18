@@ -4,6 +4,11 @@ import pandas as pd
 from snowflake.snowpark import Session
 from snowflake.snowpark.functions import col
 
+# Ensure secrets are correctly configured
+if "snowflake" not in st.secrets:
+    st.error("Snowflake credentials are missing from the secrets configuration.")
+    st.stop()
+
 # Set up Snowflake connection parameters
 connection_parameters = {
     "account": st.secrets["snowflake"]["account"],
