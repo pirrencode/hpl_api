@@ -40,6 +40,15 @@ def generate_safety_data():
     
     return df
 
+def test_snowflake_save():
+    simple_df = pd.DataFrame({
+        "ID": [1, 2, 3],
+        "VALUE": [0.1, 0.2, 0.3]
+    })
+    save_to_snowflake(simple_df)
+
+test_snowflake_save()
+
 # Function to save data to Snowflake
 def save_to_snowflake(df):
     # Create a Snowflake session
