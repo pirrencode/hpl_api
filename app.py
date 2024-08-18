@@ -8,7 +8,8 @@ files = {
     "Reliability": "reliability_curve_dynamics.csv",
     "Scalability": "scalability_curve_dynamics.csv",
     "Infrastructure Integration": "infrastructure_integration_dynamics.csv",
-    # Add other criteria files here
+    "Environmental Sustainability": "environmental_sustainability_dynamics.csv",
+    "Governance Compliance": "governance_compliance_simulation_2.csv",
 }
 
 def serve_data(criterion):
@@ -17,14 +18,13 @@ def serve_data(criterion):
     else:
         return "Criterion not found", 404
 
-# Streamlit UI
 st.title("Criteria Data API")
 
 # Handle query params
 criterion = st.experimental_get_query_params().get("criterion", [None])[0]
 
 if criterion:
-    # Serve the CSV data for the specified criterion
+    # CSV data for the specified criterion
     data = serve_data(criterion)
     st.write(data)
 
