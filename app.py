@@ -6,13 +6,13 @@ from snowflake.snowpark.functions import col
 
 # Set up Snowflake connection parameters
 connection_parameters = {
-    "account": "your_account_name",
-    "user": "your_username",
-    "password": "your_password",
-    "role": "your_role",
-    "warehouse": "your_warehouse",
-    "database": "HPL_SYSTEM_DYNAMICS",
-    "schema": "SYSTEM_DYNAMICS"
+    "account": st.secrets["snowflake"]["account"],
+    "user": st.secrets["snowflake"]["user"],
+    "password": st.secrets["snowflake"]["password"],
+    "role": st.secrets["snowflake"]["role"],
+    "warehouse": st.secrets["snowflake"]["warehouse"],
+    "database": st.secrets["snowflake"]["database"],
+    "schema": st.secrets["snowflake"]["schema"]
 }
 
 # Function to generate Safety criterion data
