@@ -40,12 +40,39 @@ def generate_safety_data():
     
     return df
 
-def test_snowflake_save():
-    simple_df = pd.DataFrame({
-        "ID": [1, 2, 3],
-        "VALUE": [0.1, 0.2, 0.3]
-    })
-    save_to_snowflake(simple_df)
+import tempfile
+
+def save_to_snowflake_csv(df):
+    # Create a temporary CSV file
+    with tempfile.NamedTemporaryFile(delete=False, suffix=".csv") as tmp:
+        csv_file = tmp.name
+        df.to_csv(csv_file, index=False)
+        
+        session = Session.builder.configs(connection_parameters).create()
+        
+        # Use PUT command to upload the CSV file
+        session.file.put(local_path=csv_file, stage_location="@~")
+        session.sql(f"COPY INTO SAFETY_CRITERION_RESULTS FROM @~/{csv_file.split('/')[-1]} FILE_FORMAT = (type = csv field_optionally_enclosed_by='\"')").collect()
+        
+        session.close()
+
+import tempfile
+
+def save_to_snowflake_csv(df):
+    # Create a temporary CSV file
+    with tempfile.NamedTemporaryFile(delete=False, suffix=".csv") as tmp:
+        csv_file = tmp.name
+        df.to_csv(csv_file, index=False)
+        
+        session = Session.builder.configs(connection_parameters).create()
+        
+        # Use PUT command to upload the CSV file
+        session.file.put(local_path=csv_file, stage_location="@~")
+        session.sql(f"COPY INTO SAFETY_CRITERION_RESULTS FROM @~/{csv_file.split('/')[-1]} FILE_FORMAT = (type = csv field_optionally_enclosed_by='\"')").collect()
+        
+        session.close()
+
+"""
 
 # Function to save data to Snowflake
 def save_to_snowflake(df):
@@ -56,9 +83,9 @@ def save_to_snowflake(df):
     session.write_pandas(df, "SAFETY_CRITERION_RESULTS", mode="overwrite")
     
     # Close the session
-    session.close()
+    session.close() 
 
-test_snowflake_save()    
+"""
 
 # Function to retrieve data from Snowflake
 def load_from_snowflake():
