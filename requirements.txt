@@ -2,3 +2,4 @@ streamlit>=1.3.0
 snowflake-snowpark-python>=1.0.0
 pandas
 numpy
+pyarrow>=8.0.0
