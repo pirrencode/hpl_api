@@ -1,40 +1,47 @@
 import streamlit as st
-import pandas as pd
+from fastapi import FastAPI
+from fastapi.responses import FileResponse
+import threading
+import uvicorn
 import os
 
-# Load data files (assuming the CSVs are in the same directory)
-files = {
-    "economic_viability": "economic_viability_dynamics.csv",
-    "reliability": "reliability_curve_dynamics.csv",
-    "scalability": "scalability_curve_dynamics.csv",
-    "infrastructure_integration": "infrastructure_integration_dynamics.csv",
-    "environmental_sustainability": "environmental_sustainability_dynamics.csv",
-    "governance_compliance": "governance_compliance_simulation_2.csv",
-}
+# Initialize the FastAPI app
+api = FastAPI()
 
-# Function to serve data with correct headers
-def serve_data(criterion):
+# Initialize Streamlit UI
+def run_streamlit():
+    st.title("Criteria Data API")
+    st.write("This app serves CSV files via an API endpoint using FastAPI.")
+
+    # Instructions for the user
+    st.write("### API Endpoints")
+    st.write("You can access the CSV data for different criteria using the following URLs:")
+    st.code("http://localhost:8000/api/economic_viability", language="python")
+    st.code("http://localhost:8000/api/reliability", language="python")
+    st.code("http://localhost:8000/api/scalability", language="python")
+    st.code("http://localhost:8000/api/infrastructure_integration", language="python")
+
+# Define FastAPI routes
+@api.get("/api/{criterion}")
+async def get_csv(criterion: str):
+    files = {
+        "economic_viability": "economic_viability_dynamics.csv",
+        "reliability": "reliability_curve_dynamics.csv",
+        "scalability": "scalability_curve_dynamics.csv",
+        "infrastructure_integration": "infrastructure_integration_dynamics.csv",
+        # Add other criteria files here
+    }
+    
     if criterion in files:
-        csv = pd.read_csv(files[criterion]).to_csv(index=False)
-        st.experimental_set_query_params(criterion=criterion)
-        st.write(csv)
-        # Set the proper header to signal that this is a CSV file
-        st.markdown(f'<a href="data:file/csv;base64,{csv}" download="{criterion.lower().replace(" ", "_")}.csv">Download {criterion} CSV</a>', unsafe_allow_html=True)
+        return FileResponse(files[criterion], media_type='text/csv', filename=f"{criterion}.csv")
     else:
-        return "Criterion not found", 404
+        return {"error": "Criterion not found"}
 
-# Streamlit UI
-st.title("Criteria Data API")
+# Run FastAPI in a separate thread
+def run_fastapi():
+    uvicorn.run(api, host="0.0.0.0", port=8000)
 
-# Handle query params
-criterion = st.experimental_get_query_params().get("criterion", [None])[0]
-
-if criterion:
-    st.header(f"Data for {criterion}")
-    serve_data(criterion)
-
-# Dropdown to select which criterion to fetch for interactive use
-selected_criterion = st.selectbox("Select Criterion", list(files.keys()))
-
-if st.button("Get Data"):
-    serve_data(selected_criterion)
+# Start the FastAPI and Streamlit servers
+if __name__ == "__main__":
+    threading.Thread(target=run_fastapi, daemon=True).start()
+    run_streamlit()
