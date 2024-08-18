@@ -4,12 +4,12 @@ import os
 
 # Load data files (assuming the CSVs are in the same directory)
 files = {
-    "Economic Viability": "economic_viability_dynamics.csv",
-    "Reliability": "reliability_curve_dynamics.csv",
-    "Scalability": "scalability_curve_dynamics.csv",
-    "Infrastructure Integration": "infrastructure_integration_dynamics.csv",
-    "Environmental Sustainability": "environmental_sustainability_dynamics.csv",
-    "Governance Compliance": "governance_compliance_simulation_2.csv",
+    "economic_viability": "economic_viability_dynamics.csv",
+    "reliability": "reliability_curve_dynamics.csv",
+    "scalability": "scalability_curve_dynamics.csv",
+    "infrastructure_integration": "infrastructure_integration_dynamics.csv",
+    "environmental_sustainability": "environmental_sustainability_dynamics.csv",
+    "governance_compliance": "governance_compliance_simulation_2.csv",
 }
 
 def serve_data(criterion):
