@@ -11,13 +11,26 @@ files = {
     # Add other criteria files here
 }
 
+def serve_data(criterion):
+    if criterion in files:
+        return pd.read_csv(files[criterion]).to_csv(index=False)
+    else:
+        return "Criterion not found", 404
+
 # Streamlit UI
 st.title("Criteria Data API")
 
-# Dropdown to select which criterion to fetch
+# Handle query params
+criterion = st.experimental_get_query_params().get("criterion", [None])[0]
+
+if criterion:
+    # Serve the CSV data for the specified criterion
+    data = serve_data(criterion)
+    st.write(data)
+
+# Dropdown to select which criterion to fetch for interactive use
 selected_criterion = st.selectbox("Select Criterion", list(files.keys()))
 
-# Serve the selected CSV data
 if st.button("Get Data"):
     data = pd.read_csv(files[selected_criterion])
     st.write(data)
@@ -28,14 +41,6 @@ if st.button("Get Data"):
         file_name=f"{selected_criterion.lower().replace(' ', '_')}.csv",
         mime="text/csv"
     )
-
-# Streamlit provides a way to use the API
-@st.experimental_memo
-def get_csv(criterion):
-    if criterion in files:
-        return pd.read_csv(files[criterion])
-    else:
-        return None
 
 st.write("### API Access")
 st.write(f"To access the data via API, use the URL format:")
