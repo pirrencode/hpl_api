@@ -57,6 +57,7 @@ def save_to_snowflake_csv(df):
         session.close()
 
 import tempfile
+import os
 
 def save_to_snowflake_csv(df):
     # Create a temporary CSV file
