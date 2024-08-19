@@ -78,7 +78,8 @@ def load_from_snowflake():
     return df
 
 # Streamlit UI
-st.title("Criteria Data Generator, Viewer, and Power BI Dashboard")
+st.title("HDME")
+st.subheader("v0.01-dev")
 
 # Criterion selection
 criterion = st.selectbox("Select Criterion", ["Safety"])
