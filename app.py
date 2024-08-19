@@ -42,13 +42,15 @@ def generate_safety_data():
     
     return df
 
-# Function to save data to Snowflake from a DataFrame
 def save_to_snowflake(df):
     with tempfile.NamedTemporaryFile(delete=False, suffix=".csv") as tmp:
         csv_file = tmp.name
         df.to_csv(csv_file, index=False)
 
     session = Session.builder.configs(connection_parameters).create()
+
+    # Optional: Clear the table before inserting new data
+    session.sql("DELETE FROM SAFETY_CRITERION_RESULTS").collect()
 
     stage_name = "my_temp_stage"
     file_name = os.path.basename(csv_file)
