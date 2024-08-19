@@ -111,3 +111,15 @@ if uploaded_file is not None:
         st.write("Saving uploaded data to Snowflake...")
         save_to_snowflake(df_uploaded)
         st.write("Uploaded data saved to Snowflake successfully!")
+
+# New Feature: Visualize Safety Parameters
+if st.button("Visualize Safety Parameters"):
+    st.write("Loading data for visualization...")
+    df = load_from_snowflake()
+
+    st.write("Visualizing Safety Parameters...")
+    # Plot each risk score component against time
+    for component in ["RISK_SCORE_COMPONENT_1", "RISK_SCORE_COMPONENT_2", "RISK_SCORE_COMPONENT_3", 
+                      "RISK_SCORE_COMPONENT_4", "RISK_SCORE_COMPONENT_5", "SAFETY_CRITERION"]:
+        fig = px.line(df, x="TIME", y=component, title=f"{component} over Time")
+        st.plotly_chart(fig)
