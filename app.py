@@ -1,8 +1,8 @@
 import streamlit as st
 import numpy as np
 import pandas as pd
+import plotly.express as px
 from snowflake.snowpark import Session
-from snowflake.snowpark.functions import col
 import os
 import tempfile
 
@@ -76,7 +76,7 @@ def load_from_snowflake():
     return df
 
 # Streamlit UI
-st.title("Criteria Data Generator and Viewer")
+st.title("Criteria Data Generator, Viewer, and Power BI Dashboard")
 
 # Criterion selection
 criterion = st.selectbox("Select Criterion", ["Safety"])
@@ -102,7 +102,6 @@ if st.button("View Data from Snowflake"):
 uploaded_file = st.file_uploader("Choose a CSV file to upload", type="csv")
 
 if uploaded_file is not None:
-    # Read the CSV file into a DataFrame
     df_uploaded = pd.read_csv(uploaded_file)
     st.write("CSV file loaded successfully!")
     st.dataframe(df_uploaded.head())
