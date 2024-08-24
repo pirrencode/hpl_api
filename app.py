@@ -109,6 +109,8 @@ def render_upload_data_page():
             save_data_to_snowflake(df_uploaded, "SAFETY_CRITERION_RESULTS")
             st.write("Uploaded data saved to Snowflake successfully!")
 
+    st.markdown("<br><br>", unsafe_allow_html=True)  # Add some space before the Back button
+
     # Back button to return to the main screen
     if st.button("⬅️ Back"):
         st.session_state['page'] = 'home'
@@ -126,6 +128,8 @@ def render_visualizations_page():
                           "RISK_SCORE_COMPONENT_4", "RISK_SCORE_COMPONENT_5", "SAFETY_CRITERION"]:
             fig = px.line(df, x="TIME", y=component, title=f"{component} over Time")
             st.plotly_chart(fig)
+
+    st.markdown("<br><br>", unsafe_allow_html=True)  # Add some space before the Back button
 
     # Back button to return to the main screen
     if st.button("⬅️ Back"):
