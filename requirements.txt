@@ -5,3 +5,4 @@ numpy
 pyarrow>=8.0.0
 plotly
 Pillow>=10.1
+base64

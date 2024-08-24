@@ -1,6 +1,7 @@
 import streamlit as st
 from PIL import Image
 import os
+import base64  # <-- Import base64 module
 from io import BytesIO
 import pandas as pd
 import plotly.express as px
