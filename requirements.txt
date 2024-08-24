@@ -4,4 +4,4 @@ pandas
 numpy
 pyarrow>=8.0.0
 plotly
-Pillow>=10.4.0
+Pillow
