@@ -64,8 +64,8 @@ def render_homepage():
     """)
 
     # Load images
-    rocket_img = Image.open("images/rocket.png")
-    hyperloop_img = Image.open("images/hyperloop.png")
+    rocket_img = Image.open("media/images/rocket.png")
+    hyperloop_img = Image.open("media/images/hyperloop.png")
 
     # Navigation buttons with images
     col1, col2 = st.columns(2)
