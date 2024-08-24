@@ -1,6 +1,7 @@
 import streamlit as st
-import os
 from PIL import Image
+import os
+from io import BytesIO
 import pandas as pd
 import plotly.express as px
 import tempfile
@@ -53,6 +54,19 @@ def save_data_to_snowflake(df, table_name):
     session.close()
     os.remove(csv_file)
 
+# Function to create clickable images
+def clickable_image(image_path, caption, target_page):
+    st.write(
+        f"""
+        <div style="text-align:center; cursor: pointer;" 
+             onclick="window.location.href = '{target_page}';">
+            <img src="data:image/png;base64,{image_path}" width="200" style="border-radius:10px"/>
+            <p style="font-weight:bold">{caption}</p>
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
+
 # Function to handle homepage navigation
 def render_homepage():
     st.title("HDME")
@@ -67,18 +81,18 @@ def render_homepage():
     rocket_img = Image.open("media/images/rocket.png")
     hyperloop_img = Image.open("media/images/hyperloop.png")
 
-    # Navigation buttons with images
+    # Convert images to base64 for embedding in HTML
+    rocket_img_b64 = base64.b64encode(rocket_img.tobytes()).decode()
+    hyperloop_img_b64 = base64.b64encode(hyperloop_img.tobytes()).decode()
+
+    # Display clickable images
     col1, col2 = st.columns(2)
 
     with col1:
-        if st.button(" "):
-            st.session_state['page'] = 'upload_data'
-        st.image(rocket_img, caption="Upload Data to Ecosystem", use_column_width=True)
+        clickable_image(rocket_img_b64, "Upload Data to Ecosystem", "?page=upload_data")
 
     with col2:
-        if st.button("  "):
-            st.session_state['page'] = 'visualizations'
-        st.image(hyperloop_img, caption="Hyperloop Project System Dynamics Project", use_column_width=True)
+        clickable_image(hyperloop_img_b64, "Hyperloop Project System Dynamics Project", "?page=visualizations")
 
 # Function to handle the data upload and management page
 def render_upload_data_page():
