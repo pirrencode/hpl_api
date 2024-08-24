@@ -4,5 +4,5 @@ pandas
 numpy
 pyarrow>=8.0.0
 plotly
-Pillow>=9.0
+Pillow==9.2
 base64
