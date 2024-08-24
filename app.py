@@ -1,7 +1,8 @@
 import streamlit as st
+import os
+from PIL import Image
 import pandas as pd
 import plotly.express as px
-import os
 import tempfile
 from snowflake.snowpark import Session
 from criterion_factors_logic import generate_safety_data
@@ -62,16 +63,22 @@ def render_homepage():
         of the Hyperloop Project's system dynamics.
     """)
 
-    # Navigation buttons
+    # Load images
+    rocket_img = Image.open("images/rocket.png")
+    hyperloop_img = Image.open("images/hyperloop.png")
+
+    # Navigation buttons with images
     col1, col2 = st.columns(2)
 
     with col1:
-        if st.button("😃 Upload Data to Ecosystem"):
+        if st.button(" "):
             st.session_state['page'] = 'upload_data'
+        st.image(rocket_img, caption="Upload Data to Ecosystem", use_column_width=True)
 
     with col2:
-        if st.button("📊 Hyperloop Project System Dynamics Dashboard"):
+        if st.button("  "):
             st.session_state['page'] = 'visualizations'
+        st.image(hyperloop_img, caption="Hyperloop Project System Dynamics Project", use_column_width=True)
 
 # Function to handle the data upload and management page
 def render_upload_data_page():
