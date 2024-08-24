@@ -109,6 +109,10 @@ def render_upload_data_page():
             save_data_to_snowflake(df_uploaded, "SAFETY_CRITERION_RESULTS")
             st.write("Uploaded data saved to Snowflake successfully!")
 
+    # Back button to return to the main screen
+    if st.button("⬅️ Back"):
+        st.session_state['page'] = 'home'
+
 # Function to handle the visualizations page
 def render_visualizations_page():
     st.title("Hyperloop Project System Dynamics Dashboard")
@@ -122,6 +126,10 @@ def render_visualizations_page():
                           "RISK_SCORE_COMPONENT_4", "RISK_SCORE_COMPONENT_5", "SAFETY_CRITERION"]:
             fig = px.line(df, x="TIME", y=component, title=f"{component} over Time")
             st.plotly_chart(fig)
+
+    # Back button to return to the main screen
+    if st.button("⬅️ Back"):
+        st.session_state['page'] = 'home'
 
 # Main application logic to switch between pages
 if 'page' not in st.session_state:
