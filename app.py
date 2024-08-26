@@ -3,7 +3,7 @@ import pandas as pd
 import plotly.express as px
 import tempfile
 import logging
-from io import StringIO
+from io import BytesIO
 from snowflake.snowpark import Session
 from criterion_factors_logic import generate_safety_data, generate_environmental_impact_data
 
@@ -29,11 +29,10 @@ def load_data_from_snowflake(table_name):
     session.close()
     return df
 
-# Updated function to save data to Snowflake with improved handling
 def save_data_to_snowflake(df, table_name):
     try:
-        # Use StringIO to create an in-memory CSV file
-        csv_buffer = StringIO()
+        # Use BytesIO to create an in-memory CSV file
+        csv_buffer = BytesIO()
         df.to_csv(csv_buffer, index=False)
         csv_buffer.seek(0)  # Reset buffer to start
 
