@@ -122,7 +122,7 @@ def calculate_cr_reg():
 
     session = Session.builder.configs(get_snowflake_connection_params()).create()
 
-    df_source = session.table("CR_TFE_SOURCE").to_pandas()
+    df_source = session.table("CR_REG_SOURCE").to_pandas()
     st.write("DF is defined")
 
     df_result = pd.DataFrame()
