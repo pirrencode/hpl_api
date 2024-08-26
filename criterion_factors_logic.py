@@ -61,3 +61,16 @@ def generate_environmental_impact_data(time_periods=100):
     st.dataframe(df.head())
 
     return df
+
+def generate_social_acceptance_data(time_periods=100):
+    time = np.arange(time_periods)
+    positive_feedback = np.random.rand(time_periods) * 100
+    negative_feedback = np.random.rand(time_periods) * 50
+
+    data = pd.DataFrame({
+        'TIME': time,
+        'POSITIVE_FEEDBACK': positive_feedback,
+        'NEGATIVE_FEEDBACK': negative_feedback
+    })
+
+    return data

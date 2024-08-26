@@ -69,6 +69,28 @@ def calculate_cr_sfy():
 
     return df_cr_sfy
 
+def calculate_cr_sac():
+
+    session = Session.builder.configs(get_snowflake_connection_params()).create()
+
+    df_source = session.table("CR_SAC_SOURCE").to_pandas()
+    st.write("DF is defined")
+
+    df_result = pd.DataFrame()
+    df_result['TIME'] = df_source['TIME']
+    
+    # Calculate Social Acceptance criterion
+    cr_sac_raw = df_source['POSITIVE_FEEDBACK'] / (df_source['NEGATIVE_FEEDBACK'] + 1e-6)  # Avoid division by zero
+    
+    # Normalize CR_SAC to be in the range [0, 1]
+    cr_sac_min = cr_sac_raw.min()
+    cr_sac_max = cr_sac_raw.max()
+    df_result['CR_SAC'] = (cr_sac_raw - cr_sac_min) / (cr_sac_max - cr_sac_min)
+
+    st.write("df_result is created")
+
+    return df_result
+
 def load_data_from_snowflake(table_name):
     session = Session.builder.configs(get_snowflake_connection_params()).create()
     df = session.table(table_name).to_pandas()
@@ -120,7 +142,7 @@ def save_data_to_snowflake(df, table_name):
 # Function to handle homepage navigation
 def render_homepage():
     st.title("HDME")
-    st.subheader("v0.02-dev")
+    st.subheader("v0.03-dev")
     st.write("""
         Welcome to the Hyperloop Project System Dynamics Dashboard. 
         This application allows you to upload, manage, and visualize data related to various criteria 
@@ -146,12 +168,14 @@ def render_upload_data_page():
 
     source_table_mapping = {
         "Safety": "CR_SFY_SOURCE",
-        "Environmental Impact": "CR_ENV_SOURCE"
+        "Environmental Impact": "CR_ENV_SOURCE",
+        "Social Acceptance": "CR_SAC_SOURCE"
     }
 
     criterion_table_mapping = {
         "Safety": "CALC_CR_SF",
-        "Environmental Impact": "CALC_CR_ENV"
+        "Environmental Impact": "CALC_CR_ENV",
+        "Social Acceptance": "CALC_CR_SAC"
     }    
 
     generate_function_mapping = {
@@ -232,6 +256,17 @@ def render_visualizations_page():
 
         fig = px.line(df_summary, x="TIME", y="CR_ENV", title="CR_ENV over Time")
         st.plotly_chart(fig)
+
+    if st.button("Social Acceptance"):
+        df_source = load_data_from_snowflake("CR_SAC_SOURCE")
+        df_summary = load_data_from_snowflake("CALC_CR_SAC")
+
+        for component in ["POSITIVE_FEEDBACK", "NEGATIVE_FEEDBACK"]:
+            fig = px.line(df_source, x="TIME", y=component, title=f"{component} over Time")
+            st.plotly_chart(fig)
+
+        fig = px.line(df_summary, x="TIME", y="CR_SAC", title="CR_SAC over Time")
+        st.plotly_chart(fig)        
 
     if st.button("⬅️ Back"):
         st.session_state['page'] = 'home'
