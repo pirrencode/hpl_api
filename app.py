@@ -2,8 +2,10 @@ import streamlit as st
 import pandas as pd
 import plotly.express as px
 import tempfile
+import shutil
 from snowflake.snowpark import Session
-from criterion_factors_logic import generate_safety_data
+from criterion_factors_logic import generate_safety_data, generate_environmental_impact_data
+
 
 # Set up Snowflake connection parameters (parameterized for reusability)
 def get_snowflake_connection_params():
@@ -24,32 +26,40 @@ def load_data_from_snowflake(table_name):
     session.close()
     return df
 
-# General function to save data to Snowflake
 def save_data_to_snowflake(df, table_name):
+    # Use NamedTemporaryFile to create a temporary file and ensure it's properly handled
     with tempfile.NamedTemporaryFile(delete=False, suffix=".csv") as tmp:
         csv_file = tmp.name
-        df.to_csv(csv_file, index=False)
+        df.to_csv(csv_file, index=False)  # Save the DataFrame to CSV
+    
+    # Ensure the file is closed before accessing it
+    try:
+        session = Session.builder.configs(get_snowflake_connection_params()).create()
 
-    session = Session.builder.configs(get_snowflake_connection_params()).create()
+        # Clear the table before inserting new data
+        session.sql(f"DELETE FROM {table_name}").collect()
 
-    # Clear the table before inserting new data
-    session.sql(f"DELETE FROM {table_name}").collect()
+        stage_name = "my_temp_stage"
 
-    stage_name = "my_temp_stage"
-    file_name = os.path.basename(csv_file)
+        # Ensure the stage is created
+        session.sql(f"CREATE TEMPORARY STAGE IF NOT EXISTS {stage_name}").collect()
+        
+        # Upload the file to the stage
+        session.file.put(f"file://{csv_file}", f"@{stage_name}")
 
-    session.sql(f"CREATE TEMPORARY STAGE IF NOT EXISTS {stage_name}").collect()
-    session.file.put(f"file://{csv_file}", f"@{stage_name}")
+        # Load the data into the Snowflake table
+        session.sql(f"""
+            COPY INTO {table_name}
+            FROM @{stage_name}/{os.path.basename(csv_file)}
+            FILE_FORMAT = (TYPE = 'CSV' FIELD_OPTIONALLY_ENCLOSED_BY='"' SKIP_HEADER=1)
+        """).collect()
 
-    session.sql(f"""
-        COPY INTO {table_name}
-        FROM @{stage_name}/{file_name}
-        FILE_FORMAT = (TYPE = 'CSV' FIELD_OPTIONALLY_ENCLOSED_BY='"' SKIP_HEADER=1)
-    """).collect()
-
-    session.sql(f"REMOVE @{stage_name}/{file_name}").collect()
-    session.close()
-    os.remove(csv_file)
+        # Clean up: remove the file from the stage
+        session.sql(f"REMOVE @{stage_name}/{os.path.basename(csv_file)}").collect()
+        
+    finally:
+        session.close()
+        os.remove(csv_file)
 
 # Function to handle homepage navigation
 def render_homepage():
@@ -76,56 +86,62 @@ def render_homepage():
 def render_upload_data_page():
     st.title("Upload Data to Ecosystem")
 
-    # Criterion selection
-    criterion = st.selectbox("Select Criterion", ["Safety"])
+    criterion = st.selectbox("Select Criterion", ["Safety", "Environmental Impact"])
+
+    table_mapping = {
+        "Safety": "SAFETY_CRITERION_RESULTS",
+        "Environmental Impact": "ENVIRONMENTAL_IMPACT"
+    }
+
+    generate_function_mapping = {
+        "Safety": generate_safety_data,
+        "Environmental Impact": generate_environmental_impact_data
+    }
+
+    selected_table = table_mapping.get(criterion, "SAFETY_CRITERION_RESULTS")
+    generate_function = generate_function_mapping.get(criterion, generate_safety_data)
 
     if st.button("Generate and Save Data"):
-        if criterion == "Safety":
-            st.write("Generating data for Safety criterion...")
-            df = generate_safety_data()
-            st.write("Data generated successfully!")
-            st.dataframe(df.head())
-            st.write("Saving data to Snowflake...")
-            save_data_to_snowflake(df, "SAFETY_CRITERION_RESULTS")
-            st.write("Data saved to Snowflake successfully!")
+        df = generate_function()
+        st.write(f"Data generated successfully for {criterion}!")
+        st.dataframe(df.head())
+        save_data_to_snowflake(df, selected_table)
+        st.write(f"Data saved to Snowflake successfully!")
 
-    # Button to view data from Snowflake
     if st.button("View Data from Snowflake"):
+        df = load_data_from_snowflake(selected_table)
         st.write(f"Loading {criterion} data from Snowflake...")
-        df = load_data_from_snowflake("SAFETY_CRITERION_RESULTS")
-        st.write("Data loaded successfully!")
         st.dataframe(df)
 
-    # Button to upload a CSV file and save to Snowflake
     uploaded_file = st.file_uploader("Choose a CSV file to upload", type="csv")
 
     if uploaded_file is not None:
         df_uploaded = pd.read_csv(uploaded_file)
         st.write("CSV file loaded successfully!")
         st.dataframe(df_uploaded.head())
-
         if st.button("Save Uploaded CSV Data to Snowflake"):
-            st.write(f"Saving uploaded data to {criterion} table in Snowflake...")
-            save_data_to_snowflake(df_uploaded, "SAFETY_CRITERION_RESULTS")
-            st.write("Uploaded data saved to Snowflake successfully!")
+            save_data_to_snowflake(df_uploaded, selected_table)
+            st.write(f"Uploaded data saved to Snowflake successfully!")
 
-    st.markdown("<br><br>", unsafe_allow_html=True)  # Add some space before the Back button
-
-    # Back button to return to the main screen
     if st.button("⬅️ Back"):
         st.session_state['page'] = 'home'
 
 # Function to handle the visualizations page
 def render_visualizations_page():
     st.title("Hyperloop Project System Dynamics Dashboard")
-    
+
     if st.button("Visualize Safety Criterion"):
         st.write("Loading data for visualization...")
         df = load_data_from_snowflake("SAFETY_CRITERION_RESULTS")
-
-        st.write("Visualizing Safety Parameters...")
         for component in ["RISK_SCORE_COMPONENT_1", "RISK_SCORE_COMPONENT_2", "RISK_SCORE_COMPONENT_3", 
                           "RISK_SCORE_COMPONENT_4", "RISK_SCORE_COMPONENT_5", "SAFETY_CRITERION"]:
+            fig = px.line(df, x="TIME", y=component, title=f"{component} over Time")
+            st.plotly_chart(fig)
+
+    if st.button("Visualize Environmental Impact"):
+        st.write("Loading data for visualization...")
+        df = load_data_from_snowflake("ENVIRONMENTAL_IMPACT")
+        for component in ["CARBON_FOOTPRINT", "AIR_QUALITY_IMPACT", "WATER_CONSUMPTION", "BIODIVERSITY_LOSS", "ENVIRONMENTAL_IMPACT_SCORE"]:
             fig = px.line(df, x="TIME", y=component, title=f"{component} over Time")
             st.plotly_chart(fig)
 
