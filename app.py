@@ -43,7 +43,7 @@ def calculate_cr_env(df_source, w1=0.25, w2=0.25, w3=0.25, w4=0.25):
                            w3 * df_source['MATERIAL_SUSTAINABILITY'] +
                            w4 * df_source['ENV_IMPACT_SCORE'])
     st.write("df_result is created")
-    
+
     return df_result
 
 def calculate_cr_sfy():
@@ -172,13 +172,14 @@ def render_upload_data_page():
 
     if st.button("Generate and Save Data"):
         df = generate_function()
-        st.write(f"Data generated successfully for {criterion}!")
+        st.write(f"Data generated for {criterion}:")
         st.dataframe(df.head())
         save_data_to_snowflake(df, selected_source_table)
 
     if st.button("Calculate Criterion and Save Data"):
+        st.write(f"DEBUG: {criterion_function}")
         df = criterion_function()
-        st.write("CR_SFY calculated and saved successfully!")
+        st.write(f"Criterion {criterion} data generated.")
         st.dataframe(df.head())
         save_data_to_snowflake(df, selected_criterion_table)
 
