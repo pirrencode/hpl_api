@@ -26,9 +26,10 @@ def load_data_from_snowflake(table_name):
 
 # General function to save data to Snowflake
 def save_data_to_snowflake(df, table_name):
+    # Use NamedTemporaryFile to create a temporary file
     with tempfile.NamedTemporaryFile(delete=False, suffix=".csv") as tmp:
         csv_file = tmp.name
-        df.to_csv(csv_file, index=False)
+        df.to_csv(csv_file, index=False)  # Save the DataFrame to CSV
 
     session = Session.builder.configs(get_snowflake_connection_params()).create()
 
@@ -49,6 +50,8 @@ def save_data_to_snowflake(df, table_name):
 
     session.sql(f"REMOVE @{stage_name}/{file_name}").collect()
     session.close()
+
+    # Clean up temporary file
     os.remove(csv_file)
 
 # Function to handle homepage navigation
