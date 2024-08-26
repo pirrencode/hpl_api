@@ -168,7 +168,7 @@ def render_upload_data_page():
     
     generate_function = generate_function_mapping.get(criterion, generate_safety_data)
 
-    criterion_function = criterion_function_mapping.get(criterion, generate_safety_data)
+    criterion_function = criterion_function_mapping.get(criterion, calculate_cr_sfy)
 
     if st.button("Generate and Save Data"):
         df = generate_function()
