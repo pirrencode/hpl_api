@@ -32,3 +32,22 @@ def generate_safety_data(time_steps=100):
     })
     
     return df
+
+def generate_environmental_impact_data(time_periods=100):
+    time = np.arange(0, time_periods)
+    carbon_footprint = np.random.uniform(0, 1, time_periods)  # Example logic for carbon footprint
+    air_quality_impact = np.random.uniform(0, 1, time_periods)  # Example logic for air quality impact
+    water_consumption = np.random.uniform(0, 1, time_periods)  # Example logic for water consumption
+    biodiversity_loss = np.random.uniform(0, 1, time_periods)  # Example logic for biodiversity loss
+    
+    environmental_impact_score = 1 - np.mean([carbon_footprint, air_quality_impact, water_consumption, biodiversity_loss], axis=0)
+
+    data = {
+        "TIME": time,
+        "CARBON_FOOTPRINT": carbon_footprint,
+        "AIR_QUALITY_IMPACT": air_quality_impact,
+        "WATER_CONSUMPTION": water_consumption,
+        "BIODIVERSITY_LOSS": biodiversity_loss,
+        "ENVIRONMENTAL_IMPACT_SCORE": environmental_impact_score
+    }
+    return pd.DataFrame(data)
