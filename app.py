@@ -6,7 +6,7 @@ import tempfile
 import logging
 from io import BytesIO
 from snowflake.snowpark import Session
-from criterion_factors_logic import generate_safety_data, generate_environmental_impact_data, generate_social_acceptance_data
+from criterion_factors_logic import generate_safety_data, generate_environmental_impact_data, generate_social_acceptance_data, generate_technical_feasibility_data
 
 # Configure logging
 logging.basicConfig(level=logging.DEBUG)
@@ -91,6 +91,33 @@ def calculate_cr_sac():
 
     return df_result
 
+def calculate_cr_tfe():
+
+    session = Session.builder.configs(get_snowflake_connection_params()).create()
+
+    df_source = session.table("CR_TFE_SOURCE").to_pandas()
+    st.write("DF is defined")
+
+    df_result = pd.DataFrame()
+    df_result['TIME'] = df_source['TIME']
+
+    # Calculate CR_TFE using the provided formula
+    w1 = 0.5
+    w2 = 0.5
+    
+    # Formula implementation
+    cr_tfe_raw = (w1 * (df_source['CURRENT_TRL'] / df_source['TARGET_TRL']) +
+                  w2 * (df_source['ENG_CHALLENGES_RESOLVED'] / df_source['TARGET_ENG_CHALLENGES']))
+
+    # Normalize CR_TFE to be in the range [0, 1]
+    cr_tfe_min = cr_tfe_raw.min()
+    cr_tfe_max = cr_tfe_raw.max()
+    df_result['CR_TFE'] = (cr_tfe_raw - cr_tfe_min) / (cr_tfe_max - cr_tfe_min)
+
+    st.write("df_result is created")
+
+    return df_result
+
 def load_data_from_snowflake(table_name):
     session = Session.builder.configs(get_snowflake_connection_params()).create()
     df = session.table(table_name).to_pandas()
@@ -164,30 +191,34 @@ def render_upload_data_page():
     st.title("Upload Data to Ecosystem")
 
     # Criterion selection
-    criterion = st.selectbox("Select Criterion", ["Safety", "Environmental Impact", "Social Acceptance"])
+    criterion = st.selectbox("Select Criterion", ["Safety", "Environmental Impact", "Social Acceptance", "Technical Feasibility"])
 
     source_table_mapping = {
         "Safety": "CR_SFY_SOURCE",
         "Environmental Impact": "CR_ENV_SOURCE",
-        "Social Acceptance": "CR_SAC_SOURCE"
+        "Social Acceptance": "CR_SAC_SOURCE",
+        "Technical Feasibility": "CR_TFE_SOURCE"
     }
 
     criterion_table_mapping = {
         "Safety": "CALC_CR_SF",
         "Environmental Impact": "CALC_CR_ENV",
-        "Social Acceptance": "CALC_CR_SAC"
+        "Social Acceptance": "CALC_CR_SAC",
+        "Technical Feasibility": "CALC_CR_TFE"
     }    
 
     generate_function_mapping = {
         "Safety": generate_safety_data,
         "Environmental Impact": generate_environmental_impact_data,
         "Social Acceptance": generate_social_acceptance_data,
+        "Technical Feasibility": generate_technical_feasibility_data,
     }
 
     criterion_function_mapping = {
         "Safety": calculate_cr_sfy,
         "Environmental Impact": calculate_cr_env,
         "Social Acceptance": calculate_cr_sac,
+        "Technical Feasibility": calculate_cr_tfe,
     }    
 
     selected_source_table = source_table_mapping.get(criterion, "CR_SFY_SOURCE")
@@ -268,7 +299,18 @@ def render_visualizations_page():
             st.plotly_chart(fig)
 
         fig = px.line(df_summary, x="TIME", y="CR_SAC", title="CR_SAC over Time")
-        st.plotly_chart(fig)        
+        st.plotly_chart(fig)
+
+    if st.button("Technical Feasibility"):
+        df_source = load_data_from_snowflake("CR_TFE_SOURCE")
+        df_summary = load_data_from_snowflake("CALC_CR_TFE")
+
+        for component in ["CURRENT_TRL", "TARGET_TRL", "ENG_CHALLENGES_RESOLVED", "TARGET_ENG_CHALLENGES"]:
+            fig = px.line(df_source, x="TIME", y=component, title=f"{component} over Time")
+            st.plotly_chart(fig)
+
+        fig = px.line(df_summary, x="TIME", y="CR_TFE", title="CR_TFE over Time")
+        st.plotly_chart(fig)             
 
     if st.button("⬅️ Back"):
         st.session_state['page'] = 'home'
