@@ -1,8 +1,6 @@
 import numpy as np
 import pandas as pd
-
-import numpy as np
-import pandas as pd
+import streamlit as st
 
 def generate_safety_data(time_periods=100):
     np.random.seed(42)  # Seed for reproducibility
@@ -24,6 +22,9 @@ def generate_safety_data(time_periods=100):
         "MIN_RISK_SCORE": min_risks,
         "MAX_RISK_SCORE": max_risks
     })
+
+    st.write("Generated dataset:")
+    st.dataframe(df.head())
 
     return df
 

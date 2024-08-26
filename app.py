@@ -9,7 +9,7 @@ from snowflake.snowpark import Session
 from criterion_factors_logic import generate_safety_data, generate_environmental_impact_data
 
 # Configure logging
-logging.basicConfig(level=logging.INFO)
+logging.basicConfig(level=logging.DEBUG)
 
 # Set up Snowflake connection parameters (parameterized for reusability)
 def get_snowflake_connection_params():
