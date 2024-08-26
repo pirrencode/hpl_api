@@ -6,7 +6,7 @@ import tempfile
 import logging
 from io import BytesIO
 from snowflake.snowpark import Session
-from criterion_factors_logic import generate_safety_data, generate_environmental_impact_data
+from criterion_factors_logic import generate_safety_data, generate_environmental_impact_data, generate_social_acceptance_data
 
 # Configure logging
 logging.basicConfig(level=logging.DEBUG)
@@ -180,12 +180,14 @@ def render_upload_data_page():
 
     generate_function_mapping = {
         "Safety": generate_safety_data,
-        "Environmental Impact": generate_environmental_impact_data
+        "Environmental Impact": generate_environmental_impact_data,
+        "Social Acceptance": generate_social_acceptance_data,
     }
 
     criterion_function_mapping = {
         "Safety": calculate_cr_sfy,
-        "Environmental Impact": calculate_cr_env
+        "Environmental Impact": calculate_cr_env,
+        "Social Acceptance": calculate_cr_sac,
     }    
 
     selected_source_table = source_table_mapping.get(criterion, "CR_SFY_SOURCE")
