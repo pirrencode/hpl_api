@@ -3,7 +3,7 @@ import pandas as pd
 import plotly.express as px
 import tempfile
 from snowflake.snowpark import Session
-from criterion_factors_logic import generate_safety_data
+from criterion_factors_logic import generate_safety_data, generate_environmental_impact_data
 
 # Set up Snowflake connection parameters (parameterized for reusability)
 def get_snowflake_connection_params():
