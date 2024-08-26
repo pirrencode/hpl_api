@@ -67,6 +67,9 @@ def save_data_to_snowflake(df, table_name):
         put_result = session.file.put_stream(csv_buffer, f"@{stage_name}/temp_file.csv")
         logging.info(f"PUT command result: {put_result}")
 
+        delete_data = session.sql(f"TRUNCATE TABLE IF EXISTS {table_name}").collect()
+        logging.info(f"TRUNCATE command result: {delete_data}")
+
         # Load the data into the Snowflake table
         copy_result = session.sql(f"""
             COPY INTO {table_name}
