@@ -5,7 +5,7 @@ import tempfile
 import logging
 from io import BytesIO
 from snowflake.snowpark import Session
-from criterion_factors_logic import generate_safety_data, generate_environmental_impact_data, calculate_cr_sfy
+from criterion_factors_logic import generate_safety_data, generate_environmental_impact_data
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -188,3 +188,4 @@ elif st.session_state['page'] == 'upload_data':
     render_upload_data_page()
 elif st.session_state['page'] == 'visualizations':
     render_visualizations_page()
+   
