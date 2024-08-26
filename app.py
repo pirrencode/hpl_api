@@ -23,6 +23,9 @@ def get_snowflake_connection_params():
         "schema": st.secrets["snowflake"]["schema"]
     }
 
+def calculate_cr_env():
+    st.write("Hello ENV")
+
 def calculate_cr_sfy():
     session = Session.builder.configs(get_snowflake_connection_params()).create()
 
@@ -134,11 +137,18 @@ def render_upload_data_page():
         "Environmental Impact": generate_environmental_impact_data
     }
 
+    criterion_function_mapping = {
+        "Safety": calculate_cr_sfy,
+        "Environmental Impact": calculate_cr_env
+    }    
+
     selected_source_table = source_table_mapping.get(criterion, "CR_SFY_SOURCE")
 
     selected_criterion_table = criterion_table_mapping.get(criterion, "CALC_CR_SFY")
     
     generate_function = generate_function_mapping.get(criterion, generate_safety_data)
+
+    criterion_function = criterion_function_mapping.get(criterion, generate_safety_data)
 
     if st.button("Generate and Save Data"):
         df = generate_function()
@@ -147,9 +157,9 @@ def render_upload_data_page():
         save_data_to_snowflake(df, selected_source_table)
 
     if st.button("Calculate Criterion and Save Data"):
-        df_cr_sfy = calculate_cr_sfy()
+        df = criterion_function()
         st.write("CR_SFY calculated and saved successfully!")
-        st.dataframe(df_cr_sfy.head())
+        st.dataframe(df.head())
         save_data_to_snowflake(df, selected_criterion_table)
 
     if st.button("View Source Data from Snowflake"):
