@@ -164,7 +164,7 @@ def render_upload_data_page():
     st.title("Upload Data to Ecosystem")
 
     # Criterion selection
-    criterion = st.selectbox("Select Criterion", ["Safety", "Environmental Impact"])
+    criterion = st.selectbox("Select Criterion", ["Safety", "Environmental Impact", "Social Acceptance"])
 
     source_table_mapping = {
         "Safety": "CR_SFY_SOURCE",
