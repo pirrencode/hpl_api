@@ -5,7 +5,7 @@ import tempfile
 import logging
 from io import BytesIO
 from snowflake.snowpark import Session
-from criterion_factors_logic import generate_safety_data, generate_environmental_impact_data
+from criterion_factors_logic import generate_safety_data, generate_environmental_impact_data, calculate_cr_sfy
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -29,7 +29,6 @@ def load_data_from_snowflake(table_name):
     session.close()
     return df
 
-# Save data to Snowflake
 def save_data_to_snowflake(df, table_name):
     try:
         # Use BytesIO to create an in-memory CSV file
@@ -118,6 +117,11 @@ def render_upload_data_page():
         st.write(f"Data generated successfully for {criterion}!")
         st.dataframe(df.head())
         save_data_to_snowflake(df, selected_table)
+
+    if st.button("Calculate Criterion and Save Data"):
+        df_cr_sfy = calculate_cr_sfy()
+        st.write("CR_SFY calculated and saved successfully!")
+        st.dataframe(df_cr_sfy)
 
     if st.button("View Source Data from Snowflake"):
         df = load_data_from_snowflake(selected_table)
