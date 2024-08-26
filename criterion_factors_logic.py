@@ -92,3 +92,21 @@ def generate_technical_feasibility_data(time_periods=100):
 
     return data
 
+def generate_regulatory_approval_data(time_periods=100):
+    time = np.arange(time_periods)
+    ethical_compliance = np.random.rand(time_periods)
+    legal_compliance = np.random.rand(time_periods)
+    land_usage_compliance = np.random.rand(time_periods)
+    int_law_compliance = np.random.rand(time_periods)
+    trl_compliance = np.random.rand(time_periods)
+
+    data = pd.DataFrame({
+        'TIME': time,
+        'ETHICAL_COMPLIANCE': ethical_compliance,
+        'LEGAL_COMPLIANCE': legal_compliance,
+        'LAND_USAGE_COMPLIANCE': land_usage_compliance,
+        'INT_LAW_COMPLIANCE': int_law_compliance,
+        'TRL_COMPLIANCE': trl_compliance
+    })
+
+    return data

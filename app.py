@@ -6,7 +6,7 @@ import tempfile
 import logging
 from io import BytesIO
 from snowflake.snowpark import Session
-from criterion_factors_logic import generate_safety_data, generate_environmental_impact_data, generate_social_acceptance_data, generate_technical_feasibility_data
+from criterion_factors_logic import generate_safety_data, generate_environmental_impact_data, generate_social_acceptance_data, generate_technical_feasibility_data, generate_regulatory_approval_data
 
 # Configure logging
 logging.basicConfig(level=logging.DEBUG)
@@ -118,6 +118,30 @@ def calculate_cr_tfe():
 
     return df_result
 
+def calculate_cr_reg():
+
+    session = Session.builder.configs(get_snowflake_connection_params()).create()
+
+    df_source = session.table("CR_TFE_SOURCE").to_pandas()
+    st.write("DF is defined")
+
+    df_result = pd.DataFrame()
+    df_result['TIME'] = df_source['TIME']
+
+    # Evenly distributed weights
+    w1 = w2 = w3 = w4 = w5 = 0.2
+    
+    # Formula implementation
+    df_result['CR_REG'] = (w1 * df_source['ETHICAL_COMPLIANCE'] +
+                           w2 * df_source['LEGAL_COMPLIANCE'] +
+                           w3 * df_source['LAND_USAGE_COMPLIANCE'] +
+                           w4 * df_source['INT_LAW_COMPLIANCE'] +
+                           w5 * df_source['TRL_COMPLIANCE'])
+    
+    st.write("df_result is created")    
+    
+    return df_result
+
 def load_data_from_snowflake(table_name):
     session = Session.builder.configs(get_snowflake_connection_params()).create()
     df = session.table(table_name).to_pandas()
@@ -191,20 +215,22 @@ def render_upload_data_page():
     st.title("Upload Data to Ecosystem")
 
     # Criterion selection
-    criterion = st.selectbox("Select Criterion", ["Safety", "Environmental Impact", "Social Acceptance", "Technical Feasibility"])
+    criterion = st.selectbox("Select Criterion", ["Safety", "Environmental Impact", "Social Acceptance", "Technical Feasibility", "Regulatory Approval"])
 
     source_table_mapping = {
         "Safety": "CR_SFY_SOURCE",
         "Environmental Impact": "CR_ENV_SOURCE",
         "Social Acceptance": "CR_SAC_SOURCE",
-        "Technical Feasibility": "CR_TFE_SOURCE"
+        "Technical Feasibility": "CR_TFE_SOURCE",
+        "Regulatory Approval": "CR_REG_SOURCE",
     }
 
     criterion_table_mapping = {
         "Safety": "CALC_CR_SF",
         "Environmental Impact": "CALC_CR_ENV",
         "Social Acceptance": "CALC_CR_SAC",
-        "Technical Feasibility": "CALC_CR_TFE"
+        "Technical Feasibility": "CALC_CR_TFE",
+        "Regulatory Approval": "CALC_CR_REG",
     }    
 
     generate_function_mapping = {
@@ -212,6 +238,7 @@ def render_upload_data_page():
         "Environmental Impact": generate_environmental_impact_data,
         "Social Acceptance": generate_social_acceptance_data,
         "Technical Feasibility": generate_technical_feasibility_data,
+        "Regulatory Approval": generate_regulatory_approval_data,
     }
 
     criterion_function_mapping = {
@@ -219,6 +246,7 @@ def render_upload_data_page():
         "Environmental Impact": calculate_cr_env,
         "Social Acceptance": calculate_cr_sac,
         "Technical Feasibility": calculate_cr_tfe,
+        "Regulatory Approval": calculate_cr_reg,
     }    
 
     selected_source_table = source_table_mapping.get(criterion, "CR_SFY_SOURCE")
@@ -310,7 +338,18 @@ def render_visualizations_page():
             st.plotly_chart(fig)
 
         fig = px.line(df_summary, x="TIME", y="CR_TFE", title="CR_TFE over Time")
-        st.plotly_chart(fig)             
+        st.plotly_chart(fig)
+
+    if st.button("Regulatory approval"):
+        df_source = load_data_from_snowflake("CR_REG_SOURCE")
+        df_summary = load_data_from_snowflake("CALC_CR_REG")
+
+        for component in ["ETHICAL_COMPLIANCE", "LEGAL_COMPLIANCE", "LAND_USAGE_COMPLIANCE", "INT_LAW_COMPLIANCE", "TRL_COMPLIANCE"]:
+            fig = px.line(df_source, x="TIME", y=component, title=f"{component} over Time")
+            st.plotly_chart(fig)
+
+        fig = px.line(df_summary, x="TIME", y="CR_REG", title="CR_REG over Time")
+        st.plotly_chart(fig)        
 
     if st.button("⬅️ Back"):
         st.session_state['page'] = 'home'
