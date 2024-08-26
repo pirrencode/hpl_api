@@ -28,22 +28,22 @@ def calculate_cr_sfy():
 
     # Load data from CR_SFY_SOURCE table
     df = session.table("CR_SFY_SOURCE").to_pandas()
-
+    st.write("DF is defined")
     # Calculate CR_SFY for each time period
     epsilon = 1e-6  # Avoid division by zero
     cr_sfy = np.array([1 / np.sum((df.iloc[t]["RISK_SCORE"] - df.iloc[t]["MIN_RISK_SCORE"]) / 
                                   (df.iloc[t]["MAX_RISK_SCORE"] - df.iloc[t]["MIN_RISK_SCORE"] + epsilon))
                        for t in range(len(df))])
-
+    st.write("CR_SFY is calculated")
     # Create DataFrame with TIME and CR_SFY
     df_cr_sfy = pd.DataFrame({
         "TIME": df["TIME"],
         "CR_SFY": cr_sfy
     })
-
+    st.write("df_cr_sfy is created")
     # Save the calculated CR_SFY to CALC_CR_SF table in Snowflake
-    session.write_pandas(df_cr_sfy, "CALC_CR_SF", mode="overwrite")
-    session.close()
+    # session.write_pandas(df_cr_sfy, "CALC_CR_SF", mode="overwrite")
+    # session.close()
 
     return df_cr_sfy
 
@@ -146,7 +146,8 @@ def render_upload_data_page():
     if st.button("Calculate Criterion and Save Data"):
         df_cr_sfy = calculate_cr_sfy()
         st.write("CR_SFY calculated and saved successfully!")
-        st.dataframe(df_cr_sfy)
+        st.dataframe(df_cr_sfy.head())
+        save_data_to_snowflake(df, selected_table)
 
     if st.button("View Source Data from Snowflake"):
         df = load_data_from_snowflake(selected_table)
