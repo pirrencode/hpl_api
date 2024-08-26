@@ -29,6 +29,7 @@ def load_data_from_snowflake(table_name):
     session.close()
     return df
 
+# Save data to Snowflake
 def save_data_to_snowflake(df, table_name):
     try:
         # Use BytesIO to create an in-memory CSV file
@@ -100,8 +101,8 @@ def render_upload_data_page():
     criterion = st.selectbox("Select Criterion", ["Safety", "Environmental Impact"])
 
     table_mapping = {
-        "Safety": "SAFETY_CRITERION_RESULTS",
-        "Environmental Impact": "ENVIRONMENTAL_IMPACT"
+        "Safety": "CR_SFY_SOURCE",
+        "Environmental Impact": "CR_ENV_SOURCE"
     }
 
     generate_function_mapping = {
@@ -109,7 +110,7 @@ def render_upload_data_page():
         "Environmental Impact": generate_environmental_impact_data
     }
 
-    selected_table = table_mapping.get(criterion, "SAFETY_CRITERION_RESULTS")
+    selected_table = table_mapping.get(criterion, "CR_SFY_SOURCE")
     generate_function = generate_function_mapping.get(criterion, generate_safety_data)
 
     if st.button("Generate and Save Data"):
@@ -118,9 +119,14 @@ def render_upload_data_page():
         st.dataframe(df.head())
         save_data_to_snowflake(df, selected_table)
 
-    if st.button("View Data from Snowflake"):
+    if st.button("View Source Data from Snowflake"):
         df = load_data_from_snowflake(selected_table)
         st.write(f"Loading {criterion} data from Snowflake...")
+        st.dataframe(df)
+
+    if st.button("View Hyperloop System Dynamics Input Criterion"):
+        df = load_data_from_snowflake("HPL_SD_CRS")
+        st.write(f"Loading Hyperloop System Dynamics Input Criterion from Snowflake...")
         st.dataframe(df)
 
     uploaded_file = st.file_uploader("Choose a CSV file to upload", type="csv")
@@ -140,17 +146,30 @@ def render_visualizations_page():
     st.title("Hyperloop Project System Dynamics Dashboard")
     
     if st.button("Visualize Safety Criterion"):
-        df = load_data_from_snowflake("SAFETY_CRITERION_RESULTS")
-        for component in ["RISK_SCORE_COMPONENT_1", "RISK_SCORE_COMPONENT_2", "RISK_SCORE_COMPONENT_3", 
-                          "RISK_SCORE_COMPONENT_4", "RISK_SCORE_COMPONENT_5", "SAFETY_CRITERION"]:
-            fig = px.line(df, x="TIME", y=component, title=f"{component} over Time")
+        df_source = load_data_from_snowflake("CR_SFY_SOURCE")
+        df_summary = load_data_from_snowflake("HPL_SD_CRS")
+
+        # Visualize source data
+        for component in ["RISK_SCORE", "MIN_RISK_SCORE", "MAX_RISK_SCORE"]:
+            fig = px.line(df_source, x="TIME", y=component, title=f"{component} over Time")
             st.plotly_chart(fig)
 
+        # Visualize CR_SFY summary data
+        fig = px.line(df_summary, x="TIME", y="CR_SFY", title="CR_SFY over Time")
+        st.plotly_chart(fig)
+
     if st.button("Visualize Environmental Impact"):
-        df = load_data_from_snowflake("ENVIRONMENTAL_IMPACT")
-        for component in ["CARBON_FOOTPRINT", "AIR_QUALITY_IMPACT", "WATER_CONSUMPTION", "BIODIVERSITY_LOSS", "ENVIRONMENTAL_IMPACT_SCORE"]:
-            fig = px.line(df, x="TIME", y=component, title=f"{component} over Time")
+        df_source = load_data_from_snowflake("CR_ENV_SOURCE")
+        df_summary = load_data_from_snowflake("HPL_SD_CRS")
+
+        # Visualize source data
+        for component in ["ENERGY_CONSUMED", "DISTANCE", "LOAD_WEIGHT", "CO2_EMISSIONS", "MATERIAL_SUSTAINABILITY"]:
+            fig = px.line(df_source, x="TIME", y=component, title=f"{component} over Time")
             st.plotly_chart(fig)
+
+        # Visualize CR_ENV summary data
+        fig = px.line(df_summary, x="TIME", y="CR_ENV", title="CR_ENV over Time")
+        st.plotly_chart(fig)
 
     if st.button("⬅️ Back"):
         st.session_state['page'] = 'home'
