@@ -17,23 +17,39 @@ def generate_safety_data(time_periods=100):
     min_risks = risk_scores.min(axis=1)
     max_risks = risk_scores.max(axis=1)
 
-    # Calculate CR_SFY using the formula provided
-    # Avoid division by zero by adding a small epsilon value
-    epsilon = 1e-6
-    cr_sfy = np.array([1 / np.sum((risk_scores[t, :] - min_risks[t]) / 
-                                  (max_risks[t] - min_risks[t] + epsilon))
-                       for t in range(time_periods)])
-
-    # Create DataFrame according to the new schema
+    # Create DataFrame according to the new schema without CR_SFY
     df = pd.DataFrame({
         "TIME": time,
         "RISK_SCORE": risk_scores.mean(axis=1),  # Average risk score for each time period
         "MIN_RISK_SCORE": min_risks,
-        "MAX_RISK_SCORE": max_risks,
-        "CR_SFY": cr_sfy
+        "MAX_RISK_SCORE": max_risks
     })
 
     return df
+
+def calculate_cr_sfy():
+    session = Session.builder.configs(get_snowflake_connection_params()).create()
+
+    # Load data from CR_SFY_SOURCE table
+    df = session.table("CR_SFY_SOURCE").to_pandas()
+
+    # Calculate CR_SFY for each time period
+    epsilon = 1e-6  # Avoid division by zero
+    cr_sfy = np.array([1 / np.sum((df.iloc[t]["RISK_SCORE"] - df.iloc[t]["MIN_RISK_SCORE"]) / 
+                                  (df.iloc[t]["MAX_RISK_SCORE"] - df.iloc[t]["MIN_RISK_SCORE"] + epsilon))
+                       for t in range(len(df))])
+
+    # Create DataFrame with TIME and CR_SFY
+    df_cr_sfy = pd.DataFrame({
+        "TIME": df["TIME"],
+        "CR_SFY": cr_sfy
+    })
+
+    # Save the calculated CR_SFY to CALC_CR_SF table in Snowflake
+    session.write_pandas(df_cr_sfy, "CALC_CR_SF", mode="overwrite")
+    session.close()
+
+    return df_cr_sfy
 
 def generate_environmental_impact_data(time_periods=100):
     np.random.seed(42)
