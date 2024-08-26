@@ -3,14 +3,12 @@ import pandas as pd
 import streamlit as st
 
 def generate_safety_data(time_periods=100):
-    if seed is not None:
-        np.random.seed(seed)
-    
+
     # Simulate time periods
     time = np.arange(0, time_periods)
 
     # Generate risk scores between 0 and 1
-    risk_scores = np.random.rand(time_periods, 5)  # Assuming 5 risk components
+    risk_scores = np.random.rand(time_periods, 5)
 
     # Compute the min and max risk scores across all components
     min_risks = risk_scores.min(axis=1)
