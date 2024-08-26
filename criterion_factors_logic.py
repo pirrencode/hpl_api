@@ -28,7 +28,7 @@ def generate_safety_data(time_periods=100):
     return df
 
 def generate_environmental_impact_data(time_periods=100):
-    np.random.seed(42)
+
     time = np.arange(0, time_periods)
     energy_consumed = np.random.rand(time_periods)
     distance = np.random.rand(time_periods)
