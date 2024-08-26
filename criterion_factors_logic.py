@@ -3,7 +3,8 @@ import pandas as pd
 import streamlit as st
 
 def generate_safety_data(time_periods=100):
-    np.random.seed(42)  # Seed for reproducibility
+    if seed is not None:
+        np.random.seed(seed)
     
     # Simulate time periods
     time = np.arange(0, time_periods)
