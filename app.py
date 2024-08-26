@@ -23,7 +23,7 @@ def get_snowflake_connection_params():
         "schema": st.secrets["snowflake"]["schema"]
     }
 
-def calculate_cr_env(df_source, w1=0.25, w2=0.25, w3=0.25, w4=0.25):
+def calculate_cr_env():
     """
     Calculate the Environmental Impact criterion based on the source data.
 
@@ -34,8 +34,10 @@ def calculate_cr_env(df_source, w1=0.25, w2=0.25, w3=0.25, w4=0.25):
     :param w4: Weight for environmental impact score
     :return: DataFrame correlating to the CALC_CR_ENV schema
     """
-    
+    session = Session.builder.configs(get_snowflake_connection_params()).create()
+    df_source = session.table("CR_ENV_SOURCE").to_pandas()
     # Calculate the CR_ENV using the formula
+    w1, w2, w3, w4 = 0.25, 0.25, 0.25, 0.25
     df_result = pd.DataFrame()
     df_result['TIME'] = df_source['TIME']
     df_result['CR_ENV'] = (w1 * (df_source['ENERGY_CONSUMED'] / (df_source['DISTANCE'] * df_source['LOAD_WEIGHT'])) +
