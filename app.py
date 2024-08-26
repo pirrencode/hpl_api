@@ -2,10 +2,13 @@ import streamlit as st
 import pandas as pd
 import plotly.express as px
 import tempfile
-import shutil
+import logging
+from io import StringIO
 from snowflake.snowpark import Session
 from criterion_factors_logic import generate_safety_data, generate_environmental_impact_data
 
+# Configure logging
+logging.basicConfig(level=logging.INFO)
 
 # Set up Snowflake connection parameters (parameterized for reusability)
 def get_snowflake_connection_params():
@@ -26,40 +29,48 @@ def load_data_from_snowflake(table_name):
     session.close()
     return df
 
+# Updated function to save data to Snowflake with improved handling
 def save_data_to_snowflake(df, table_name):
-    # Use NamedTemporaryFile to create a temporary file and ensure it's properly handled
-    with tempfile.NamedTemporaryFile(delete=False, suffix=".csv") as tmp:
-        csv_file = tmp.name
-        df.to_csv(csv_file, index=False)  # Save the DataFrame to CSV
-    
-    # Ensure the file is closed before accessing it
     try:
+        # Use StringIO to create an in-memory CSV file
+        csv_buffer = StringIO()
+        df.to_csv(csv_buffer, index=False)
+        csv_buffer.seek(0)  # Reset buffer to start
+
+        # Establish a Snowflake session
         session = Session.builder.configs(get_snowflake_connection_params()).create()
 
-        # Clear the table before inserting new data
-        session.sql(f"DELETE FROM {table_name}").collect()
-
         stage_name = "my_temp_stage"
-
+        
         # Ensure the stage is created
         session.sql(f"CREATE TEMPORARY STAGE IF NOT EXISTS {stage_name}").collect()
-        
-        # Upload the file to the stage
-        session.file.put(f"file://{csv_file}", f"@{stage_name}")
+        logging.info("Temporary stage created or already exists.")
+
+        # Upload the in-memory file to the stage
+        put_result = session.file.put_stream(csv_buffer, f"@{stage_name}/temp_file.csv")
+        logging.info(f"PUT command result: {put_result}")
 
         # Load the data into the Snowflake table
-        session.sql(f"""
+        copy_result = session.sql(f"""
             COPY INTO {table_name}
-            FROM @{stage_name}/{os.path.basename(csv_file)}
+            FROM @{stage_name}/temp_file.csv
             FILE_FORMAT = (TYPE = 'CSV' FIELD_OPTIONALLY_ENCLOSED_BY='"' SKIP_HEADER=1)
         """).collect()
+        logging.info(f"COPY command result: {copy_result}")
 
         # Clean up: remove the file from the stage
-        session.sql(f"REMOVE @{stage_name}/{os.path.basename(csv_file)}").collect()
-        
+        session.sql(f"REMOVE @{stage_name}/temp_file.csv").collect()
+        logging.info("Temporary file removed from stage.")
+
+    except Exception as e:
+        logging.error(f"Error saving data to Snowflake: {e}")
+        st.error(f"An error occurred while saving data to Snowflake: {str(e)}")
     finally:
-        session.close()
-        os.remove(csv_file)
+        if session:
+            session.close()
+        csv_buffer.close()
+
+    st.success(f"Data successfully saved to {table_name} in Snowflake!")
 
 # Function to handle homepage navigation
 def render_homepage():
@@ -86,6 +97,7 @@ def render_homepage():
 def render_upload_data_page():
     st.title("Upload Data to Ecosystem")
 
+    # Criterion selection
     criterion = st.selectbox("Select Criterion", ["Safety", "Environmental Impact"])
 
     table_mapping = {
@@ -106,7 +118,6 @@ def render_upload_data_page():
         st.write(f"Data generated successfully for {criterion}!")
         st.dataframe(df.head())
         save_data_to_snowflake(df, selected_table)
-        st.write(f"Data saved to Snowflake successfully!")
 
     if st.button("View Data from Snowflake"):
         df = load_data_from_snowflake(selected_table)
@@ -121,7 +132,6 @@ def render_upload_data_page():
         st.dataframe(df_uploaded.head())
         if st.button("Save Uploaded CSV Data to Snowflake"):
             save_data_to_snowflake(df_uploaded, selected_table)
-            st.write(f"Uploaded data saved to Snowflake successfully!")
 
     if st.button("⬅️ Back"):
         st.session_state['page'] = 'home'
@@ -129,9 +139,8 @@ def render_upload_data_page():
 # Function to handle the visualizations page
 def render_visualizations_page():
     st.title("Hyperloop Project System Dynamics Dashboard")
-
+    
     if st.button("Visualize Safety Criterion"):
-        st.write("Loading data for visualization...")
         df = load_data_from_snowflake("SAFETY_CRITERION_RESULTS")
         for component in ["RISK_SCORE_COMPONENT_1", "RISK_SCORE_COMPONENT_2", "RISK_SCORE_COMPONENT_3", 
                           "RISK_SCORE_COMPONENT_4", "RISK_SCORE_COMPONENT_5", "SAFETY_CRITERION"]:
@@ -139,15 +148,11 @@ def render_visualizations_page():
             st.plotly_chart(fig)
 
     if st.button("Visualize Environmental Impact"):
-        st.write("Loading data for visualization...")
         df = load_data_from_snowflake("ENVIRONMENTAL_IMPACT")
         for component in ["CARBON_FOOTPRINT", "AIR_QUALITY_IMPACT", "WATER_CONSUMPTION", "BIODIVERSITY_LOSS", "ENVIRONMENTAL_IMPACT_SCORE"]:
             fig = px.line(df, x="TIME", y=component, title=f"{component} over Time")
             st.plotly_chart(fig)
 
-    st.markdown("<br><br>", unsafe_allow_html=True)  # Add some space before the Back button
-
-    # Back button to return to the main screen
     if st.button("⬅️ Back"):
         st.session_state['page'] = 'home'
 
