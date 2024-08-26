@@ -213,7 +213,7 @@ def render_visualizations_page():
     
     if st.button("Visualize Safety Criterion"):
         df_source = load_data_from_snowflake("CR_SFY_SOURCE")
-        df_summary = load_data_from_snowflake("HPL_SD_CRS")
+        df_summary = load_data_from_snowflake("CALC_CR_SF")
 
         for component in ["RISK_SCORE", "MIN_RISK_SCORE", "MAX_RISK_SCORE"]:
             fig = px.line(df_source, x="TIME", y=component, title=f"{component} over Time")
@@ -224,7 +224,7 @@ def render_visualizations_page():
 
     if st.button("Visualize Environmental Impact"):
         df_source = load_data_from_snowflake("CR_ENV_SOURCE")
-        df_summary = load_data_from_snowflake("HPL_SD_CRS")
+        df_summary = load_data_from_snowflake("CALC_CR_ENV")
 
         for component in ["ENERGY_CONSUMED", "DISTANCE", "LOAD_WEIGHT", "CO2_EMISSIONS", "MATERIAL_SUSTAINABILITY"]:
             fig = px.line(df_source, x="TIME", y=component, title=f"{component} over Time")
