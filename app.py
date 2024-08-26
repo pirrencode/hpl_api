@@ -252,7 +252,7 @@ def render_upload_data_page():
         "Social Acceptance": "CALC_CR_SAC",
         "Technical Feasibility": "CALC_CR_TFE",
         "Regulatory Approval": "CALC_CR_REG",
-        "Quantum Factor": "CALC_QMF_REG",
+        "Quantum Factor": "CALC_CR_QMF",
     }    
 
     generate_function_mapping = {
