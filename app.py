@@ -41,13 +41,9 @@ def calculate_cr_sfy():
         "CR_SFY": cr_sfy
     })
     st.write("df_cr_sfy is created")
-    # Save the calculated CR_SFY to CALC_CR_SF table in Snowflake
-    # session.write_pandas(df_cr_sfy, "CALC_CR_SF", mode="overwrite")
-    # session.close()
 
     return df_cr_sfy
 
-# General function to load data from Snowflake
 def load_data_from_snowflake(table_name):
     session = Session.builder.configs(get_snowflake_connection_params()).create()
     df = session.table(table_name).to_pandas()
@@ -56,17 +52,14 @@ def load_data_from_snowflake(table_name):
 
 def save_data_to_snowflake(df, table_name):
     try:
-        # Use BytesIO to create an in-memory CSV file
         csv_buffer = BytesIO()
         df.to_csv(csv_buffer, index=False)
         csv_buffer.seek(0)  # Reset buffer to start
 
-        # Establish a Snowflake session
         session = Session.builder.configs(get_snowflake_connection_params()).create()
 
         stage_name = "my_temp_stage"
         
-        # Ensure the stage is created
         session.sql(f"CREATE TEMPORARY STAGE IF NOT EXISTS {stage_name}").collect()
         logging.info("Temporary stage created or already exists.")
 
@@ -106,7 +99,6 @@ def render_homepage():
         of the Hyperloop Project's system dynamics.
     """)
 
-    # Display clickable emojis
     col1, col2 = st.columns(2)
 
     with col1:
@@ -179,12 +171,10 @@ def render_visualizations_page():
         df_source = load_data_from_snowflake("CR_SFY_SOURCE")
         df_summary = load_data_from_snowflake("HPL_SD_CRS")
 
-        # Visualize source data
         for component in ["RISK_SCORE", "MIN_RISK_SCORE", "MAX_RISK_SCORE"]:
             fig = px.line(df_source, x="TIME", y=component, title=f"{component} over Time")
             st.plotly_chart(fig)
 
-        # Visualize CR_SFY summary data
         fig = px.line(df_summary, x="TIME", y="CR_SFY", title="CR_SFY over Time")
         st.plotly_chart(fig)
 
@@ -192,12 +182,10 @@ def render_visualizations_page():
         df_source = load_data_from_snowflake("CR_ENV_SOURCE")
         df_summary = load_data_from_snowflake("HPL_SD_CRS")
 
-        # Visualize source data
         for component in ["ENERGY_CONSUMED", "DISTANCE", "LOAD_WEIGHT", "CO2_EMISSIONS", "MATERIAL_SUSTAINABILITY"]:
             fig = px.line(df_source, x="TIME", y=component, title=f"{component} over Time")
             st.plotly_chart(fig)
 
-        # Visualize CR_ENV summary data
         fig = px.line(df_summary, x="TIME", y="CR_ENV", title="CR_ENV over Time")
         st.plotly_chart(fig)
 
