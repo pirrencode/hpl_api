@@ -57,4 +57,7 @@ def generate_environmental_impact_data(time_periods=100):
         # "CR_ENV": criterion_values
     })
 
+    st.write("Generated dataset:")
+    st.dataframe(df.head())
+
     return df
