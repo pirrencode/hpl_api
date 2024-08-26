@@ -74,3 +74,21 @@ def generate_social_acceptance_data(time_periods=100):
     })
 
     return data
+
+def generate_technical_feasibility_data(time_periods=100):
+    time = np.arange(time_periods)
+    current_trl = np.full(time_periods, 6)  # Stable CURRENT_TRL at 6
+    target_trl = np.random.uniform(6, 11, time_periods)
+    eng_challenges_resolved = np.random.rand(time_periods)  # In the range [0, 1]
+    target_eng_challenges = np.random.rand(time_periods)  # In the range [0, 1]
+
+    data = pd.DataFrame({
+        'TIME': time,
+        'CURRENT_TRL': current_trl,
+        'TARGET_TRL': target_trl,
+        'ENG_CHALLENGES_RESOLVED': eng_challenges_resolved,
+        'TARGET_ENG_CHALLENGES': target_eng_challenges
+    })
+
+    return data
+
