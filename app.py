@@ -379,7 +379,18 @@ def render_visualizations_page():
         df_source = load_data_from_snowflake("CR_QMF_SOURCE")
         df_summary = load_data_from_snowflake("CALC_CR_QMF")
 
-        for component in ["DISRUPTIVE_TECH_USED", "TOTAL_DISRUPTIVE_TECH"]:
+        for component in ["MAGLEV_LEVITATION", 
+                          "AMBIENT_INTELLIGENCE", 
+                          "GENERATIVE_AI", 
+                          "AI_MACHINE_LEARNING", 
+                          "DIGITAL_TWINS", 
+                          "FIVE_G", "QUANTUM_COMPUTING", 
+                          "AUGMENTED_REALITY", 
+                          "VIRTUAL_REALITY", 
+                          "PRINTING_AT_SCALE", 
+                          "BLOCKCHAIN", 
+                          "SELF_DRIVING_AUTONOMOUS_VEHICLES",
+                          "TOTAL_DISRUPTIVE_TECH"]:
             fig = px.line(df_source, x="TIME", y=component, title=f"{component} over Time")
             st.plotly_chart(fig)
 
