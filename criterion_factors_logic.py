@@ -39,12 +39,12 @@ def generate_environmental_impact_data(time_periods=100):
 
     # Compute Environmental Impact criterion based on formula
     w1, w2, w3, w4 = 0.25, 0.25, 0.25, 0.25
-    criterion_values = (
-        w1 * energy_consumed / (distance * load_weight) +
-        w2 * co2_emissions / (distance * load_weight) +
-        w3 * material_sustainability +
-        w4 * env_impact_score
-    )
+    # criterion_values = (
+    #     w1 * energy_consumed / (distance * load_weight) +
+    #     w2 * co2_emissions / (distance * load_weight) +
+    #     w3 * material_sustainability +
+    #     w4 * env_impact_score
+    # )
 
     df = pd.DataFrame({
         "TIME": time,
@@ -54,7 +54,7 @@ def generate_environmental_impact_data(time_periods=100):
         "CO2_EMISSIONS": co2_emissions,
         "MATERIAL_SUSTAINABILITY": material_sustainability,
         "ENV_IMPACT_SCORE": env_impact_score,
-        "CR_ENV": criterion_values
+        # "CR_ENV": criterion_values
     })
 
     return df
