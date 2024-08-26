@@ -113,12 +113,43 @@ def generate_regulatory_approval_data(time_periods=100):
 
 def generate_quantum_factor_data(time_periods=100):
     time = np.arange(time_periods)
-    disruptive_tech_used = np.random.choice([True, False], time_periods)
-    total_disruptive_tech = np.random.randint(1, 10, time_periods)
+
+    # Generate random boolean values for each technology
+    maglev_levitation = np.random.choice([True, False], time_periods)
+    ambient_intelligence = np.random.choice([True, False], time_periods)
+    generative_ai = np.random.choice([True, False], time_periods)
+    ai_machine_learning = np.random.choice([True, False], time_periods)
+    digital_twins = np.random.choice([True, False], time_periods)
+    five_g = np.random.choice([True, False], time_periods)
+    quantum_computing = np.random.choice([True, False], time_periods)
+    augmented_reality = np.random.choice([True, False], time_periods)
+    virtual_reality = np.random.choice([True, False], time_periods)
+    printing_at_scale = np.random.choice([True, False], time_periods)
+    blockchain = np.random.choice([True, False], time_periods)
+    self_driving_autonomous_vehicles = np.random.choice([True, False], time_periods)
+
+    # Calculate TOTAL_DISRUPTIVE_TECH based on the sum of TRUE values
+    total_disruptive_tech = (maglev_levitation.astype(int) + ambient_intelligence.astype(int) +
+                             generative_ai.astype(int) + ai_machine_learning.astype(int) +
+                             digital_twins.astype(int) + five_g.astype(int) +
+                             quantum_computing.astype(int) + augmented_reality.astype(int) +
+                             virtual_reality.astype(int) + printing_at_scale.astype(int) +
+                             blockchain.astype(int) + self_driving_autonomous_vehicles.astype(int))
 
     data = pd.DataFrame({
         'TIME': time,
-        'DISRUPTIVE_TECH_USED': disruptive_tech_used,
+        'MAGLEV_LEVITATION': maglev_levitation,
+        'AMBIENT_INTELLIGENCE': ambient_intelligence,
+        'GENERATIVE_AI': generative_ai,
+        'AI_MACHINE_LEARNING': ai_machine_learning,
+        'DIGITAL_TWINS': digital_twins,
+        'FIVE_G': five_g,
+        'QUANTUM_COMPUTING': quantum_computing,
+        'AUGMENTED_REALITY': augmented_reality,
+        'VIRTUAL_REALITY': virtual_reality,
+        'PRINTING_AT_SCALE': printing_at_scale,
+        'BLOCKCHAIN': blockchain,
+        'SELF_DRIVING_AUTONOMOUS_VEHICLES': self_driving_autonomous_vehicles,
         'TOTAL_DISRUPTIVE_TECH': total_disruptive_tech
     })
 

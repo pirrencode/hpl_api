@@ -152,8 +152,8 @@ def calculate_cr_qmf(df_source):
     df_result = pd.DataFrame()
     df_result['TIME'] = df_source['TIME']
 
-    # Calculate CR_QMF using the provided formula
-    df_result['CR_QMF'] = df_source['DISRUPTIVE_TECH_USED'].astype(int) / df_source['TOTAL_DISRUPTIVE_TECH']
+    # Calculate CR_QMF as TOTAL_DISRUPTIVE_TECH / 12 (max possible value)
+    df_result['CR_QMF'] = df_source['TOTAL_DISRUPTIVE_TECH'] / 12.0
 
     # Ensure CR_QMF is in the range [0, 1]
     df_result['CR_QMF'] = df_result['CR_QMF'].clip(0, 1)
