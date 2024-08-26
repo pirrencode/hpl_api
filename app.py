@@ -119,33 +119,41 @@ def render_upload_data_page():
     # Criterion selection
     criterion = st.selectbox("Select Criterion", ["Safety", "Environmental Impact"])
 
-    table_mapping = {
+    source_table_mapping = {
         "Safety": "CR_SFY_SOURCE",
         "Environmental Impact": "CR_ENV_SOURCE"
     }
+
+    criterion_table_mapping = {
+        "Safety": "CALC_CR_SFY",
+        "Environmental Impact": "CALC_CR_ENV"
+    }    
 
     generate_function_mapping = {
         "Safety": generate_safety_data,
         "Environmental Impact": generate_environmental_impact_data
     }
 
-    selected_table = table_mapping.get(criterion, "CR_SFY_SOURCE")
+    selected_source_table = source_table_mapping.get(criterion, "CR_SFY_SOURCE")
+
+    selected_criterion_table = criterion_table_mapping.get(criterion, "CALC_CR_SFY")
+    
     generate_function = generate_function_mapping.get(criterion, generate_safety_data)
 
     if st.button("Generate and Save Data"):
         df = generate_function()
         st.write(f"Data generated successfully for {criterion}!")
         st.dataframe(df.head())
-        save_data_to_snowflake(df, selected_table)
+        save_data_to_snowflake(df, selected_source_table)
 
     if st.button("Calculate Criterion and Save Data"):
         df_cr_sfy = calculate_cr_sfy()
         st.write("CR_SFY calculated and saved successfully!")
         st.dataframe(df_cr_sfy.head())
-        save_data_to_snowflake(df, selected_table)
+        save_data_to_snowflake(df, selected_criterion_table)
 
     if st.button("View Source Data from Snowflake"):
-        df = load_data_from_snowflake(selected_table)
+        df = load_data_from_snowflake(selected_source_table)
         st.write(f"Loading {criterion} data from Snowflake...")
         st.dataframe(df)
 
@@ -161,7 +169,7 @@ def render_upload_data_page():
         st.write("CSV file loaded successfully!")
         st.dataframe(df_uploaded.head())
         if st.button("Save Uploaded CSV Data to Snowflake"):
-            save_data_to_snowflake(df_uploaded, selected_table)
+            save_data_to_snowflake(df_uploaded, selected_source_table)
 
     if st.button("⬅️ Back"):
         st.session_state['page'] = 'home'
