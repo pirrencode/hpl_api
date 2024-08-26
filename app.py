@@ -191,8 +191,8 @@ def render_upload_data_page():
         st.dataframe(df)
 
     if st.button("View Hyperloop System Dynamics Input Criterion"):
-        df = load_data_from_snowflake("CALC_CR_SF")
-        st.write(f"Loading Hyperloop System Dynamics Input Criterion from Snowflake...")
+        df = load_data_from_snowflake(selected_criterion_table)
+        st.write(f"Loading Hyperloop System Dynamics Input Criterion from Snowflake... Table: {selected_criterion_table}")
         st.dataframe(df)
 
     uploaded_file = st.file_uploader("Choose a CSV file to upload", type="csv")
