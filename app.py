@@ -98,7 +98,7 @@ def save_data_to_snowflake(df, table_name):
 # Function to handle homepage navigation
 def render_homepage():
     st.title("HDME")
-    st.subheader("v0.01-dev")
+    st.subheader("v0.02-dev")
     st.write("""
         Welcome to the Hyperloop Project System Dynamics Dashboard. 
         This application allows you to upload, manage, and visualize data related to various criteria 
@@ -153,7 +153,7 @@ def render_upload_data_page():
         st.dataframe(df)
 
     if st.button("View Hyperloop System Dynamics Input Criterion"):
-        df = load_data_from_snowflake("HPL_SD_CRS")
+        df = load_data_from_snowflake("CALC_CR_SF")
         st.write(f"Loading Hyperloop System Dynamics Input Criterion from Snowflake...")
         st.dataframe(df)
 
