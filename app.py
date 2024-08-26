@@ -2,8 +2,10 @@ import streamlit as st
 import pandas as pd
 import plotly.express as px
 import tempfile
+import shutil
 from snowflake.snowpark import Session
 from criterion_factors_logic import generate_safety_data, generate_environmental_impact_data
+
 
 # Set up Snowflake connection parameters (parameterized for reusability)
 def get_snowflake_connection_params():
@@ -24,35 +26,41 @@ def load_data_from_snowflake(table_name):
     session.close()
     return df
 
-# General function to save data to Snowflake
 def save_data_to_snowflake(df, table_name):
-    # Use NamedTemporaryFile to create a temporary file
+    # Use NamedTemporaryFile to create a temporary file and ensure it's properly handled
     with tempfile.NamedTemporaryFile(delete=False, suffix=".csv") as tmp:
         csv_file = tmp.name
         df.to_csv(csv_file, index=False)  # Save the DataFrame to CSV
+    
+    # Ensure the file is closed before accessing it
+    try:
+        session = Session.builder.configs(get_snowflake_connection_params()).create()
 
-    session = Session.builder.configs(get_snowflake_connection_params()).create()
+        # Clear the table before inserting new data
+        session.sql(f"DELETE FROM {table_name}").collect()
 
-    # Clear the table before inserting new data
-    session.sql(f"DELETE FROM {table_name}").collect()
+        stage_name = "my_temp_stage"
 
-    stage_name = "my_temp_stage"
-    file_name = os.path.basename(csv_file)
+        # Ensure the stage is created
+        session.sql(f"CREATE TEMPORARY STAGE IF NOT EXISTS {stage_name}").collect()
+        
+        # Upload the file to the stage
+        session.file.put(f"file://{csv_file}", f"@{stage_name}")
 
-    session.sql(f"CREATE TEMPORARY STAGE IF NOT EXISTS {stage_name}").collect()
-    session.file.put(f"file://{csv_file}", f"@{stage_name}")
+        # Load the data into the Snowflake table
+        session.sql(f"""
+            COPY INTO {table_name}
+            FROM @{stage_name}/{os.path.basename(csv_file)}
+            FILE_FORMAT = (TYPE = 'CSV' FIELD_OPTIONALLY_ENCLOSED_BY='"' SKIP_HEADER=1)
+        """).collect()
 
-    session.sql(f"""
-        COPY INTO {table_name}
-        FROM @{stage_name}/{file_name}
-        FILE_FORMAT = (TYPE = 'CSV' FIELD_OPTIONALLY_ENCLOSED_BY='"' SKIP_HEADER=1)
-    """).collect()
-
-    session.sql(f"REMOVE @{stage_name}/{file_name}").collect()
-    session.close()
-
-    # Clean up temporary file
-    os.remove(csv_file)
+        # Clean up: remove the file from the stage
+        session.sql(f"REMOVE @{stage_name}/{os.path.basename(csv_file)}").collect()
+        
+    finally:
+        # Ensure the session is closed and the temp file is deleted
+        session.close()
+        os.remove(csv_file)
 
 # Function to handle homepage navigation
 def render_homepage():
