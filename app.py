@@ -22,6 +22,30 @@ def get_snowflake_connection_params():
         "schema": st.secrets["snowflake"]["schema"]
     }
 
+def calculate_cr_sfy():
+    session = Session.builder.configs(get_snowflake_connection_params()).create()
+
+    # Load data from CR_SFY_SOURCE table
+    df = session.table("CR_SFY_SOURCE").to_pandas()
+
+    # Calculate CR_SFY for each time period
+    epsilon = 1e-6  # Avoid division by zero
+    cr_sfy = np.array([1 / np.sum((df.iloc[t]["RISK_SCORE"] - df.iloc[t]["MIN_RISK_SCORE"]) / 
+                                  (df.iloc[t]["MAX_RISK_SCORE"] - df.iloc[t]["MIN_RISK_SCORE"] + epsilon))
+                       for t in range(len(df))])
+
+    # Create DataFrame with TIME and CR_SFY
+    df_cr_sfy = pd.DataFrame({
+        "TIME": df["TIME"],
+        "CR_SFY": cr_sfy
+    })
+
+    # Save the calculated CR_SFY to CALC_CR_SF table in Snowflake
+    session.write_pandas(df_cr_sfy, "CALC_CR_SF", mode="overwrite")
+    session.close()
+
+    return df_cr_sfy
+
 # General function to load data from Snowflake
 def load_data_from_snowflake(table_name):
     session = Session.builder.configs(get_snowflake_connection_params()).create()
@@ -188,4 +212,3 @@ elif st.session_state['page'] == 'upload_data':
     render_upload_data_page()
 elif st.session_state['page'] == 'visualizations':
     render_visualizations_page()
-   
