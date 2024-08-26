@@ -6,7 +6,7 @@ import tempfile
 import logging
 from io import BytesIO
 from snowflake.snowpark import Session
-from criterion_factors_logic import generate_safety_data, generate_environmental_impact_data, generate_social_acceptance_data, generate_technical_feasibility_data, generate_regulatory_approval_data
+from criterion_factors_logic import generate_safety_data, generate_environmental_impact_data, generate_social_acceptance_data, generate_technical_feasibility_data, generate_regulatory_approval_data, generate_quantum_factor_data
 
 # Configure logging
 logging.basicConfig(level=logging.DEBUG)
@@ -142,6 +142,26 @@ def calculate_cr_reg():
     
     return df_result
 
+def calculate_cr_qmf(df_source):
+
+    session = Session.builder.configs(get_snowflake_connection_params()).create()
+
+    df_source = session.table("CR_QMF_SOURCE").to_pandas()
+    st.write("DF is defined")
+
+    df_result = pd.DataFrame()
+    df_result['TIME'] = df_source['TIME']
+
+    # Calculate CR_QMF using the provided formula
+    df_result['CR_QMF'] = df_source['DISRUPTIVE_TECH_USED'].astype(int) / df_source['TOTAL_DISRUPTIVE_TECH']
+
+    # Ensure CR_QMF is in the range [0, 1]
+    df_result['CR_QMF'] = df_result['CR_QMF'].clip(0, 1)
+
+    st.write("df_result is created")      
+    
+    return df_result
+
 def load_data_from_snowflake(table_name):
     session = Session.builder.configs(get_snowflake_connection_params()).create()
     df = session.table(table_name).to_pandas()
@@ -215,7 +235,7 @@ def render_upload_data_page():
     st.title("Upload Data to Ecosystem")
 
     # Criterion selection
-    criterion = st.selectbox("Select Criterion", ["Safety", "Environmental Impact", "Social Acceptance", "Technical Feasibility", "Regulatory Approval"])
+    criterion = st.selectbox("Select Criterion", ["Safety", "Environmental Impact", "Social Acceptance", "Technical Feasibility", "Regulatory Approval", "Quantum Factor"])
 
     source_table_mapping = {
         "Safety": "CR_SFY_SOURCE",
@@ -223,6 +243,7 @@ def render_upload_data_page():
         "Social Acceptance": "CR_SAC_SOURCE",
         "Technical Feasibility": "CR_TFE_SOURCE",
         "Regulatory Approval": "CR_REG_SOURCE",
+        "Quantum Factor": "CR_QMF_SOURCE",
     }
 
     criterion_table_mapping = {
@@ -231,6 +252,7 @@ def render_upload_data_page():
         "Social Acceptance": "CALC_CR_SAC",
         "Technical Feasibility": "CALC_CR_TFE",
         "Regulatory Approval": "CALC_CR_REG",
+        "Quantum Factor": "CALC_QMF_REG",
     }    
 
     generate_function_mapping = {
@@ -239,6 +261,7 @@ def render_upload_data_page():
         "Social Acceptance": generate_social_acceptance_data,
         "Technical Feasibility": generate_technical_feasibility_data,
         "Regulatory Approval": generate_regulatory_approval_data,
+        "Quantum Factor": generate_quantum_factor_data,
     }
 
     criterion_function_mapping = {
@@ -247,6 +270,7 @@ def render_upload_data_page():
         "Social Acceptance": calculate_cr_sac,
         "Technical Feasibility": calculate_cr_tfe,
         "Regulatory Approval": calculate_cr_reg,
+        "Quantum Factor": calculate_cr_qmf,
     }    
 
     selected_source_table = source_table_mapping.get(criterion, "CR_SFY_SOURCE")
@@ -340,7 +364,7 @@ def render_visualizations_page():
         fig = px.line(df_summary, x="TIME", y="CR_TFE", title="CR_TFE over Time")
         st.plotly_chart(fig)
 
-    if st.button("Regulatory approval"):
+    if st.button("Regulatory Approval"):
         df_source = load_data_from_snowflake("CR_REG_SOURCE")
         df_summary = load_data_from_snowflake("CALC_CR_REG")
 
@@ -349,6 +373,17 @@ def render_visualizations_page():
             st.plotly_chart(fig)
 
         fig = px.line(df_summary, x="TIME", y="CR_REG", title="CR_REG over Time")
+        st.plotly_chart(fig)
+
+    if st.button("Quantum Factor"):
+        df_source = load_data_from_snowflake("CR_QMF_SOURCE")
+        df_summary = load_data_from_snowflake("CALC_CR_QMF")
+
+        for component in ["DISRUPTIVE_TECH_USED", "TOTAL_DISRUPTIVE_TECH"]:
+            fig = px.line(df_source, x="TIME", y=component, title=f"{component} over Time")
+            st.plotly_chart(fig)
+
+        fig = px.line(df_summary, x="TIME", y="CR_QMF", title="CR_REG over Time")
         st.plotly_chart(fig)        
 
     if st.button("⬅️ Back"):

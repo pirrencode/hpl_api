@@ -110,3 +110,16 @@ def generate_regulatory_approval_data(time_periods=100):
     })
 
     return data
+
+def generate_quantum_factor_data(time_periods=100):
+    time = np.arange(time_periods)
+    disruptive_tech_used = np.random.choice([True, False], time_periods)
+    total_disruptive_tech = np.random.randint(1, 10, time_periods)
+
+    data = pd.DataFrame({
+        'TIME': time,
+        'DISRUPTIVE_TECH_USED': disruptive_tech_used,
+        'TOTAL_DISRUPTIVE_TECH': total_disruptive_tech
+    })
+
+    return data
