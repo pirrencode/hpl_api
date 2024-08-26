@@ -142,7 +142,7 @@ def calculate_cr_reg():
     
     return df_result
 
-def calculate_cr_qmf(df_source):
+def calculate_cr_qmf():
 
     session = Session.builder.configs(get_snowflake_connection_params()).create()
 
