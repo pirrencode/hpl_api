@@ -1,36 +1,38 @@
 import numpy as np
 import pandas as pd
 
-def generate_safety_data(time_steps=100):
-    """
-    Generates Safety criterion data.
-    
-    Args:
-    - time_steps (int): The number of time steps to generate data for.
-    
-    Returns:
-    - DataFrame: A Pandas DataFrame containing the generated data.
-    """
-    risk_scores = np.random.rand(time_steps, 5)  # Simulate risk scores for 5 components
-    min_risks = risk_scores.min(axis=0)
-    max_risks = risk_scores.max(axis=0)
+import numpy as np
+import pandas as pd
 
-    # Calculate Safety Criterion
-    safety_criterion = np.zeros(time_steps)
-    for t in range(time_steps):
-        safety_criterion[t] = 1 / np.sum((risk_scores[t, :] - min_risks) / (max_risks - min_risks))
+def generate_safety_data(time_periods=100):
+    np.random.seed(42)  # Seed for reproducibility
+    
+    # Simulate time periods
+    time = np.arange(0, time_periods)
 
-    # Create a DataFrame
+    # Generate risk scores between 0 and 1
+    risk_scores = np.random.rand(time_periods, 5)  # Assuming 5 risk components
+
+    # Compute the min and max risk scores across all components
+    min_risks = risk_scores.min(axis=1)
+    max_risks = risk_scores.max(axis=1)
+
+    # Calculate CR_SFY using the formula provided
+    # Avoid division by zero by adding a small epsilon value
+    epsilon = 1e-6
+    cr_sfy = np.array([1 / np.sum((risk_scores[t, :] - min_risks[t]) / 
+                                  (max_risks[t] - min_risks[t] + epsilon))
+                       for t in range(time_periods)])
+
+    # Create DataFrame according to the new schema
     df = pd.DataFrame({
-        "TIME": np.arange(time_steps),
-        "RISK_SCORE_COMPONENT_1": risk_scores[:, 0],
-        "RISK_SCORE_COMPONENT_2": risk_scores[:, 1],
-        "RISK_SCORE_COMPONENT_3": risk_scores[:, 2],
-        "RISK_SCORE_COMPONENT_4": risk_scores[:, 3],
-        "RISK_SCORE_COMPONENT_5": risk_scores[:, 4],
-        "SAFETY_CRITERION": safety_criterion
+        "TIME": time,
+        "RISK_SCORE": risk_scores.mean(axis=1),  # Average risk score for each time period
+        "MIN_RISK_SCORE": min_risks,
+        "MAX_RISK_SCORE": max_risks,
+        "CR_SFY": cr_sfy
     })
-    
+
     return df
 
 def generate_environmental_impact_data(time_periods=100):
