@@ -11,7 +11,26 @@ from criterion_factors_logic import generate_safety_data, generate_environmental
 # Configure logging
 logging.basicConfig(level=logging.INFO)
 
-# Set up Snowflake connection parameters (parameterized for reusability)
+##################################
+# CSS Style
+##################################
+
+st.markdown("""
+    <style>
+    .stButton button {
+        font-size: 20px;
+        padding: 15px 50px;
+        width: 100%;
+        margin-bottom: 10px;
+        border-radius: 10px;
+    }
+    </style>
+    """, unsafe_allow_html=True)
+
+###########################################
+# Snowflake connection parameters
+###########################################
+
 def get_snowflake_connection_params():
     return {
         "account": st.secrets["snowflake"]["account"],
