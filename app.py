@@ -569,41 +569,87 @@ def visualize_all_success_factors():
         with cols[col_idx]:  # Place the figure in the corresponding column
             st.plotly_chart(fig)
 
-def compute_dmmi_factors(df):
-    df['Governance_and_Management'] = df[['CR_REG', 'CR_TFE', 'CR_SFY']].mean(axis=1)
-    df['Strategy_and_Planning'] = df[['CR_TFE', 'CR_ENV', 'CR_ECV']].mean(axis=1)
-    df['Technology_and_Infrastructure'] = df[['CR_TFE', 'CR_INF', 'CR_RLB']].mean(axis=1)
-    df['Processes_and_Methodologies'] = df[['CR_SFY', 'CR_TFE']].mean(axis=1)
-    df['People_and_Culture'] = df[['CR_SAC', 'CR_USB']].mean(axis=1)
-    df['Data_and_Information_Management'] = df[['CR_QMF', 'CR_RLB']].mean(axis=1)
-    df['Performance_Measurement'] = df[['CR_ECV', 'CR_USB']].mean(axis=1)
-    df['Project_Maturity_Level'] = df.mean(axis=1)  # Example: Average of all DMMI factors
-
-    return df            
-
 import plotly.express as px
 
-def visualize_dmmi_dashboard():
-    # Step 1: Establish Snowflake session and load data from HPL_SD_CRS
-    session = Session.builder.configs(get_snowflake_connection_params()).create()
-    hpl_sd_crs_df = session.table("HPL_SD_CRS").to_pandas()
-
-    # Step 2: Compute DMMI factors
-    dmmi_df = compute_dmmi_factors(hpl_sd_crs_df)
-
-    # Step 3: Define the DMMI factors to visualize
-    dmmi_factors = ['Governance_and_Management', 'Strategy_and_Planning', 'Technology_and_Infrastructure',
-                    'Processes_and_Methodologies', 'People_and_Culture', 'Data_and_Information_Management',
-                    'Performance_Measurement', 'Project_Maturity_Level']
-
-    # Step 4: Create subplots for each factor, 4 in a row
-    cols = st.columns(4)  # Creates four columns to place graphs side by side
+def calculate_maturity_level(dmmi_df):
+    # Normalize each DMMI factor (ensure values are between 0 and 1)
+    dmmi_df['Governance and Management'] = dmmi_df['Governance and Management'].clip(0, 1)
+    dmmi_df['Strategy and Planning'] = dmmi_df['Strategy and Planning'].clip(0, 1)
+    dmmi_df['Technology and Infrastructure'] = dmmi_df['Technology and Infrastructure'].clip(0, 1)
+    dmmi_df['Processes and Methodologies'] = dmmi_df['Processes and Methodologies'].clip(0, 1)
+    dmmi_df['People and Culture'] = dmmi_df['People and Culture'].clip(0, 1)
+    dmmi_df['Data and Information Management'] = dmmi_df['Data and Information Management'].clip(0, 1)
+    dmmi_df['Performance Measurement'] = dmmi_df['Performance Measurement'].clip(0, 1)
     
-    for i, factor in enumerate(dmmi_factors):
+    # Assign weights to each factor (weights sum to 1)
+    weights = {
+        'Governance and Management': 0.15,
+        'Strategy and Planning': 0.15,
+        'Technology and Infrastructure': 0.15,
+        'Processes and Methodologies': 0.15,
+        'People and Culture': 0.15,
+        'Data and Information Management': 0.15,
+        'Performance Measurement': 0.10,
+    }
+    
+    # Calculate weighted maturity level score (before scaling)
+    dmmi_df['Maturity Level'] = (
+        dmmi_df['Governance and Management'] * weights['Governance and Management'] +
+        dmmi_df['Strategy and Planning'] * weights['Strategy and Planning'] +
+        dmmi_df['Technology and Infrastructure'] * weights['Technology and Infrastructure'] +
+        dmmi_df['Processes and Methodologies'] * weights['Processes and Methodologies'] +
+        dmmi_df['People and Culture'] * weights['People and Culture'] +
+        dmmi_df['Data and Information Management'] * weights['Data and Information Management'] +
+        dmmi_df['Performance Measurement'] * weights['Performance Measurement']
+    )
+    
+    # Scale maturity level to range [1, 5]
+    dmmi_df['Maturity Level'] = 1 + 4 * dmmi_df['Maturity Level']
+    
+    return dmmi_df
+
+def visualize_ddmi_factors(dmmi_df):
+    # Define columns layout
+    cols = st.columns(4)  # Four columns for dashboard layout
+    
+    # Plot each DMMI factor
+    factors = [
+        'Governance and Management', 'Strategy and Planning', 
+        'Technology and Infrastructure', 'Processes and Methodologies',
+        'People and Culture', 'Data and Information Management',
+        'Performance Measurement', 'Maturity Level'
+    ]
+    
+    for i, factor in enumerate(factors):
         fig = px.line(dmmi_df, x='TIME', y=factor, title=f"{factor} over Time")
         col_idx = i % 4  # Get column index: 0, 1, 2, 3
         with cols[col_idx]:  # Place the figure in the corresponding column
-            st.plotly_chart(fig)            
+            st.plotly_chart(fig)
+
+def render_ddmi_dashboard():
+    st.title("DMMI Factors and Project Maturity Level Visualization")
+    
+    # Load data from HPL_SD_CRS
+    session = Session.builder.configs(get_snowflake_connection_params()).create()
+    hpl_sd_crs_df = session.table("HPL_SD_CRS").to_pandas()
+
+    # Calculate DMMI factors (example logic, adjust as per your data)
+    dmmi_df = pd.DataFrame({
+        'TIME': hpl_sd_crs_df['TIME'],
+        'Governance and Management': hpl_sd_crs_df[['CR_REG', 'CR_TFE', 'CR_SFY']].mean(axis=1),
+        'Strategy and Planning': hpl_sd_crs_df[['CR_TFE', 'CR_ENV', 'CR_ECV']].mean(axis=1),
+        'Technology and Infrastructure': hpl_sd_crs_df[['CR_TFE', 'CR_INF', 'CR_RLB']].mean(axis=1),
+        'Processes and Methodologies': hpl_sd_crs_df[['CR_SFY', 'CR_TFE']].mean(axis=1),
+        'People and Culture': hpl_sd_crs_df[['CR_SAC', 'CR_USB']].mean(axis=1),
+        'Data and Information Management': hpl_sd_crs_df[['CR_QMF', 'CR_RLB']].mean(axis=1),
+        'Performance Measurement': hpl_sd_crs_df[['CR_ECV', 'CR_USB']].mean(axis=1)
+    })
+
+    # Calculate final maturity level
+    dmmi_df = calculate_maturity_level(dmmi_df)
+
+    # Display DMMI factor visualizations and overall maturity level
+    visualize_ddmi_factors(dmmi_df)          
 
 ########################
 # Visualizations page
