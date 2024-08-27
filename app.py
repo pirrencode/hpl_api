@@ -6,7 +6,7 @@ import tempfile
 import logging
 from io import BytesIO
 from snowflake.snowpark import Session
-from criterion_factors_logic import generate_safety_data, generate_environmental_impact_data, generate_social_acceptance_data, generate_technical_feasibility_data, generate_regulatory_approval_data, generate_quantum_factor_data, generate_economic_viability_data, generate_usability_data, generate_reliability_data, generate_infrastructure_integration_data
+from criterion_factors_logic import generate_safety_data, generate_environmental_impact_data, generate_social_acceptance_data, generate_technical_feasibility_data, generate_regulatory_approval_data, generate_quantum_factor_data, generate_economic_viability_data, generate_usability_data, generate_reliability_data, generate_infrastructure_integration_data, generate_scalability_data
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -269,6 +269,30 @@ def calculate_cr_inf():
     
     return calc_df
 
+def calculate_cr_scl():
+    session = Session.builder.configs(get_snowflake_connection_params()).create()
+    
+    cr_scl_source_df = session.table("CR_SCL_SOURCE").to_pandas()
+    st.write("CR_SCL_SOURCE DataFrame Loaded")
+    
+    calc_data = []
+    
+    for _, row in cr_scl_source_df.iterrows():
+        time = int(row['TIME'])
+        L1 = float(row['RESOURCE_MILEAGE'])
+        Q = float(row['PLANNED_VOLUME'])
+        K1 = float(row['ADJUSTMENT_COEF_1'])
+        K2 = float(row['ADJUSTMENT_COEF_2'])
+        K3 = float(row['ADJUSTMENT_COEF_3'])
+
+        cr_scl = max(0, min((L1 * Q * K1 * K2 * K3) ** (1/3), 1))
+        
+        calc_data.append({"TIME": time, "CR_SCL": cr_scl})
+    
+    calc_df = pd.DataFrame(calc_data)
+    
+    return calc_df
+
 def load_data_from_snowflake(table_name):
     session = Session.builder.configs(get_snowflake_connection_params()).create()
     df = session.table(table_name).to_pandas()
@@ -352,6 +376,7 @@ def render_upload_data_page():
                                                   "Usability",
                                                   "Reliability",
                                                   "Infrastructure Integration",
+                                                  "Scalability",
                                                   ])
 
     source_table_mapping = {
@@ -365,6 +390,7 @@ def render_upload_data_page():
         "Usability": "CR_USB_SOURCE",
         "Reliability": "CR_RLB_SOURCE",
         "Infrastructure Integration": "CR_INF_SOURCE",
+        "Scalability": "CR_SCL_SOURCE",
     }
 
     criterion_table_mapping = {
@@ -378,6 +404,7 @@ def render_upload_data_page():
         "Usability": "CALC_CR_USB",
         "Reliability": "CALC_CR_RLB",
         "Infrastructure Integration": "CALC_CR_INF",
+        "Scalability": "CALC_CR_SCL",
     }    
 
     generate_function_mapping = {
@@ -391,6 +418,7 @@ def render_upload_data_page():
         "Usability": generate_usability_data,
         "Reliability": generate_reliability_data,
         "Infrastructure Integration": generate_infrastructure_integration_data,
+        "Scalability": generate_scalability_data,
     }
 
     criterion_function_mapping = {
@@ -404,6 +432,7 @@ def render_upload_data_page():
         "Usability": calculate_cr_usb,
         "Reliability": calculate_cr_rlb,
         "Infrastructure Integration": calculate_cr_inf,
+        "Scalability": calculate_cr_scl,
     }    
 
     selected_source_table = source_table_mapping.get(criterion, "CR_SFY_SOURCE")
@@ -561,7 +590,7 @@ def render_visualizations_page():
         for component in ["DURABILITY", "DIGITAL_RELIABILITY", "WEATHER_DISASTER_RESILIENCE", "POLLUTION_PRODUCED"]:
             component_visualization(df_source,component)
 
-        criterion_visualization(df_summary, crt)               
+        criterion_visualization(df_summary, crt)
 
     if st.button("Infrastructure Integration"):
         crt = "INF"
@@ -571,7 +600,17 @@ def render_visualizations_page():
         for component in ["COMMON_INFRA_FEATURES", "CONSTRUCTION_BARRIERS", "INTERMODAL_CONNECTIONS", "INFRA_ADAPTABILITY_FEATURES"]:
             component_visualization(df_source,component)
 
-        criterion_visualization(df_summary, crt)         
+        criterion_visualization(df_summary, crt)
+
+    if st.button("Scalability"):
+        crt = "SCL"
+        df_source = load_data_from_snowflake(f"CR_{crt}_SOURCE")
+        df_summary = load_data_from_snowflake(f"CALC_CR_{crt}")
+
+        for component in ["RESOURCE_MILEAGE", "PLANNED_VOLUME", "ADJUSTMENT_COEF_1", "ADJUSTMENT_COEF_2", "ADJUSTMENT_COEF_3"]:
+            component_visualization(df_source,component)
+
+        criterion_visualization(df_summary, crt)        
 
     if st.button("⬅️ Back"):
         st.session_state['page'] = 'home'        

@@ -207,3 +207,16 @@ def generate_infrastructure_integration_data(time_periods=100):
     
     df = pd.DataFrame(data)
     return df
+
+def generate_scalability_data(time_periods=100):
+    data = {
+        "TIME": list(range(1, time_periods + 1)),
+        "RESOURCE_MILEAGE": [round(random.uniform(0.5, 1.5), 2) for _ in range(time_periods)],    # L1: values between 0.5 and 1.5
+        "PLANNED_VOLUME": [round(random.uniform(0.5, 1.5), 2) for _ in range(time_periods)],      # Q: values between 0.5 and 1.5
+        "ADJUSTMENT_COEF_1": [round(random.uniform(0.5, 1.5), 2) for _ in range(time_periods)],   # K1: values between 0.5 and 1.5
+        "ADJUSTMENT_COEF_2": [round(random.uniform(0.5, 1.5), 2) for _ in range(time_periods)],   # K2: values between 0.5 and 1.5
+        "ADJUSTMENT_COEF_3": [round(random.uniform(0.5, 1.5), 2) for _ in range(time_periods)]    # K3: values between 0.5 and 1.5
+    }
+    
+    df = pd.DataFrame(data)
+    return df
