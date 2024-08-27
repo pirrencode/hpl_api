@@ -9,7 +9,7 @@ from snowflake.snowpark import Session
 from criterion_factors_logic import generate_safety_data, generate_environmental_impact_data, generate_social_acceptance_data, generate_technical_feasibility_data, generate_regulatory_approval_data, generate_quantum_factor_data, generate_economic_viability_data
 
 # Configure logging
-logging.basicConfig(level=logging.DEBUG)
+logging.basicConfig(level=logging.INFO)
 
 # Set up Snowflake connection parameters (parameterized for reusability)
 def get_snowflake_connection_params():
@@ -438,7 +438,8 @@ def render_visualizations_page():
                           "GENERATIVE_AI", 
                           "AI_MACHINE_LEARNING", 
                           "DIGITAL_TWINS", 
-                          "FIVE_G", "QUANTUM_COMPUTING", 
+                          "FIVE_G", 
+                          "QUANTUM_COMPUTING", 
                           "AUGMENTED_REALITY", 
                           "VIRTUAL_REALITY", 
                           "PRINTING_AT_SCALE", 
