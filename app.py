@@ -629,7 +629,7 @@ def visualize_ddmi_factors(dmmi_df):
 def render_ddmi_dashboard(session):
     st.title("DMMI Factors and Project Maturity Level Visualization")
     
-    # Load data from HPL_SD_CRS using the existing Snowflake session
+    session = Session.builder.configs(get_snowflake_connection_params()).create()
     hpl_sd_crs_df = session.table("HPL_SD_CRS").to_pandas()
 
     # Calculate DMMI factors
