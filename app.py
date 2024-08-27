@@ -626,14 +626,13 @@ def visualize_ddmi_factors(dmmi_df):
         with cols[col_idx]:  # Place the figure in the corresponding column
             st.plotly_chart(fig)
 
-def render_ddmi_dashboard():
+def render_ddmi_dashboard(session):
     st.title("DMMI Factors and Project Maturity Level Visualization")
     
-    # Load data from HPL_SD_CRS
-    session = Session.builder.configs(get_snowflake_connection_params()).create()
+    # Load data from HPL_SD_CRS using the existing Snowflake session
     hpl_sd_crs_df = session.table("HPL_SD_CRS").to_pandas()
 
-    # Calculate DMMI factors (example logic, adjust as per your data)
+    # Calculate DMMI factors
     dmmi_df = pd.DataFrame({
         'TIME': hpl_sd_crs_df['TIME'],
         'Governance and Management': hpl_sd_crs_df[['CR_REG', 'CR_TFE', 'CR_SFY']].mean(axis=1),
