@@ -390,7 +390,10 @@ def save_data_to_snowflake(df, table_name):
 
     st.success(f"Data successfully saved to {table_name} in Snowflake!")
 
-# Function to handle homepage navigation
+##############################################################
+# HOMEPAGE RENDERING
+##############################################################
+
 def render_homepage():
     st.title("HDME")
     st.subheader("v0.04-dev")
@@ -410,7 +413,10 @@ def render_homepage():
         if st.button("📊\n\nHyperloop Project System Dynamics Project", use_container_width=True):
             st.session_state['page'] = 'visualizations'
 
-# Function to handle the data upload and management page
+##############################################################
+# Data upload and management page
+##############################################################
+
 def render_upload_data_page():
     st.title("Upload Data to Ecosystem")
 
@@ -534,6 +540,10 @@ def render_upload_data_page():
     if st.button("⬅️ Back"):
         st.session_state['page'] = 'home'
 
+#############################
+# HELPERS FOR VISUALIZATION
+#############################
+
 def component_visualization(df_source, component):
     fig = px.line(df_source, x="TIME", y=component, title=f"{component} over Time")
     st.plotly_chart(fig)
@@ -566,7 +576,7 @@ def visualize_all_success_factors():
 def render_visualizations_page():
     st.title("Hyperloop Project System Dynamics Dashboard")
 
-    if st.button("Visualize all success factors criterions"):
+    if st.button("HYPERLOOP SUCCESS FACTORS DASHBOARD"):
         visualize_all_success_factors()
 
     if st.button("Visualize Safety Criterion"):
@@ -695,7 +705,7 @@ def render_visualizations_page():
         st.session_state['page'] = 'home'        
 
 ########################
-# Application naivgation
+# APPLICATION NAVIGATION
 ########################
 
 if 'page' not in st.session_state:
