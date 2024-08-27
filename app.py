@@ -342,6 +342,53 @@ def populate_hpl_sd_crs():
 
     return combined_df
 
+def save_data_to_snowflake_without_index(df, table_name):
+    session = None
+    try:
+        # Step 1: Save DataFrame to an in-memory CSV, excluding the index
+        csv_buffer = BytesIO()
+        df.to_csv(csv_buffer, index=False)
+        csv_buffer.seek(0)  # Reset buffer to start
+
+        # Step 2: Set up Snowflake session
+        session = Session.builder.configs(get_snowflake_connection_params()).create()
+        stage_name = "my_temp_stage"
+        
+        # Step 3: Create a temporary stage in Snowflake
+        session.sql(f"CREATE TEMPORARY STAGE IF NOT EXISTS {stage_name}").collect()
+        logging.info("Temporary stage created or already exists.")
+
+        # Step 4: Upload the in-memory CSV to the Snowflake stage
+        put_result = session.file.put_stream(csv_buffer, f"@{stage_name}/temp_file.csv")
+        logging.info(f"PUT command result: {put_result}")
+
+        # Step 5: Truncate the target table in Snowflake
+        delete_data = session.sql(f"TRUNCATE TABLE IF EXISTS {table_name}").collect()
+        logging.info(f"TRUNCATE command result: {delete_data}")
+
+        # Step 6: Load the data from the stage into the target table
+        copy_result = session.sql(f"""
+            COPY INTO {table_name}
+            FROM @{stage_name}/temp_file.csv
+            FILE_FORMAT = (TYPE = 'CSV' FIELD_OPTIONALLY_ENCLOSED_BY='"' SKIP_HEADER=1)
+        """).collect()
+        logging.info(f"COPY command result: {copy_result}")
+
+        # Step 7: Clean up the stage by removing the file
+        session.sql(f"REMOVE @{stage_name}/temp_file.csv").collect()
+        logging.info("Temporary file removed from stage.")
+
+    except Exception as e:
+        logging.error(f"Error saving data to Snowflake: {e}")
+        st.error(f"An error occurred while saving data to Snowflake: {str(e)}")
+    
+    finally:
+        if session:
+            session.close()
+        csv_buffer.close()
+
+    st.success(f"Data successfully saved to {table_name} in Snowflake!")
+
 def load_data_from_snowflake(table_name):
     session = Session.builder.configs(get_snowflake_connection_params()).create()
     df = session.table(table_name).to_pandas()
@@ -528,7 +575,7 @@ def render_upload_data_page():
         df = populate_hpl_sd_crs()
         st.write(f"Criterion data preview.")
         st.dataframe(df.head())
-        save_data_to_snowflake(df, selected_criterion_table)
+        save_data_to_snowflake_without_index(df, selected_criterion_table)
         st.write(f"Table population completed. Please proceed to visualization tab")
 
     if st.button("⬅️ Back"):
