@@ -391,7 +391,7 @@ def save_data_to_snowflake(df, table_name):
     st.success(f"Data successfully saved to {table_name} in Snowflake!")
 
 ##############################################################
-# HOMEPAGE RENDERING
+# HOMEPAGE CREATION
 ##############################################################
 
 def render_homepage():
@@ -412,6 +412,9 @@ def render_homepage():
     with col2:
         if st.button("📊\n\nHyperloop Project System Dynamics Project", use_container_width=True):
             st.session_state['page'] = 'visualizations'
+
+    if st.button("SCENARIOS SIMULATION 🌐"):
+        render_scenarios_simulation_page()            
 
 ##############################################################
 # Data upload and management page
@@ -788,9 +791,129 @@ def render_visualizations_page():
     if st.button("⬅️ Back"):
         st.session_state['page'] = 'home'        
 
-########################
+#######################################
+# SCENARIOUS SIMULATIONS
+#######################################
+
+from simulation_scenarios import (
+    generate_cr_env_data, generate_cr_sac_data, generate_cr_tfe_data, 
+    generate_cr_sfy_data, generate_cr_reg_data, generate_cr_qmf_data,
+    generate_cr_ecv_data, generate_cr_usb_data, generate_cr_rlb_data,
+    generate_cr_inf_data, generate_cr_scl_data
+)
+
+def generate_rapid_decline_scenario():
+    # session = Session.builder.configs(get_snowflake_connection_params()).create()
+
+    # Generate data for each criterion
+    cr_env_df = generate_cr_env_data()
+    cr_sac_df = generate_cr_sac_data()
+    cr_tfe_df = generate_cr_tfe_data()
+    cr_sfy_df = generate_cr_sfy_data()
+    cr_reg_df = generate_cr_reg_data()
+    cr_qmf_df = generate_cr_qmf_data()
+    cr_ecv_df = generate_cr_ecv_data()
+    cr_usb_df = generate_cr_usb_data()
+    cr_rlb_df = generate_cr_rlb_data()
+    cr_inf_df = generate_cr_inf_data()
+    cr_scl_df = generate_cr_scl_data()
+
+    # Save generated data to Snowflake
+    save_data_to_snowflake(cr_env_df, "CR_ENV_SOURCE")
+    save_data_to_snowflake(cr_sac_df, "CR_SAC_SOURCE")
+    save_data_to_snowflake(cr_tfe_df, "CR_TFE_SOURCE")
+    save_data_to_snowflake(cr_sfy_df, "CR_SFY_SOURCE")
+    save_data_to_snowflake(cr_reg_df, "CR_REG_SOURCE")
+    save_data_to_snowflake(cr_qmf_df, "CR_QMF_SOURCE")
+    save_data_to_snowflake(cr_ecv_df, "CR_ECV_SOURCE")
+    save_data_to_snowflake(cr_usb_df, "CR_USB_SOURCE")
+    save_data_to_snowflake(cr_rlb_df, "CR_RLB_SOURCE")
+    save_data_to_snowflake(cr_inf_df, "CR_INF_SOURCE")
+    save_data_to_snowflake(cr_scl_df, "CR_SCL_SOURCE")
+
+    # Calculate the CALC_CR_* tables
+    rapid_df_env = calculate_cr_env()
+    st.write(f"Criterion rapid_df_env data loaded.")
+    st.dataframe(rapid_df_env.head())
+    save_data_to_snowflake(rapid_df_env, "CALC_CR_ENV")   
+
+    rapid_df_sac = calculate_cr_sac()
+    st.write(f"Criterion rapid_df_sac data loaded.")
+    st.dataframe(rapid_df_sac.head())
+    save_data_to_snowflake(rapid_df_sac, "CALC_CR_ENV")  
+
+    rapid_df_tfe = calculate_cr_tfe()
+    st.write(f"Criterion rapid_df_tfe data loaded.")
+    st.dataframe(rapid_df_tfe.head())
+    save_data_to_snowflake(rapid_df_tfe, "CALC_CR_TFE")  
+
+    rapid_df_sfy = calculate_cr_sfy()
+    st.write(f"Criterion rapid_df_sfy data loaded.")
+    st.dataframe(rapid_df_sfy.head())
+    save_data_to_snowflake(rapid_df_sfy, "CALC_CR_SFY") 
+
+    rapid_df_reg = calculate_cr_reg()
+    st.write(f"Criterion rapid_df_reg data loaded.")
+    st.dataframe(rapid_df_reg.head())
+    save_data_to_snowflake(rapid_df_reg, "CALC_CR_REG")  
+
+    rapid_df_qmf = calculate_cr_qmf()
+    st.write(f"Criterion rapid_df_qmf data loaded.")
+    st.dataframe(rapid_df_qmf.head())
+    save_data_to_snowflake(rapid_df_qmf, "CALC_CR_QMF")  
+
+    rapid_df_ecv = calculate_cr_ecv()
+    st.write(f"Criterion rapid_df_ecv data loaded.")
+    st.dataframe(rapid_df_ecv.head())
+    save_data_to_snowflake(rapid_df_ecv, "CALC_CR_ECV") 
+
+    rapid_df_usb = calculate_cr_usb()
+    st.write(f"Criterion rapid_df_usb data loaded.")
+    st.dataframe(rapid_df_usb.head())
+    save_data_to_snowflake(rapid_df_usb, "CALC_CR_USB")  
+
+    rapid_df_rlb = calculate_cr_rlb()
+    st.write(f"Criterion rapid_df_rlb data loaded.")
+    st.dataframe(rapid_df_rlb.head())
+    save_data_to_snowflake(rapid_df_rlb, "CALC_CR_RLB")        
+    
+    rapid_df_inf = calculate_cr_inf()
+    st.write(f"Criterion rapid_df_rlb data loaded.")
+    st.dataframe(rapid_df_rlb.head())
+    save_data_to_snowflake(rapid_df_rlb, "CALC_CR_RLB")   
+
+    rapid_df_scl = calculate_cr_scl()
+    st.write(f"Criterion rapid_df_scl data loaded.")
+    st.dataframe(rapid_df_scl.head())
+    save_data_to_snowflake(rapid_df_scl, "CALC_CR_SCL")       
+
+    st.success("Rapid Decline scenario data generated and saved.")
+
+def render_scenarios_simulation_page():
+    st.title("Simulation Scenarios 🌍")
+    
+    # Define columns layout for the buttons
+    col1, col2 = st.columns(2)
+    with col1:
+        if st.button("RAPID DECLINE 📉"):
+            generate_rapid_decline_scenario()
+
+    #     if st.button("SUSTAINABLE GROWTH 🌱"):
+    #         generate_sustainable_growth_scenario()
+    
+    # with col2:
+    #     if st.button("DECLINE OVER TIME ⏳"):
+    #         generate_decline_over_time_scenario()
+
+    #     if st.button("RAPID GROWTH 🚀"):
+    #         generate_rapid_growth_scenario()
+
+# Function to be called from the homepage
+render_scenarios_simulation_page()
+
+#######################################
 # APPLICATION NAVIGATION
-########################
+#######################################
 
 if 'page' not in st.session_state:
     st.session_state['page'] = 'home'
