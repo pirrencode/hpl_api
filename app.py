@@ -452,16 +452,12 @@ def render_visualizations_page():
         df_source = load_data_from_snowflake(f"CR_{crt}_SOURCE")
         df_summary = load_data_from_snowflake(f"CALC_{crt}_ECV")
 
-        for component in ["REVENUE",
-                          "OPEX",
-                          "CAPEX",
-                          "DISCOUNT_RATE",
-                          "PROJECT_LIFETIME",]:
+        for component in ["REVENUE", "OPEX", "CAPEX", "DISCOUNT_RATE", "PROJECT_LIFETIME"]:
             fig = px.line(df_source, x="TIME", y=component, title=f"{component} over Time")
             st.plotly_chart(fig)
 
         fig = px.line(df_summary, x="TIME", y=f"CR_{crt}", title=f"CR_{crt} over Time")
-        st.plotly_chart(fig)               
+        st.plotly_chart(fig)            
 
     if st.button("⬅️ Back"):
         st.session_state['page'] = 'home'
