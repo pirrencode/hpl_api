@@ -1,6 +1,7 @@
 import numpy as np
 import pandas as pd
 import streamlit as st
+import random
 
 def generate_safety_data(time_periods=100):
 
@@ -154,3 +155,19 @@ def generate_quantum_factor_data(time_periods=100):
     })
 
     return data
+
+def generate_economic_viability_data(time_periods=100):
+
+    data = {
+        "TIME": list(range(1, time_periods + 1)),
+        "REVENUE": [round(random.uniform(100000, 500000), 2) for _ in range(time_periods)],
+        "OPEX": [round(random.uniform(50000, 200000), 2) for _ in range(time_periods)],
+        "CAPEX": [round(random.uniform(1000000, 5000000), 2) for _ in range(time_periods)],
+        "DISCOUNT_RATE": [round(random.uniform(0.01, 0.1), 2) for _ in range(time_periods)],
+        "PROJECT_LIFETIME": [random.randint(10, 30) for _ in range(time_periods)]
+    }
+    
+
+    df = pd.DataFrame(data)
+    
+    return df

@@ -6,7 +6,7 @@ import tempfile
 import logging
 from io import BytesIO
 from snowflake.snowpark import Session
-from criterion_factors_logic import generate_safety_data, generate_environmental_impact_data, generate_social_acceptance_data, generate_technical_feasibility_data, generate_regulatory_approval_data, generate_quantum_factor_data
+from criterion_factors_logic import generate_safety_data, generate_environmental_impact_data, generate_social_acceptance_data, generate_technical_feasibility_data, generate_regulatory_approval_data, generate_quantum_factor_data, generate_economic_viability_data
 
 # Configure logging
 logging.basicConfig(level=logging.DEBUG)
@@ -162,6 +162,38 @@ def calculate_cr_qmf():
     
     return df_result
 
+def calculate_cr_ecv():
+
+    session = Session.builder.configs(get_snowflake_connection_params()).create()
+
+    cr_ecv_source_df = session.table("CR_QMF_SOURCE").to_pandas()
+    st.write("DF is defined")
+
+    calc_data = []
+    
+    # Iterate over the rows of the CR_ECV_SOURCE DataFrame
+    for _, row in cr_ecv_source_df.iterrows():
+        time = row['TIME']
+        revenue = row['REVENUE']
+        opex = row['OPEX']
+        capex = row['CAPEX']
+        discount_rate = row['DISCOUNT_RATE']
+        project_lifetime = row['PROJECT_LIFETIME']
+        
+        # Calculate NPV
+        npv = sum((revenue - opex) / ((1 + discount_rate) ** t) for t in range(1, project_lifetime + 1))
+        
+        # Calculate CR_ECV, ensuring it is within the range [0, 1]
+        cr_ecv = max(0, min(npv / capex, 1))
+        
+        # Append the results to the list
+        calc_data.append({"TIME": time, "CR_ECV": cr_ecv})
+    
+    # Convert the list to a DataFrame
+    calc_df = pd.DataFrame(calc_data)
+    
+    return calc_df
+
 def load_data_from_snowflake(table_name):
     session = Session.builder.configs(get_snowflake_connection_params()).create()
     df = session.table(table_name).to_pandas()
@@ -235,7 +267,14 @@ def render_upload_data_page():
     st.title("Upload Data to Ecosystem")
 
     # Criterion selection
-    criterion = st.selectbox("Select Criterion", ["Safety", "Environmental Impact", "Social Acceptance", "Technical Feasibility", "Regulatory Approval", "Quantum Factor"])
+    criterion = st.selectbox("Select Criterion", ["Safety", 
+                                                  "Environmental Impact", 
+                                                  "Social Acceptance", 
+                                                  "Technical Feasibility", 
+                                                  "Regulatory Approval", 
+                                                  "Quantum Factor",
+                                                  "Economical Viability",
+                                                  ])
 
     source_table_mapping = {
         "Safety": "CR_SFY_SOURCE",
@@ -244,6 +283,7 @@ def render_upload_data_page():
         "Technical Feasibility": "CR_TFE_SOURCE",
         "Regulatory Approval": "CR_REG_SOURCE",
         "Quantum Factor": "CR_QMF_SOURCE",
+        "Economical Viability": "CR_ECV_SOURCE",
     }
 
     criterion_table_mapping = {
@@ -252,7 +292,8 @@ def render_upload_data_page():
         "Social Acceptance": "CALC_CR_SAC",
         "Technical Feasibility": "CALC_CR_TFE",
         "Regulatory Approval": "CALC_CR_REG",
-        "Quantum Factor": "CALC_CR_QMF",
+        "Quantum Factor": "CR_QMF_SOURCE",
+        "Economical Viability": "CR_ECV_SOURCE",
     }    
 
     generate_function_mapping = {
@@ -262,6 +303,7 @@ def render_upload_data_page():
         "Technical Feasibility": generate_technical_feasibility_data,
         "Regulatory Approval": generate_regulatory_approval_data,
         "Quantum Factor": generate_quantum_factor_data,
+        "Economical Viability": generate_economic_viability_data,        
     }
 
     criterion_function_mapping = {
@@ -271,6 +313,7 @@ def render_upload_data_page():
         "Technical Feasibility": calculate_cr_tfe,
         "Regulatory Approval": calculate_cr_reg,
         "Quantum Factor": calculate_cr_qmf,
+        "Economical Viability": calculate_cr_ecv,
     }    
 
     selected_source_table = source_table_mapping.get(criterion, "CR_SFY_SOURCE")
@@ -395,7 +438,23 @@ def render_visualizations_page():
             st.plotly_chart(fig)
 
         fig = px.line(df_summary, x="TIME", y="CR_QMF", title="CR_QMF over Time")
-        st.plotly_chart(fig)        
+        st.plotly_chart(fig)
+
+    if st.button("Economical Viability"):
+        crt = "ECV"
+        df_source = load_data_from_snowflake(f"CR_{crt}_SOURCE")
+        df_summary = load_data_from_snowflake(f"CALC_{crt}_ECV")
+
+        for component in ["REVENUE",
+                          "OPEX",
+                          "CAPEX",
+                          "DISCOUNT_RATE",
+                          "PROJECT_LIFETIME",]:
+            fig = px.line(df_source, x="TIME", y=component, title=f"{component} over Time")
+            st.plotly_chart(fig)
+
+        fig = px.line(df_summary, x="TIME", y=f"CR_{crt}", title=f"CR_{crt} over Time")
+        st.plotly_chart(fig)               
 
     if st.button("⬅️ Back"):
         st.session_state['page'] = 'home'
