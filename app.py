@@ -294,7 +294,7 @@ def render_upload_data_page():
     }
 
     criterion_table_mapping = {
-        "Safety": "CALC_CR_SF",
+        "Safety": "CALC_CR_SFY",
         "Environmental Impact": "CALC_CR_ENV",
         "Social Acceptance": "CALC_CR_SAC",
         "Technical Feasibility": "CALC_CR_TFE",
