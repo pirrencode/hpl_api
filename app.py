@@ -374,18 +374,11 @@ def criterion_visualization(df_summary, crt):
     fig = px.line(df_summary, x="TIME", y=f"CR_{crt}", title=f"CR_{crt} over Time")
     st.plotly_chart(fig)
 
-def load_source_for_visualization(crt):
-    df_source = load_data_from_snowflake(f"CR_{crt}_SOURCE")
-    df_summary = load_data_from_snowflake(f"CALC_CR_{crt}")
-
-    return df_source, df_summary 
-
 # Function to handle the visualizations page
 def render_visualizations_page():
     st.title("Hyperloop Project System Dynamics Dashboard")
     
     if st.button("Visualize Safety Criterion"):
-        # load_source_for_visualization("SFY")
         crt = "SFY"
         df_source = load_data_from_snowflake(f"CR_{crt}_SOURCE")
         df_summary = load_data_from_snowflake(f"CALC_CR_{crt}")
@@ -396,7 +389,7 @@ def render_visualizations_page():
         criterion_visualization(df_summary, crt) 
 
     if st.button("Visualize Environmental Impact"):
-        crt = "EMV"
+        crt = "ENV"
         df_source = load_data_from_snowflake(f"CR_{crt}_SOURCE")
         df_summary = load_data_from_snowflake(f"CALC_CR_{crt}")
 
@@ -406,8 +399,9 @@ def render_visualizations_page():
         criterion_visualization(df_summary, crt) 
 
     if st.button("Social Acceptance"):
-        df_source = load_data_from_snowflake("CR_SAC_SOURCE")
-        df_summary = load_data_from_snowflake("CALC_CR_SAC")
+        crt = "SAC"
+        df_source = load_data_from_snowflake(f"CR_{crt}_SOURCE")
+        df_summary = load_data_from_snowflake(f"CALC_CR_{crt}")
 
         for component in ["POSITIVE_FEEDBACK", "NEGATIVE_FEEDBACK"]:
             component_visualization(df_source,component)
