@@ -296,6 +296,7 @@ def calculate_cr_scl():
 def populate_hpl_sd_crs():
     session = Session.builder.configs(get_snowflake_connection_params()).create()
 
+    # Load data from each CALC_CR_* table
     cr_env_df = session.table("CALC_CR_ENV").to_pandas()
     cr_sac_df = session.table("CALC_CR_SAC").to_pandas()
     cr_tfe_df = session.table("CALC_CR_TFE").to_pandas()
@@ -308,41 +309,30 @@ def populate_hpl_sd_crs():
     cr_inf_df = session.table("CALC_CR_INF").to_pandas()
     cr_scl_df = session.table("CALC_CR_SCL").to_pandas()
 
-    # combined_df = cr_env_df.merge(cr_sac_df, on="TIME", how="inner")\
-    #                        .merge(cr_tfe_df, on="TIME", how="inner")\
-    #                        .merge(cr_sfy_df, on="TIME", how="inner")\
-    #                        .merge(cr_reg_df, on="TIME", how="inner")\
-    #                        .merge(cr_qmf_df, on="TIME", how="inner")\
-    #                        .merge(cr_ecv_df, on="TIME", how="inner")\
-    #                        .merge(cr_usb_df, on="TIME", how="inner")\
-    #                        .merge(cr_rlb_df, on="TIME", how="inner")\
-    #                        .merge(cr_inf_df, on="TIME", how="inner")\
-    #                        .merge(cr_scl_df, on="TIME", how="inner")
+    # Start with the first DataFrame and merge sequentially, keeping only TIME and the relevant criterion column
+    combined_df = cr_env_df[['TIME', 'CR_ENV']]\
+        .merge(cr_sac_df[['TIME', 'CR_SAC']], on="TIME", how="outer")\
+        .merge(cr_tfe_df[['TIME', 'CR_TFE']], on="TIME", how="outer")\
+        .merge(cr_sfy_df[['TIME', 'CR_SFY']], on="TIME", how="outer")\
+        .merge(cr_reg_df[['TIME', 'CR_REG']], on="TIME", how="outer")\
+        .merge(cr_qmf_df[['TIME', 'CR_QMF']], on="TIME", how="outer")\
+        .merge(cr_ecv_df[['TIME', 'CR_ECV']], on="TIME", how="outer")\
+        .merge(cr_usb_df[['TIME', 'CR_USB']], on="TIME", how="outer")\
+        .merge(cr_rlb_df[['TIME', 'CR_RLB']], on="TIME", how="outer")\
+        .merge(cr_inf_df[['TIME', 'CR_INF']], on="TIME", how="outer")\
+        .merge(cr_scl_df[['TIME', 'CR_SCL']], on="TIME", how="outer")
 
-    # Ensure column names are correctly aligned
+    # Ensure there are no extra columns
     expected_columns = ['TIME', 'CR_ENV', 'CR_SAC', 'CR_TFE', 'CR_SFY', 'CR_REG', 'CR_QMF', 'CR_ECV', 'CR_USB', 'CR_RLB', 'CR_INF', 'CR_SCL']
-    
-    # Perform an outer join on TIME
-    combined_df = cr_env_df.merge(cr_sac_df, on="TIME", how="outer")\
-                           .merge(cr_tfe_df, on="TIME", how="outer")\
-                           .merge(cr_sfy_df, on="TIME", how="outer")\
-                           .merge(cr_reg_df, on="TIME", how="outer")\
-                           .merge(cr_qmf_df, on="TIME", how="outer")\
-                           .merge(cr_ecv_df, on="TIME", how="outer")\
-                           .merge(cr_usb_df, on="TIME", how="outer")\
-                           .merge(cr_rlb_df, on="TIME", how="outer")\
-                           .merge(cr_inf_df, on="TIME", how="outer")\
-                           .merge(cr_scl_df, on="TIME", how="outer")
-    
-    # Reorder columns to match the HPL_SD_CRS table schema
     combined_df = combined_df[expected_columns]
 
-    # Check for any missing columns or incorrect names
+    # Check for any unexpected columns
     if list(combined_df.columns) != expected_columns:
         st.error("The DataFrame columns do not match the expected structure.")
         st.write("DataFrame columns:", combined_df.columns)
         return
 
+    # Fill any NaN values that may have been introduced during the outer joins
     combined_df.fillna(0, inplace=True)
 
     st.write("DEBUG: ALL")
