@@ -574,8 +574,8 @@ def render_upload_data_page():
     if st.button("Populate Hyperloop success factors table"):
         df = populate_hpl_sd_crs()
         st.write(f"Criterion data preview.")
-        st.dataframe(df.head())
-        save_data_to_snowflake_without_index(df, selected_criterion_table)
+        st.dataframe(df())
+        save_data_to_snowflake(df, "HPL_SD_CRS")
         st.write(f"Table population completed. Please proceed to visualization tab")
 
     if st.button("⬅️ Back"):
