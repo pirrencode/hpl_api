@@ -530,7 +530,7 @@ def render_visualizations_page():
         df_source = load_data_from_snowflake(f"CR_{crt}_SOURCE")
         df_summary = load_data_from_snowflake(f"CALC_CR_{crt}")
 
-        for component in ["PRODUCTION_OUTPUT", "USER_EXP_RATIO", "ACCESSIBILITY_AGEING"]:
+        for component in ["DURABILITY", "DIGITAL_RELIABILITY", "WEATHER_DISASTER_RESILIENCE", "POLLUTION_PRODUCED"]:
             component_visualization(df_source,component)
 
         criterion_visualization(df_summary, crt)               
