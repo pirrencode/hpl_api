@@ -195,3 +195,15 @@ def generate_reliability_data(time_periods=100):
     
     df = pd.DataFrame(data)
     return df
+
+def generate_infrastructure_integration_data(time_periods=100):
+    data = {
+        "TIME": list(range(1, time_periods + 1)),
+        "COMMON_INFRA_FEATURES": [round(random.uniform(0.5, 1.5), 2) for _ in range(time_periods)],  # C: values between 0.5 and 1.5
+        "CONSTRUCTION_BARRIERS": [round(random.uniform(0.5, 1.5), 2) for _ in range(time_periods)],  # E: values between 0.5 and 1.5
+        "INTERMODAL_CONNECTIONS": [round(random.uniform(0.5, 1.5), 2) for _ in range(time_periods)], # M: values between 0.5 and 1.5
+        "INFRA_ADAPTABILITY_FEATURES": [round(random.uniform(0.5, 1.5), 2) for _ in range(time_periods)] # A: values between 0.5 and 1.5
+    }
+    
+    df = pd.DataFrame(data)
+    return df

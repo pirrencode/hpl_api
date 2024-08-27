@@ -6,7 +6,7 @@ import tempfile
 import logging
 from io import BytesIO
 from snowflake.snowpark import Session
-from criterion_factors_logic import generate_safety_data, generate_environmental_impact_data, generate_social_acceptance_data, generate_technical_feasibility_data, generate_regulatory_approval_data, generate_quantum_factor_data, generate_economic_viability_data, generate_usability_data, generate_reliability_data
+from criterion_factors_logic import generate_safety_data, generate_environmental_impact_data, generate_social_acceptance_data, generate_technical_feasibility_data, generate_regulatory_approval_data, generate_quantum_factor_data, generate_economic_viability_data, generate_usability_data, generate_reliability_data, generate_infrastructure_integration_data
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -246,6 +246,29 @@ def calculate_cr_rlb():
     
     return calc_df
 
+def calculate_cr_inf():
+    session = Session.builder.configs(get_snowflake_connection_params()).create()
+    
+    cr_inf_source_df = session.table("CR_INF_SOURCE").to_pandas()
+    st.write("CR_INF_SOURCE DataFrame Loaded")
+    
+    calc_data = []
+    
+    for _, row in cr_inf_source_df.iterrows():
+        time = int(row['TIME'])
+        C = float(row['COMMON_INFRA_FEATURES'])
+        E = float(row['CONSTRUCTION_BARRIERS'])
+        M = float(row['INTERMODAL_CONNECTIONS'])
+        A = float(row['INFRA_ADAPTABILITY_FEATURES'])
+
+        cr_inf = max(0, min((C + E + M + A) / 4, 1))
+        
+        calc_data.append({"TIME": time, "CR_INF": cr_inf})
+    
+    calc_df = pd.DataFrame(calc_data)
+    
+    return calc_df
+
 def load_data_from_snowflake(table_name):
     session = Session.builder.configs(get_snowflake_connection_params()).create()
     df = session.table(table_name).to_pandas()
@@ -328,6 +351,7 @@ def render_upload_data_page():
                                                   "Economical Viability",
                                                   "Usability",
                                                   "Reliability",
+                                                  "Infrastructure Integration",
                                                   ])
 
     source_table_mapping = {
@@ -340,6 +364,7 @@ def render_upload_data_page():
         "Economical Viability": "CR_ECV_SOURCE",
         "Usability": "CR_USB_SOURCE",
         "Reliability": "CR_RLB_SOURCE",
+        "Infrastructure Integration": "CR_INF_SOURCE",
     }
 
     criterion_table_mapping = {
@@ -352,6 +377,7 @@ def render_upload_data_page():
         "Economical Viability": "CALC_CR_ECV",
         "Usability": "CALC_CR_USB",
         "Reliability": "CALC_CR_RLB",
+        "Infrastructure Integration": "CALC_CR_INF",
     }    
 
     generate_function_mapping = {
@@ -364,6 +390,7 @@ def render_upload_data_page():
         "Economical Viability": generate_economic_viability_data,      
         "Usability": generate_usability_data,
         "Reliability": generate_reliability_data,
+        "Infrastructure Integration": generate_infrastructure_integration_data,
     }
 
     criterion_function_mapping = {
@@ -376,6 +403,7 @@ def render_upload_data_page():
         "Economical Viability": calculate_cr_ecv,
         "Usability": calculate_cr_usb,
         "Reliability": calculate_cr_rlb,
+        "Infrastructure Integration": calculate_cr_inf,
     }    
 
     selected_source_table = source_table_mapping.get(criterion, "CR_SFY_SOURCE")
@@ -534,6 +562,16 @@ def render_visualizations_page():
             component_visualization(df_source,component)
 
         criterion_visualization(df_summary, crt)               
+
+    if st.button("Infrastructure Integration"):
+        crt = "INF"
+        df_source = load_data_from_snowflake(f"CR_{crt}_SOURCE")
+        df_summary = load_data_from_snowflake(f"CALC_CR_{crt}")
+
+        for component in ["COMMON_INFRA_FEATURES", "CONSTRUCTION_BARRIERS", "INTERMODAL_CONNECTIONS", "INFRA_ADAPTABILITY_FEATURES"]:
+            component_visualization(df_source,component)
+
+        criterion_visualization(df_summary, crt)         
 
     if st.button("⬅️ Back"):
         st.session_state['page'] = 'home'        
