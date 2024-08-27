@@ -394,7 +394,7 @@ def render_visualizations_page():
             fig = px.line(df_source, x="TIME", y=component, title=f"{component} over Time")
             st.plotly_chart(fig)
 
-        fig = px.line(df_summary, x="TIME", y="CR_QMF", title="CR_REG over Time")
+        fig = px.line(df_summary, x="TIME", y="CR_QMF", title="CR_QMF over Time")
         st.plotly_chart(fig)        
 
     if st.button("⬅️ Back"):
