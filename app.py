@@ -870,7 +870,9 @@ def generate_rapid_growth_scenario():
     cr_usb_df = generate_cr_usb_rapid_growth_data()
     cr_rlb_df = generate_cr_rlb_rapid_growth_data()
     cr_inf_df = generate_cr_inf_rapid_growth_data()
-    cr_scl_df = generate_cr_scl_rapid_growth_data()    
+    cr_scl_df = generate_cr_scl_rapid_growth_data()
+
+    scenarios_calculation_to_snowlake(cr_env_df, cr_sac_df, cr_tfe_df, cr_sfy_df, cr_reg_df, cr_qmf_df, cr_ecv_df, cr_usb_df, cr_rlb_df, cr_inf_df, cr_scl_df)      
 
 #######################################
 # UTILITY METHODS FOR SCENARIOS
