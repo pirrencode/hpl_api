@@ -366,6 +366,10 @@ def render_upload_data_page():
     if st.button("⬅️ Back"):
         st.session_state['page'] = 'home'
 
+def criterion_visualization(df_summary, crt):
+    fig = px.line(df_summary, x="TIME", y=f"CR_{crt}", title=f"CR_{crt} over Time")
+    st.plotly_chart(fig)
+
 # Function to handle the visualizations page
 def render_visualizations_page():
     st.title("Hyperloop Project System Dynamics Dashboard")
@@ -426,8 +430,9 @@ def render_visualizations_page():
         st.plotly_chart(fig)
 
     if st.button("Quantum Factor"):
-        df_source = load_data_from_snowflake("CR_QMF_SOURCE")
-        df_summary = load_data_from_snowflake("CALC_CR_QMF")
+        crt = "QMF"
+        df_source = load_data_from_snowflake(f"CR_{crt}_SOURCE")
+        df_summary = load_data_from_snowflake(f"CALC_CR_{crt}")
 
         for component in ["MAGLEV_LEVITATION", 
                           "AMBIENT_INTELLIGENCE", 
@@ -444,7 +449,7 @@ def render_visualizations_page():
             fig = px.line(df_source, x="TIME", y=component, title=f"{component} over Time")
             st.plotly_chart(fig)
 
-        fig = px.line(df_summary, x="TIME", y="CR_QMF", title="CR_QMF over Time")
+        fig = px.line(df_summary, x="TIME", y=f"CR_{crt}", title=f"CR_{crt} over Time")
         st.plotly_chart(fig)
 
     if st.button("Economical Viability"):
@@ -456,8 +461,7 @@ def render_visualizations_page():
             fig = px.line(df_source, x="TIME", y=component, title=f"{component} over Time")
             st.plotly_chart(fig)
 
-        fig = px.line(df_summary, x="TIME", y=f"CR_{crt}", title=f"CR_{crt} over Time")
-        st.plotly_chart(fig)            
+        criterion_visualization(df_summary, crt)   
 
     if st.button("⬅️ Back"):
         st.session_state['page'] = 'home'        
