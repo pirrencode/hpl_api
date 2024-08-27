@@ -321,6 +321,8 @@ def populate_hpl_sd_crs():
 
     combined_df = combined_df[['TIME', 'CR_ENV', 'CR_SAC', 'CR_TFE', 'CR_SFY', 'CR_REG', 'CR_QMF', 'CR_ECV', 'CR_USB', 'CR_RLB', 'CR_INF', 'CR_SCL']]
 
+    st.dataframe(combined_df.head())
+
     return combined_df
 
 def load_data_from_snowflake(table_name):
