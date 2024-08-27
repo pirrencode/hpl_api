@@ -911,6 +911,9 @@ def render_scenarios_simulation_page():
             st.write("Hello")
             # generate_rapid_growth_scenario()
 
+    if st.button("⬅️ Back"):
+        st.session_state['page'] = 'home'              
+
 #######################################
 # APPLICATION NAVIGATION
 #######################################
