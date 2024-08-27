@@ -6,7 +6,7 @@ import tempfile
 import logging
 from io import BytesIO
 from snowflake.snowpark import Session
-from criterion_factors_logic import generate_safety_data, generate_environmental_impact_data, generate_social_acceptance_data, generate_technical_feasibility_data, generate_regulatory_approval_data, generate_quantum_factor_data, generate_economic_viability_data
+from criterion_factors_logic import generate_safety_data, generate_environmental_impact_data, generate_social_acceptance_data, generate_technical_feasibility_data, generate_regulatory_approval_data, generate_quantum_factor_data, generate_economic_viability_data, generate_usability_data
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -201,6 +201,28 @@ def calculate_cr_ecv():
     
     return calc_df
 
+def calculate_cr_usb():
+    session = Session.builder.configs(get_snowflake_connection_params()).create()
+    
+    cr_usb_source_df = session.table("CR_USB_SOURCE").to_pandas()
+    st.write("CR_USB_SOURCE DataFrame Loaded")
+    
+    calc_data = []
+    
+    for _, row in cr_usb_source_df.iterrows():
+        time = int(row['TIME'])
+        p = float(row['PRODUCTION_OUTPUT'])
+        e = float(row['USER_EXP_RATIO'])
+        a = float(row['ACCESSIBILITY_AGEING'])
+        
+        cr_usb = max(0, min((p + e + a) / 3, 1))
+        
+        calc_data.append({"TIME": time, "CR_USB": cr_usb})
+    
+    calc_df = pd.DataFrame(calc_data)
+     
+    return calc_df
+
 def load_data_from_snowflake(table_name):
     session = Session.builder.configs(get_snowflake_connection_params()).create()
     df = session.table(table_name).to_pandas()
@@ -281,6 +303,7 @@ def render_upload_data_page():
                                                   "Regulatory Approval", 
                                                   "Quantum Factor",
                                                   "Economical Viability",
+                                                  "Usability",
                                                   ])
 
     source_table_mapping = {
@@ -291,6 +314,7 @@ def render_upload_data_page():
         "Regulatory Approval": "CR_REG_SOURCE",
         "Quantum Factor": "CR_QMF_SOURCE",
         "Economical Viability": "CR_ECV_SOURCE",
+        "Usability": "CR_USB_SOURCE",
     }
 
     criterion_table_mapping = {
@@ -301,6 +325,7 @@ def render_upload_data_page():
         "Regulatory Approval": "CALC_CR_REG",
         "Quantum Factor": "CALC_CR_QMF",
         "Economical Viability": "CALC_CR_ECV",
+        "Usability": "CALC_CR_USB",
     }    
 
     generate_function_mapping = {
@@ -310,7 +335,8 @@ def render_upload_data_page():
         "Technical Feasibility": generate_technical_feasibility_data,
         "Regulatory Approval": generate_regulatory_approval_data,
         "Quantum Factor": generate_quantum_factor_data,
-        "Economical Viability": generate_economic_viability_data,        
+        "Economical Viability": generate_economic_viability_data,      
+        "Usability": generate_usability_data,
     }
 
     criterion_function_mapping = {
@@ -321,6 +347,7 @@ def render_upload_data_page():
         "Regulatory Approval": calculate_cr_reg,
         "Quantum Factor": calculate_cr_qmf,
         "Economical Viability": calculate_cr_ecv,
+        "Usability": calculate_cr_usb,
     }    
 
     selected_source_table = source_table_mapping.get(criterion, "CR_SFY_SOURCE")
@@ -458,7 +485,17 @@ def render_visualizations_page():
         for component in ["REVENUE", "OPEX", "CAPEX", "DISCOUNT_RATE", "PROJECT_LIFETIME"]:
             component_visualization(df_source,component)
 
-        criterion_visualization(df_summary, crt)   
+        criterion_visualization(df_summary, crt)
+
+    if st.button("Usability"):
+        crt = "USB"
+        df_source = load_data_from_snowflake(f"CR_{crt}_SOURCE")
+        df_summary = load_data_from_snowflake(f"CALC_CR_{crt}")
+
+        for component in ["PRODUCTION_OUTPUT", "USER_EXP_RATIO", "ACCESSIBILITY_AGEING"]:
+            component_visualization(df_source,component)
+
+        criterion_visualization(df_summary, crt)          
 
     if st.button("⬅️ Back"):
         st.session_state['page'] = 'home'        

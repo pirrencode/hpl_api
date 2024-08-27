@@ -171,3 +171,15 @@ def generate_economic_viability_data(time_periods=100):
     df = pd.DataFrame(data)
     
     return df
+
+def generate_usability_data(time_periods=100):
+    data = {
+        "TIME": list(range(1, time_periods + 1)),
+        "PRODUCTION_OUTPUT": [round(random.uniform(0.5, 1.5), 2) for _ in range(time_periods)],  # p: values between 0.5 and 1.5
+        "USER_EXP_RATIO": [round(random.uniform(0.5, 1.5), 2) for _ in range(time_periods)],     # e: values between 0.5 and 1.5
+        "ACCESSIBILITY_AGEING": [round(random.uniform(0.5, 1.5), 2) for _ in range(time_periods)] # a: values between 0.5 and 1.5
+    }
+    
+    df = pd.DataFrame(data)
+    
+    return df
