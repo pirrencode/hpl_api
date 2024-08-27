@@ -811,7 +811,13 @@ from simulation_scenarios import (
     generate_cr_reg_rapid_growth_data, generate_cr_qmf_rapid_growth_data,
     generate_cr_ecv_rapid_growth_data, generate_cr_usb_rapid_growth_data,
     generate_cr_rlb_rapid_growth_data, generate_cr_inf_rapid_growth_data,
-    generate_cr_scl_rapid_growth_data    
+    generate_cr_scl_rapid_growth_data,
+    generate_cr_env_sustainable_growth_data, generate_cr_sac_sustainable_growth_data,
+    generate_cr_tfe_sustainable_growth_data, generate_cr_sfy_sustainable_growth_data,
+    generate_cr_reg_sustainable_growth_data, generate_cr_qmf_sustainable_growth_data,
+    generate_cr_ecv_sustainable_growth_data, generate_cr_usb_sustainable_growth_data,
+    generate_cr_rlb_sustainable_growth_data, generate_cr_inf_sustainable_growth_data,
+    generate_cr_scl_sustainable_growth_data        
 )
 
 #######################################
@@ -875,6 +881,26 @@ def generate_rapid_growth_scenario():
     scenarios_calculation_to_snowlake(cr_env_df, cr_sac_df, cr_tfe_df, cr_sfy_df, cr_reg_df, cr_qmf_df, cr_ecv_df, cr_usb_df, cr_rlb_df, cr_inf_df, cr_scl_df)      
 
 #######################################
+# SUSTAINABLE GROWTH SCENARIO
+#######################################
+
+def generate_sustainable_growth_scenario():
+
+    cr_env_df = generate_cr_env_sustainable_growth_data()
+    cr_sac_df = generate_cr_sac_sustainable_growth_data()
+    cr_tfe_df = generate_cr_tfe_sustainable_growth_data()
+    cr_sfy_df = generate_cr_sfy_sustainable_growth_data()
+    cr_reg_df = generate_cr_reg_sustainable_growth_data()
+    cr_qmf_df = generate_cr_qmf_sustainable_growth_data()
+    cr_ecv_df = generate_cr_ecv_sustainable_growth_data()
+    cr_usb_df = generate_cr_usb_sustainable_growth_data()
+    cr_rlb_df = generate_cr_rlb_sustainable_growth_data()
+    cr_inf_df = generate_cr_inf_sustainable_growth_data()
+    cr_scl_df = generate_cr_scl_sustainable_growth_data()
+
+    scenarios_calculation_to_snowlake(cr_env_df, cr_sac_df, cr_tfe_df, cr_sfy_df, cr_reg_df, cr_qmf_df, cr_ecv_df, cr_usb_df, cr_rlb_df, cr_inf_df, cr_scl_df)    
+
+#######################################
 # UTILITY METHODS FOR SCENARIOS
 #######################################
 
@@ -890,7 +916,7 @@ def scenarios_calculation_to_snowlake(cr_env_df, cr_sac_df, cr_tfe_df, cr_sfy_df
     save_data_to_snowflake(cr_usb_df, "CR_USB_SOURCE")
     save_data_to_snowflake(cr_rlb_df, "CR_RLB_SOURCE")
     save_data_to_snowflake(cr_inf_df, "CR_INF_SOURCE")
-    save_data_to_snowflake(cr_scl_df, "CR_SCL_SOURCE")
+    save_data_to_snowflake(cr_scl_df, "CR_SCL_SOURCE")    
 
     rapid_df_env = calculate_cr_env()
     st.write(f"Criterion rapid_df_env data loaded.")
@@ -947,7 +973,7 @@ def scenarios_calculation_to_snowlake(cr_env_df, cr_sac_df, cr_tfe_df, cr_sfy_df
     st.dataframe(rapid_df_scl.head())
     save_data_to_snowflake(rapid_df_scl, "CALC_CR_SCL")   
 
-    st.success("Decline Over Time scenario data generated and saved.")
+    st.success("Scenario data generated and saved.")
 
 def render_scenarios_simulation_page():
     st.title("Simulation Scenarios 🌍")
@@ -959,8 +985,7 @@ def render_scenarios_simulation_page():
             generate_rapid_decline_scenario()
 
         if st.button("SUSTAINABLE GROWTH 🌱"):
-            st.write("Hello")
-            # generate_sustainable_growth_scenario()
+            generate_sustainable_growth_scenario()
     
     with col2:
         if st.button("DECLINE OVER TIME ⏳"):
@@ -968,6 +993,14 @@ def render_scenarios_simulation_page():
 
         if st.button("RAPID GROWTH 🚀"):
             generate_rapid_growth_scenario()
+
+    with col1:
+        if st.button("Populate Hyperloop success factors table"):
+            df = populate_hpl_sd_crs()
+            st.write(f"Criterion data preview.")
+            st.dataframe(df.head())
+            save_data_to_snowflake(df, "HPL_SD_CRS")
+            st.write(f"Table population completed. Please proceed to visualization tab")            
 
     if st.button("⬅️ Back"):
         st.session_state['page'] = 'home'              
