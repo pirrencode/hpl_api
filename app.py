@@ -319,6 +319,10 @@ def populate_hpl_sd_crs():
     #                        .merge(cr_inf_df, on="TIME", how="inner")\
     #                        .merge(cr_scl_df, on="TIME", how="inner")
 
+    # Ensure column names are correctly aligned
+    expected_columns = ['TIME', 'CR_ENV', 'CR_SAC', 'CR_TFE', 'CR_SFY', 'CR_REG', 'CR_QMF', 'CR_ECV', 'CR_USB', 'CR_RLB', 'CR_INF', 'CR_SCL']
+    
+    # Perform an outer join on TIME
     combined_df = cr_env_df.merge(cr_sac_df, on="TIME", how="outer")\
                            .merge(cr_tfe_df, on="TIME", how="outer")\
                            .merge(cr_sfy_df, on="TIME", how="outer")\
@@ -328,12 +332,22 @@ def populate_hpl_sd_crs():
                            .merge(cr_usb_df, on="TIME", how="outer")\
                            .merge(cr_rlb_df, on="TIME", how="outer")\
                            .merge(cr_inf_df, on="TIME", how="outer")\
-                           .merge(cr_scl_df, on="TIME", how="outer")    
+                           .merge(cr_scl_df, on="TIME", how="outer")
+    
+    # Reorder columns to match the HPL_SD_CRS table schema
+    combined_df = combined_df[expected_columns]
 
-    combined_df = combined_df[['TIME', 'CR_ENV', 'CR_SAC', 'CR_TFE', 'CR_SFY', 'CR_REG', 'CR_QMF', 'CR_ECV', 'CR_USB', 'CR_RLB', 'CR_INF', 'CR_SCL']]
+    # Check for any missing columns or incorrect names
+    if list(combined_df.columns) != expected_columns:
+        st.error("The DataFrame columns do not match the expected structure.")
+        st.write("DataFrame columns:", combined_df.columns)
+        return
 
     combined_df.fillna(0, inplace=True)
 
+    st.write("DEBUG: ALL")
+    st.write(combined_df) 
+    st.write("HEAD")
     st.dataframe(combined_df.head())
 
     return combined_df
