@@ -308,16 +308,27 @@ def populate_hpl_sd_crs():
     cr_inf_df = session.table("CALC_CR_INF").to_pandas()
     cr_scl_df = session.table("CALC_CR_SCL").to_pandas()
 
-    combined_df = cr_env_df.merge(cr_sac_df, on="TIME", how="inner")\
-                           .merge(cr_tfe_df, on="TIME", how="inner")\
-                           .merge(cr_sfy_df, on="TIME", how="inner")\
-                           .merge(cr_reg_df, on="TIME", how="inner")\
-                           .merge(cr_qmf_df, on="TIME", how="inner")\
-                           .merge(cr_ecv_df, on="TIME", how="inner")\
-                           .merge(cr_usb_df, on="TIME", how="inner")\
-                           .merge(cr_rlb_df, on="TIME", how="inner")\
-                           .merge(cr_inf_df, on="TIME", how="inner")\
-                           .merge(cr_scl_df, on="TIME", how="inner")
+    # combined_df = cr_env_df.merge(cr_sac_df, on="TIME", how="inner")\
+    #                        .merge(cr_tfe_df, on="TIME", how="inner")\
+    #                        .merge(cr_sfy_df, on="TIME", how="inner")\
+    #                        .merge(cr_reg_df, on="TIME", how="inner")\
+    #                        .merge(cr_qmf_df, on="TIME", how="inner")\
+    #                        .merge(cr_ecv_df, on="TIME", how="inner")\
+    #                        .merge(cr_usb_df, on="TIME", how="inner")\
+    #                        .merge(cr_rlb_df, on="TIME", how="inner")\
+    #                        .merge(cr_inf_df, on="TIME", how="inner")\
+    #                        .merge(cr_scl_df, on="TIME", how="inner")
+
+    combined_df = cr_env_df.merge(cr_sac_df, on="TIME", how="outer")\
+                           .merge(cr_tfe_df, on="TIME", how="outer")\
+                           .merge(cr_sfy_df, on="TIME", how="outer")\
+                           .merge(cr_reg_df, on="TIME", how="outer")\
+                           .merge(cr_qmf_df, on="TIME", how="outer")\
+                           .merge(cr_ecv_df, on="TIME", how="outer")\
+                           .merge(cr_usb_df, on="TIME", how="outer")\
+                           .merge(cr_rlb_df, on="TIME", how="outer")\
+                           .merge(cr_inf_df, on="TIME", how="outer")\
+                           .merge(cr_scl_df, on="TIME", how="outer")    
 
     combined_df = combined_df[['TIME', 'CR_ENV', 'CR_SAC', 'CR_TFE', 'CR_SFY', 'CR_REG', 'CR_QMF', 'CR_ECV', 'CR_USB', 'CR_RLB', 'CR_INF', 'CR_SCL']]
 
