@@ -414,7 +414,7 @@ def render_homepage():
             st.session_state['page'] = 'visualizations'
 
     if st.button("SCENARIOS SIMULATION 🌐"):
-        render_scenarios_simulation_page()           
+        st.session_state['page'] = 'scenarious'         
 
 ##############################################################
 # Data upload and management page
@@ -927,3 +927,6 @@ elif st.session_state['page'] == 'upload_data':
     render_upload_data_page()
 elif st.session_state['page'] == 'visualizations':
     render_visualizations_page()
+elif st.session_state['page'] == 'scenarious':
+    render_scenarios_simulation_page()
+    
