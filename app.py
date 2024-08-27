@@ -626,7 +626,7 @@ def visualize_ddmi_factors(dmmi_df):
         with cols[col_idx]:  # Place the figure in the corresponding column
             st.plotly_chart(fig)
 
-def render_ddmi_dashboard(session):
+def render_ddmi_dashboard():
     st.title("DMMI Factors and Project Maturity Level Visualization")
     
     session = Session.builder.configs(get_snowflake_connection_params()).create()
