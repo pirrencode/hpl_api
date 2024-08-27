@@ -366,68 +366,73 @@ def render_upload_data_page():
     if st.button("⬅️ Back"):
         st.session_state['page'] = 'home'
 
+def component_visualization(df_source, component):
+    fig = px.line(df_source, x="TIME", y=component, title=f"{component} over Time")
+    st.plotly_chart(fig)
+
 def criterion_visualization(df_summary, crt):
     fig = px.line(df_summary, x="TIME", y=f"CR_{crt}", title=f"CR_{crt} over Time")
     st.plotly_chart(fig)
+
+def load_source_for_visualization(crt):
+    df_source = load_data_from_snowflake(f"CR_{crt}_SOURCE")
+    df_summary = load_data_from_snowflake(f"CALC_CR_{crt}")
+
+    return df_source, df_summary 
 
 # Function to handle the visualizations page
 def render_visualizations_page():
     st.title("Hyperloop Project System Dynamics Dashboard")
     
     if st.button("Visualize Safety Criterion"):
-        df_source = load_data_from_snowflake("CR_SFY_SOURCE")
-        df_summary = load_data_from_snowflake("CALC_CR_SF")
+        load_source_for_visualization(crt="SFY")
+        # crt = "SFY"
+        # df_source = load_data_from_snowflake(f"CR_{crt}_SOURCE")
+        # df_summary = load_data_from_snowflake(f"CALC_CR_{crt}")
 
         for component in ["RISK_SCORE", "MIN_RISK_SCORE", "MAX_RISK_SCORE"]:
-            fig = px.line(df_source, x="TIME", y=component, title=f"{component} over Time")
-            st.plotly_chart(fig)
+            component_visualization(df_source,component)
 
-        fig = px.line(df_summary, x="TIME", y="CR_SFY", title="CR_SFY over Time")
-        st.plotly_chart(fig)
+        criterion_visualization(df_summary, crt) 
 
     if st.button("Visualize Environmental Impact"):
-        df_source = load_data_from_snowflake("CR_ENV_SOURCE")
-        df_summary = load_data_from_snowflake("CALC_CR_ENV")
+        crt = "EMV"
+        df_source = load_data_from_snowflake(f"CR_{crt}_SOURCE")
+        df_summary = load_data_from_snowflake(f"CALC_CR_{crt}")
 
         for component in ["ENERGY_CONSUMED", "DISTANCE", "LOAD_WEIGHT", "CO2_EMISSIONS", "MATERIAL_SUSTAINABILITY"]:
-            fig = px.line(df_source, x="TIME", y=component, title=f"{component} over Time")
-            st.plotly_chart(fig)
+            component_visualization(df_source,component)
 
-        fig = px.line(df_summary, x="TIME", y="CR_ENV", title="CR_ENV over Time")
-        st.plotly_chart(fig)
+        criterion_visualization(df_summary, crt) 
 
     if st.button("Social Acceptance"):
         df_source = load_data_from_snowflake("CR_SAC_SOURCE")
         df_summary = load_data_from_snowflake("CALC_CR_SAC")
 
         for component in ["POSITIVE_FEEDBACK", "NEGATIVE_FEEDBACK"]:
-            fig = px.line(df_source, x="TIME", y=component, title=f"{component} over Time")
-            st.plotly_chart(fig)
+            component_visualization(df_source,component)
 
-        fig = px.line(df_summary, x="TIME", y="CR_SAC", title="CR_SAC over Time")
-        st.plotly_chart(fig)
+        criterion_visualization(df_summary, crt) 
 
     if st.button("Technical Feasibility"):
-        df_source = load_data_from_snowflake("CR_TFE_SOURCE")
-        df_summary = load_data_from_snowflake("CALC_CR_TFE")
+        crt = "TFE"
+        df_source = load_data_from_snowflake(f"CR_{crt}_SOURCE")
+        df_summary = load_data_from_snowflake(f"CALC_CR_{crt}")
 
         for component in ["CURRENT_TRL", "TARGET_TRL", "ENG_CHALLENGES_RESOLVED", "TARGET_ENG_CHALLENGES"]:
-            fig = px.line(df_source, x="TIME", y=component, title=f"{component} over Time")
-            st.plotly_chart(fig)
+            component_visualization(df_source,component)
 
-        fig = px.line(df_summary, x="TIME", y="CR_TFE", title="CR_TFE over Time")
-        st.plotly_chart(fig)
+        criterion_visualization(df_summary, crt) 
 
     if st.button("Regulatory Approval"):
-        df_source = load_data_from_snowflake("CR_REG_SOURCE")
-        df_summary = load_data_from_snowflake("CALC_CR_REG")
+        crt = "REG"
+        df_source = load_data_from_snowflake(f"CR_{crt}_SOURCE")
+        df_summary = load_data_from_snowflake(f"CALC_CR_{crt}")
 
         for component in ["ETHICAL_COMPLIANCE", "LEGAL_COMPLIANCE", "LAND_USAGE_COMPLIANCE", "INT_LAW_COMPLIANCE", "TRL_COMPLIANCE"]:
-            fig = px.line(df_source, x="TIME", y=component, title=f"{component} over Time")
-            st.plotly_chart(fig)
+            component_visualization(df_source,component)
 
-        fig = px.line(df_summary, x="TIME", y="CR_REG", title="CR_REG over Time")
-        st.plotly_chart(fig)
+        criterion_visualization(df_summary, crt) 
 
     if st.button("Quantum Factor"):
         crt = "QMF"
@@ -446,11 +451,9 @@ def render_visualizations_page():
                           "BLOCKCHAIN", 
                           "SELF_DRIVING_AUTONOMOUS_VEHICLES",
                           "TOTAL_DISRUPTIVE_TECH"]:
-            fig = px.line(df_source, x="TIME", y=component, title=f"{component} over Time")
-            st.plotly_chart(fig)
+            component_visualization(df_source,component)
 
-        fig = px.line(df_summary, x="TIME", y=f"CR_{crt}", title=f"CR_{crt} over Time")
-        st.plotly_chart(fig)
+        criterion_visualization(df_summary, crt)
 
     if st.button("Economical Viability"):
         crt = "ECV"
@@ -458,8 +461,7 @@ def render_visualizations_page():
         df_summary = load_data_from_snowflake(f"CALC_CR_{crt}")
 
         for component in ["REVENUE", "OPEX", "CAPEX", "DISCOUNT_RATE", "PROJECT_LIFETIME"]:
-            fig = px.line(df_source, x="TIME", y=component, title=f"{component} over Time")
-            st.plotly_chart(fig)
+            component_visualization(df_source,component)
 
         criterion_visualization(df_summary, crt)   
 
