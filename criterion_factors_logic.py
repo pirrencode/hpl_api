@@ -143,7 +143,7 @@ def generate_quantum_factor_data(time_periods=100):
 def generate_economic_viability_data(time_periods=100):
 
     data = {
-        "TIME": list(range(1, time_periods + 1)),
+        "TIME": list(range(time_periods)),
         "REVENUE": [round(random.uniform(100000, 500000), 2) for _ in range(time_periods)],
         "OPEX": [round(random.uniform(50000, 200000), 2) for _ in range(time_periods)],
         "CAPEX": [round(random.uniform(1000000, 5000000), 2) for _ in range(time_periods)],
@@ -158,7 +158,7 @@ def generate_economic_viability_data(time_periods=100):
 
 def generate_usability_data(time_periods=100):
     data = {
-        "TIME": list(range(1, time_periods + 1)),
+        "TIME": list(range(time_periods)),
         "PRODUCTION_OUTPUT": [round(random.uniform(0.5, 1.5), 2) for _ in range(time_periods)],  # p: values between 0.5 and 1.5
         "USER_EXP_RATIO": [round(random.uniform(0.5, 1.5), 2) for _ in range(time_periods)],     # e: values between 0.5 and 1.5
         "ACCESSIBILITY_AGEING": [round(random.uniform(0.5, 1.5), 2) for _ in range(time_periods)] # a: values between 0.5 and 1.5
@@ -170,7 +170,7 @@ def generate_usability_data(time_periods=100):
 
 def generate_reliability_data(time_periods=100):
     data = {
-        "TIME": list(range(1, time_periods + 1)),
+        "TIME": list(range(time_periods)),
         "DURABILITY": [round(random.uniform(0.5, 1.5), 2) for _ in range(time_periods)],            # d: values between 0.5 and 1.5
         "DIGITAL_RELIABILITY": [round(random.uniform(0.5, 1.5), 2) for _ in range(time_periods)],   # c: values between 0.5 and 1.5
         "WEATHER_DISASTER_RESILIENCE": [round(random.uniform(0.5, 1.5), 2) for _ in range(time_periods)], # w: values between 0.5 and 1.5
@@ -182,7 +182,7 @@ def generate_reliability_data(time_periods=100):
 
 def generate_infrastructure_integration_data(time_periods=100):
     data = {
-        "TIME": list(range(1, time_periods + 1)),
+        "TIME": list(range(time_periods)),
         "COMMON_INFRA_FEATURES": [round(random.uniform(0.5, 1.5), 2) for _ in range(time_periods)],  # C: values between 0.5 and 1.5
         "CONSTRUCTION_BARRIERS": [round(random.uniform(0.5, 1.5), 2) for _ in range(time_periods)],  # E: values between 0.5 and 1.5
         "INTERMODAL_CONNECTIONS": [round(random.uniform(0.5, 1.5), 2) for _ in range(time_periods)], # M: values between 0.5 and 1.5
@@ -194,7 +194,7 @@ def generate_infrastructure_integration_data(time_periods=100):
 
 def generate_scalability_data(time_periods=100):
     data = {
-        "TIME": list(range(1, time_periods + 1)),
+        "TIME": list(range(time_periods)),
         "RESOURCE_MILEAGE": [round(random.uniform(0.5, 1.5), 2) for _ in range(time_periods)],    # L1: values between 0.5 and 1.5
         "PLANNED_VOLUME": [round(random.uniform(0.5, 1.5), 2) for _ in range(time_periods)],      # Q: values between 0.5 and 1.5
         "ADJUSTMENT_COEF_1": [round(random.uniform(0.5, 1.5), 2) for _ in range(time_periods)],   # K1: values between 0.5 and 1.5
