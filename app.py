@@ -569,6 +569,30 @@ def visualize_all_success_factors():
         with cols[col_idx]:  # Place the figure in the corresponding column
             st.plotly_chart(fig)
 
+import plotly.express as px
+
+def visualize_dmmi_dashboard():
+    # Step 1: Establish Snowflake session and load data from HPL_SD_CRS
+    session = Session.builder.configs(get_snowflake_connection_params()).create()
+    hpl_sd_crs_df = session.table("HPL_SD_CRS").to_pandas()
+
+    # Step 2: Compute DMMI factors
+    dmmi_df = compute_dmmi_factors(hpl_sd_crs_df)
+
+    # Step 3: Define the DMMI factors to visualize
+    dmmi_factors = ['Governance_and_Management', 'Strategy_and_Planning', 'Technology_and_Infrastructure',
+                    'Processes_and_Methodologies', 'People_and_Culture', 'Data_and_Information_Management',
+                    'Performance_Measurement', 'Project_Maturity_Level']
+
+    # Step 4: Create subplots for each factor, 4 in a row
+    cols = st.columns(4)  # Creates four columns to place graphs side by side
+    
+    for i, factor in enumerate(dmmi_factors):
+        fig = px.line(dmmi_df, x='TIME', y=factor, title=f"{factor} over Time")
+        col_idx = i % 4  # Get column index: 0, 1, 2, 3
+        with cols[col_idx]:  # Place the figure in the corresponding column
+            st.plotly_chart(fig)            
+
 ########################
 # Visualizations page
 ########################
@@ -578,6 +602,9 @@ def render_visualizations_page():
 
     if st.button("HYPERLOOP SUCCESS FACTORS DASHBOARD"):
         visualize_all_success_factors()
+
+    if st.button("Visualize all DMMI factors"):
+        visualize_dmmi_dashboard()
 
     if st.button("Visualize Safety Criterion"):
         crt = "SFY"
