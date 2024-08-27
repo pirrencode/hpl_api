@@ -342,53 +342,6 @@ def populate_hpl_sd_crs():
 
     return combined_df
 
-def save_data_to_snowflake_without_index(df, table_name):
-    session = None
-    try:
-        # Step 1: Save DataFrame to an in-memory CSV, excluding the index
-        csv_buffer = BytesIO()
-        df.to_csv(csv_buffer, index=False)
-        csv_buffer.seek(0)  # Reset buffer to start
-
-        # Step 2: Set up Snowflake session
-        session = Session.builder.configs(get_snowflake_connection_params()).create()
-        stage_name = "my_temp_stage"
-        
-        # Step 3: Create a temporary stage in Snowflake
-        session.sql(f"CREATE TEMPORARY STAGE IF NOT EXISTS {stage_name}").collect()
-        logging.info("Temporary stage created or already exists.")
-
-        # Step 4: Upload the in-memory CSV to the Snowflake stage
-        put_result = session.file.put_stream(csv_buffer, f"@{stage_name}/temp_file.csv")
-        logging.info(f"PUT command result: {put_result}")
-
-        # Step 5: Truncate the target table in Snowflake
-        delete_data = session.sql(f"TRUNCATE TABLE IF EXISTS {table_name}").collect()
-        logging.info(f"TRUNCATE command result: {delete_data}")
-
-        # Step 6: Load the data from the stage into the target table
-        copy_result = session.sql(f"""
-            COPY INTO {table_name}
-            FROM @{stage_name}/temp_file.csv
-            FILE_FORMAT = (TYPE = 'CSV' FIELD_OPTIONALLY_ENCLOSED_BY='"' SKIP_HEADER=1)
-        """).collect()
-        logging.info(f"COPY command result: {copy_result}")
-
-        # Step 7: Clean up the stage by removing the file
-        session.sql(f"REMOVE @{stage_name}/temp_file.csv").collect()
-        logging.info("Temporary file removed from stage.")
-
-    except Exception as e:
-        logging.error(f"Error saving data to Snowflake: {e}")
-        st.error(f"An error occurred while saving data to Snowflake: {str(e)}")
-    
-    finally:
-        if session:
-            session.close()
-        csv_buffer.close()
-
-    st.success(f"Data successfully saved to {table_name} in Snowflake!")
-
 def load_data_from_snowflake(table_name):
     session = Session.builder.configs(get_snowflake_connection_params()).create()
     df = session.table(table_name).to_pandas()
@@ -589,10 +542,33 @@ def criterion_visualization(df_summary, crt):
     fig = px.line(df_summary, x="TIME", y=f"CR_{crt}", title=f"CR_{crt} over Time")
     st.plotly_chart(fig)
 
-# Function to handle the visualizations page
+def visualize_all_success_factors():
+    # Step 1: Establish Snowflake session and load data from HPL_SD_CRS
+    session = Session.builder.configs(get_snowflake_connection_params()).create()
+    hpl_sd_crs_df = session.table("HPL_SD_CRS").to_pandas()
+
+    # Step 2: Define the criteria to visualize
+    criteria = ['CR_ENV', 'CR_SAC', 'CR_TFE', 'CR_SFY', 'CR_REG', 'CR_QMF', 'CR_ECV', 'CR_USB', 'CR_RLB', 'CR_INF', 'CR_SCL']
+
+    # Step 3: Create subplots for each criterion, 3 in a row
+    cols = st.columns(3)  # Creates three columns to place graphs side by side
+    
+    for i, criterion in enumerate(criteria):
+        fig = px.line(hpl_sd_crs_df, x='TIME', y=criterion, title=f"{criterion} over Time")
+        col_idx = i % 3  # Get column index: 0, 1, 2
+        with cols[col_idx]:  # Place the figure in the corresponding column
+            st.plotly_chart(fig)
+
+########################
+# Visualizations page
+########################
+
 def render_visualizations_page():
     st.title("Hyperloop Project System Dynamics Dashboard")
-    
+
+    if st.button("Visualize all success factors criterions"):
+        visualize_all_success_factors()
+
     if st.button("Visualize Safety Criterion"):
         crt = "SFY"
         df_source = load_data_from_snowflake(f"CR_{crt}_SOURCE")
@@ -718,7 +694,10 @@ def render_visualizations_page():
     if st.button("⬅️ Back"):
         st.session_state['page'] = 'home'        
 
-# Main application logic to switch between pages
+########################
+# Application naivgation
+########################
+
 if 'page' not in st.session_state:
     st.session_state['page'] = 'home'
 

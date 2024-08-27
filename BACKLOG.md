@@ -3,3 +3,4 @@
 #2. Add proper weights to CR_ENV.
 #3. Set limits for calculations in logic.
 #4. Further improve generation logic and dynamics correctness.
+#5. Fix bug with missing data for 4 criterions in populated table.
