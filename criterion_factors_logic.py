@@ -5,17 +5,13 @@ import random
 
 def generate_safety_data(time_periods=100):
 
-    # Simulate time periods
     time = np.arange(0, time_periods)
 
-    # Generate risk scores between 0 and 1
     risk_scores = np.random.rand(time_periods, 5)
 
-    # Compute the min and max risk scores across all components
     min_risks = risk_scores.min(axis=1)
     max_risks = risk_scores.max(axis=1)
 
-    # Create DataFrame according to the new schema without CR_SFY
     df = pd.DataFrame({
         "TIME": time,
         "RISK_SCORE": risk_scores.mean(axis=1),  # Average risk score for each time period
@@ -38,15 +34,6 @@ def generate_environmental_impact_data(time_periods=100):
     material_sustainability = np.random.rand(time_periods)
     env_impact_score = np.random.rand(time_periods)
 
-    # Compute Environmental Impact criterion based on formula
-    w1, w2, w3, w4 = 0.25, 0.25, 0.25, 0.25
-    # criterion_values = (
-    #     w1 * energy_consumed / (distance * load_weight) +
-    #     w2 * co2_emissions / (distance * load_weight) +
-    #     w3 * material_sustainability +
-    #     w4 * env_impact_score
-    # )
-
     df = pd.DataFrame({
         "TIME": time,
         "ENERGY_CONSUMED": energy_consumed,
@@ -55,7 +42,6 @@ def generate_environmental_impact_data(time_periods=100):
         "CO2_EMISSIONS": co2_emissions,
         "MATERIAL_SUSTAINABILITY": material_sustainability,
         "ENV_IMPACT_SCORE": env_impact_score,
-        # "CR_ENV": criterion_values
     })
 
     st.write("Generated dataset:")
@@ -78,10 +64,10 @@ def generate_social_acceptance_data(time_periods=100):
 
 def generate_technical_feasibility_data(time_periods=100):
     time = np.arange(time_periods)
-    current_trl = np.full(time_periods, 6)  # Stable CURRENT_TRL at 6
+    current_trl = np.full(time_periods, 6)  
     target_trl = np.random.uniform(6, 11, time_periods)
-    eng_challenges_resolved = np.random.rand(time_periods)  # In the range [0, 1]
-    target_eng_challenges = np.random.rand(time_periods)  # In the range [0, 1]
+    eng_challenges_resolved = np.random.rand(time_periods)
+    target_eng_challenges = np.random.rand(time_periods)
 
     data = pd.DataFrame({
         'TIME': time,
@@ -115,7 +101,6 @@ def generate_regulatory_approval_data(time_periods=100):
 def generate_quantum_factor_data(time_periods=100):
     time = np.arange(time_periods)
 
-    # Generate random boolean values for each technology
     maglev_levitation = np.random.choice([True, False], time_periods)
     ambient_intelligence = np.random.choice([True, False], time_periods)
     generative_ai = np.random.choice([True, False], time_periods)
@@ -129,7 +114,6 @@ def generate_quantum_factor_data(time_periods=100):
     blockchain = np.random.choice([True, False], time_periods)
     self_driving_autonomous_vehicles = np.random.choice([True, False], time_periods)
 
-    # Calculate TOTAL_DISRUPTIVE_TECH based on the sum of TRUE values
     total_disruptive_tech = (maglev_levitation.astype(int) + ambient_intelligence.astype(int) +
                              generative_ai.astype(int) + ai_machine_learning.astype(int) +
                              digital_twins.astype(int) + five_g.astype(int) +
