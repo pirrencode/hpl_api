@@ -1,5 +1,9 @@
 # Hyperloop decision making ecosystem changelog
 
+## v0.05-dev
+
+- Added basic unittest.
+
 ## v0.04-dev
 
 - Added DMMI dashboard.

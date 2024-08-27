@@ -2,6 +2,12 @@
 
 ## Hyperloop system dynamics dashboard application
 
+### Unittests
+
+Unittests are located under tests/unit.
+
+To execute run pytest tests/unit/{unit_test_name}.py
+
 ### Tables
 
 Source tables:

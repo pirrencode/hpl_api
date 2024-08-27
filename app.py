@@ -415,7 +415,7 @@ def save_data_to_snowflake(df, table_name):
 
 def render_homepage():
     st.title("HDME")
-    st.subheader("v0.04-dev")
+    st.subheader("v0.05-dev")
     st.write("""
         Welcome to the Hyperloop Project System Dynamics Dashboard. 
         This application allows you to upload, manage, and visualize data related to various criteria 
