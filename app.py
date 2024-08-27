@@ -293,6 +293,36 @@ def calculate_cr_scl():
     
     return calc_df
 
+def populate_hpl_sd_crs():
+    session = Session.builder.configs(get_snowflake_connection_params()).create()
+
+    cr_env_df = session.table("CALC_CR_ENV").to_pandas()
+    cr_sac_df = session.table("CALC_CR_SAC").to_pandas()
+    cr_tfe_df = session.table("CALC_CR_TFE").to_pandas()
+    cr_sfy_df = session.table("CALC_CR_SFY").to_pandas()
+    cr_reg_df = session.table("CALC_CR_REG").to_pandas()
+    cr_qmf_df = session.table("CALC_CR_QMF").to_pandas()
+    cr_ecv_df = session.table("CALC_CR_ECV").to_pandas()
+    cr_usb_df = session.table("CALC_CR_USB").to_pandas()
+    cr_rlb_df = session.table("CALC_CR_RLB").to_pandas()
+    cr_inf_df = session.table("CALC_CR_INF").to_pandas()
+    cr_scl_df = session.table("CALC_CR_SCL").to_pandas()
+
+    combined_df = cr_env_df.merge(cr_sac_df, on="TIME", how="inner")\
+                           .merge(cr_tfe_df, on="TIME", how="inner")\
+                           .merge(cr_sfy_df, on="TIME", how="inner")\
+                           .merge(cr_reg_df, on="TIME", how="inner")\
+                           .merge(cr_qmf_df, on="TIME", how="inner")\
+                           .merge(cr_ecv_df, on="TIME", how="inner")\
+                           .merge(cr_usb_df, on="TIME", how="inner")\
+                           .merge(cr_rlb_df, on="TIME", how="inner")\
+                           .merge(cr_inf_df, on="TIME", how="inner")\
+                           .merge(cr_scl_df, on="TIME", how="inner")
+
+    combined_df = combined_df[['TIME', 'CR_ENV', 'CR_SAC', 'CR_TFE', 'CR_SFY', 'CR_REG', 'CR_QMF', 'CR_ECV', 'CR_USB', 'CR_RLB', 'CR_INF', 'CR_SCL']]
+
+    return combined_df
+
 def load_data_from_snowflake(table_name):
     session = Session.builder.configs(get_snowflake_connection_params()).create()
     df = session.table(table_name).to_pandas()
@@ -344,7 +374,7 @@ def save_data_to_snowflake(df, table_name):
 # Function to handle homepage navigation
 def render_homepage():
     st.title("HDME")
-    st.subheader("v0.03-dev")
+    st.subheader("v0.04-dev")
     st.write("""
         Welcome to the Hyperloop Project System Dynamics Dashboard. 
         This application allows you to upload, manage, and visualize data related to various criteria 
@@ -474,6 +504,13 @@ def render_upload_data_page():
         st.dataframe(df_uploaded.head())
         if st.button("Save Uploaded CSV Data to Snowflake"):
             save_data_to_snowflake(df_uploaded, selected_source_table)
+
+    if st.button("Populate Hyperloop success factors table"):
+        df = populate_hpl_sd_crs()
+        st.write(f"Criterion data preview.")
+        st.dataframe(df.head())
+        save_data_to_snowflake(df, selected_criterion_table)
+        st.write(f"Table population completed. Please proceed to visualization tab")
 
     if st.button("⬅️ Back"):
         st.session_state['page'] = 'home'
