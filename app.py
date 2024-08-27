@@ -520,25 +520,25 @@ def render_upload_data_page():
 
     criterion_function = criterion_function_mapping.get(criterion, calculate_cr_sfy)
 
-    if st.button("Generate and Save Data"):
+    if st.button("🗃️ Generate and Save Data"):
         df = generate_function()
         st.write(f"Data generated for {criterion}:")
         st.dataframe(df.head())
         save_data_to_snowflake(df, selected_source_table)
 
-    if st.button("Calculate Criterion and Save Data"):
+    if st.button("🔢 Calculate Criterion and Save Data"):
         st.write(f"DEBUG: {criterion_function}")
         df = criterion_function()
         st.write(f"Criterion {criterion} data generated.")
         st.dataframe(df.head())
         save_data_to_snowflake(df, selected_criterion_table)
 
-    if st.button("View Source Data from Snowflake"):
+    if st.button("🔎View Source Data from Snowflake"):
         df = load_data_from_snowflake(selected_source_table)
         st.write(f"Loading {criterion} data from Snowflake...")
         st.dataframe(df)
 
-    if st.button("View Hyperloop System Dynamics Input Criterion"):
+    if st.button("🔎 View Hyperloop System Dynamics Input Criterion"):
         df = load_data_from_snowflake(selected_criterion_table)
         st.write(f"Loading Hyperloop System Dynamics Input Criterion from Snowflake... Table: {selected_criterion_table}")
         st.dataframe(df)
@@ -552,14 +552,14 @@ def render_upload_data_page():
         if st.button("Save Uploaded CSV Data to Snowflake"):
             save_data_to_snowflake(df_uploaded, selected_source_table)
 
-    if st.button("Populate Hyperloop success factors table"):
+    if st.button("🗝 POPULATE SUCCESS FACTORS TABLE"):
         df = populate_hpl_sd_crs()
         st.write(f"Criterion data preview.")
         st.dataframe(df.head())
         save_data_to_snowflake(df, "HPL_SD_CRS")
         st.write(f"Table population completed. Please proceed to visualization tab")
 
-    if st.button("⬅️ Back"):
+    if st.button("⬅️ BACK"):
         st.session_state['page'] = 'home'
 
 #############################
@@ -679,13 +679,15 @@ def render_ddmi_dashboard():
 def render_visualizations_page():
     st.title("Hyperloop Project System Dynamics Dashboard")
 
-    if st.button("HYPERLOOP SUCCESS FACTORS DASHBOARD"):
+    if st.button("📊 HYPERLOOP SUCCESS FACTORS DASHBOARD"):
         visualize_all_success_factors()
 
-    if st.button("HYPERLOOP PROJECT DMMI DASHBOARD"):
+    if st.button("📈 HYPERLOOP PROJECT DMMI DASHBOARD"):
         render_ddmi_dashboard()
 
-    if st.button("Visualize Safety Criterion"):
+    st.title("SUCCESS FACTORS BREAKDOWN")
+
+    if st.button("🔍 SAFETY CRITERION"):
         crt = "SFY"
         df_source = load_data_from_snowflake(f"CR_{crt}_SOURCE")
         df_summary = load_data_from_snowflake(f"CALC_CR_{crt}")
@@ -695,7 +697,7 @@ def render_visualizations_page():
 
         criterion_visualization(df_summary, crt) 
 
-    if st.button("Visualize Environmental Impact"):
+    if st.button("🌍 ENVIRNOMENTAL IMPACT"):
         crt = "ENV"
         df_source = load_data_from_snowflake(f"CR_{crt}_SOURCE")
         df_summary = load_data_from_snowflake(f"CALC_CR_{crt}")
@@ -705,7 +707,7 @@ def render_visualizations_page():
 
         criterion_visualization(df_summary, crt) 
 
-    if st.button("Social Acceptance"):
+    if st.button("📰 SOCIAL ACCEPTANCE"):
         crt = "SAC"
         df_source = load_data_from_snowflake(f"CR_{crt}_SOURCE")
         df_summary = load_data_from_snowflake(f"CALC_CR_{crt}")
@@ -715,7 +717,7 @@ def render_visualizations_page():
 
         criterion_visualization(df_summary, crt) 
 
-    if st.button("Technical Feasibility"):
+    if st.button("🔧 TECHNICAL FEASIBILITY"):
         crt = "TFE"
         df_source = load_data_from_snowflake(f"CR_{crt}_SOURCE")
         df_summary = load_data_from_snowflake(f"CALC_CR_{crt}")
@@ -725,7 +727,7 @@ def render_visualizations_page():
 
         criterion_visualization(df_summary, crt) 
 
-    if st.button("Regulatory Approval"):
+    if st.button("✔️ REGULATORY APPROVAL"):
         crt = "REG"
         df_source = load_data_from_snowflake(f"CR_{crt}_SOURCE")
         df_summary = load_data_from_snowflake(f"CALC_CR_{crt}")
@@ -735,7 +737,7 @@ def render_visualizations_page():
 
         criterion_visualization(df_summary, crt) 
 
-    if st.button("Quantum Factor"):
+    if st.button("⚛️ QUANTUM FACTOR"):
         crt = "QMF"
         df_source = load_data_from_snowflake(f"CR_{crt}_SOURCE")
         df_summary = load_data_from_snowflake(f"CALC_CR_{crt}")
@@ -757,7 +759,7 @@ def render_visualizations_page():
 
         criterion_visualization(df_summary, crt)
 
-    if st.button("Economical Viability"):
+    if st.button("💶 ECONOMICAL VIABILITY "):
         crt = "ECV"
         df_source = load_data_from_snowflake(f"CR_{crt}_SOURCE")
         df_summary = load_data_from_snowflake(f"CALC_CR_{crt}")
@@ -767,7 +769,7 @@ def render_visualizations_page():
 
         criterion_visualization(df_summary, crt)
 
-    if st.button("Usability"):
+    if st.button("💡USABILITY"):
         crt = "USB"
         df_source = load_data_from_snowflake(f"CR_{crt}_SOURCE")
         df_summary = load_data_from_snowflake(f"CALC_CR_{crt}")
@@ -777,7 +779,7 @@ def render_visualizations_page():
 
         criterion_visualization(df_summary, crt)
 
-    if st.button("Reliability"):
+    if st.button("⚖️ RELIABILITY"):
         crt = "RLB"
         df_source = load_data_from_snowflake(f"CR_{crt}_SOURCE")
         df_summary = load_data_from_snowflake(f"CALC_CR_{crt}")
@@ -787,7 +789,7 @@ def render_visualizations_page():
 
         criterion_visualization(df_summary, crt)
 
-    if st.button("Infrastructure Integration"):
+    if st.button("🏭 INFRASTRUCTURE INTEGRATION"):
         crt = "INF"
         df_source = load_data_from_snowflake(f"CR_{crt}_SOURCE")
         df_summary = load_data_from_snowflake(f"CALC_CR_{crt}")
@@ -797,7 +799,7 @@ def render_visualizations_page():
 
         criterion_visualization(df_summary, crt)
 
-    if st.button("Scalability"):
+    if st.button("🛬SCALABILITY"):
         crt = "SCL"
         df_source = load_data_from_snowflake(f"CR_{crt}_SOURCE")
         df_summary = load_data_from_snowflake(f"CALC_CR_{crt}")
@@ -807,7 +809,7 @@ def render_visualizations_page():
 
         criterion_visualization(df_summary, crt)        
 
-    if st.button("⬅️ Back"):
+    if st.button("⬅️ BACK"):
         st.session_state['page'] = 'home'        
 
 #######################################
@@ -1014,14 +1016,14 @@ def render_scenarios_simulation_page():
             generate_rapid_growth_scenario()
 
     with col1:
-        if st.button("Populate Hyperloop success factors table"):
+        if st.button("UPDATE SUCCESS FACTORS TABLE 💃"):
             df = populate_hpl_sd_crs()
             st.write(f"Criterion data preview.")
             st.dataframe(df.head())
             save_data_to_snowflake(df, "HPL_SD_CRS")
             st.write(f"Table population completed. Please proceed to visualization tab")            
 
-    if st.button("⬅️ Back"):
+    if st.button("⬅️ BACK"):
         st.session_state['page'] = 'home'              
 
 #######################################
