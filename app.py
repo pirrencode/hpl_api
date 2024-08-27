@@ -569,6 +569,18 @@ def visualize_all_success_factors():
         with cols[col_idx]:  # Place the figure in the corresponding column
             st.plotly_chart(fig)
 
+def compute_dmmi_factors(df):
+    df['Governance_and_Management'] = df[['CR_REG', 'CR_TFE', 'CR_SFY']].mean(axis=1)
+    df['Strategy_and_Planning'] = df[['CR_TFE', 'CR_ENV', 'CR_ECV']].mean(axis=1)
+    df['Technology_and_Infrastructure'] = df[['CR_TFE', 'CR_INF', 'CR_RLB']].mean(axis=1)
+    df['Processes_and_Methodologies'] = df[['CR_SFY', 'CR_TFE']].mean(axis=1)
+    df['People_and_Culture'] = df[['CR_SAC', 'CR_USB']].mean(axis=1)
+    df['Data_and_Information_Management'] = df[['CR_QMF', 'CR_RLB']].mean(axis=1)
+    df['Performance_Measurement'] = df[['CR_ECV', 'CR_USB']].mean(axis=1)
+    df['Project_Maturity_Level'] = df.mean(axis=1)  # Example: Average of all DMMI factors
+
+    return df            
+
 import plotly.express as px
 
 def visualize_dmmi_dashboard():
