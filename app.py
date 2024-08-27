@@ -450,7 +450,7 @@ def render_visualizations_page():
     if st.button("Economical Viability"):
         crt = "ECV"
         df_source = load_data_from_snowflake(f"CR_{crt}_SOURCE")
-        df_summary = load_data_from_snowflake(f"CALC_{crt}_ECV")
+        df_summary = load_data_from_snowflake(f"CALC_CR_{crt}")
 
         for component in ["REVENUE", "OPEX", "CAPEX", "DISCOUNT_RATE", "PROJECT_LIFETIME"]:
             fig = px.line(df_source, x="TIME", y=component, title=f"{component} over Time")
@@ -460,7 +460,7 @@ def render_visualizations_page():
         st.plotly_chart(fig)            
 
     if st.button("⬅️ Back"):
-        st.session_state['page'] = 'home'
+        st.session_state['page'] = 'home'        
 
 # Main application logic to switch between pages
 if 'page' not in st.session_state:
