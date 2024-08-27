@@ -805,7 +805,13 @@ from simulation_scenarios import (
     generate_cr_reg_decline_over_time_data, generate_cr_qmf_decline_over_time_data,
     generate_cr_ecv_decline_over_time_data, generate_cr_usb_decline_over_time_data,
     generate_cr_rlb_decline_over_time_data, generate_cr_inf_decline_over_time_data,
-    generate_cr_scl_decline_over_time_data
+    generate_cr_scl_decline_over_time_data,
+    generate_cr_env_rapid_growth_data, generate_cr_sac_rapid_growth_data,
+    generate_cr_tfe_rapid_growth_data, generate_cr_sfy_rapid_growth_data,
+    generate_cr_reg_rapid_growth_data, generate_cr_qmf_rapid_growth_data,
+    generate_cr_ecv_rapid_growth_data, generate_cr_usb_rapid_growth_data,
+    generate_cr_rlb_rapid_growth_data, generate_cr_inf_rapid_growth_data,
+    generate_cr_scl_rapid_growth_data    
 )
 
 #######################################
@@ -814,7 +820,6 @@ from simulation_scenarios import (
 
 def generate_rapid_decline_scenario():
 
-    # Generate data for each criterion
     cr_env_df = generate_cr_env_data_rapid_decline()
     cr_sac_df = generate_cr_sac_data_rapid_decline()
     cr_tfe_df = generate_cr_tfe_data_rapid_decline()
@@ -835,7 +840,6 @@ def generate_rapid_decline_scenario():
 
 def generate_decline_over_time_scenario():
 
-    # Generate data for each criterion
     cr_env_df = generate_cr_env_decline_over_time_data()
     cr_sac_df = generate_cr_sac_decline_over_time_data()
     cr_tfe_df = generate_cr_tfe_decline_over_time_data()
@@ -849,6 +853,28 @@ def generate_decline_over_time_scenario():
     cr_scl_df = generate_cr_scl_decline_over_time_data()
 
     scenarios_calculation_to_snowlake(cr_env_df, cr_sac_df, cr_tfe_df, cr_sfy_df, cr_reg_df, cr_qmf_df, cr_ecv_df, cr_usb_df, cr_rlb_df, cr_inf_df, cr_scl_df)
+
+#######################################
+# DECLINE OVERTIME SCENARIO
+#######################################
+
+def generate_rapid_growth_scenario():
+
+    cr_env_df = generate_cr_env_rapid_growth_data()
+    cr_sac_df = generate_cr_sac_rapid_growth_data()
+    cr_tfe_df = generate_cr_tfe_rapid_growth_data()
+    cr_sfy_df = generate_cr_sfy_rapid_growth_data()
+    cr_reg_df = generate_cr_reg_rapid_growth_data()
+    cr_qmf_df = generate_cr_qmf_rapid_growth_data()
+    cr_ecv_df = generate_cr_ecv_rapid_growth_data()
+    cr_usb_df = generate_cr_usb_rapid_growth_data()
+    cr_rlb_df = generate_cr_rlb_rapid_growth_data()
+    cr_inf_df = generate_cr_inf_rapid_growth_data()
+    cr_scl_df = generate_cr_scl_rapid_growth_data()    
+
+#######################################
+# UTILITY METHODS FOR SCENARIOS
+#######################################
 
 def scenarios_calculation_to_snowlake(cr_env_df, cr_sac_df, cr_tfe_df, cr_sfy_df, cr_reg_df, cr_qmf_df, cr_ecv_df, cr_usb_df, cr_rlb_df, cr_inf_df, cr_scl_df):
 
@@ -939,8 +965,7 @@ def render_scenarios_simulation_page():
             generate_decline_over_time_scenario()
 
         if st.button("RAPID GROWTH 🚀"):
-            st.write("Hello")
-            # generate_rapid_growth_scenario()
+            generate_rapid_growth_scenario()
 
     if st.button("⬅️ Back"):
         st.session_state['page'] = 'home'              

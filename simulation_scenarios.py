@@ -246,3 +246,126 @@ def generate_cr_scl_decline_over_time_data(time_periods=100):
         "ADJUSTMENT_COEF_3": np.linspace(1.5, 1.2, time_periods)    # Adjustment coefficient decreases slightly
     }
     return pd.DataFrame(data)
+
+##############################################
+# RAPID GROWTH SCENARIO
+##############################################
+
+def generate_cr_env_rapid_growth_data(time_periods=100):
+    time = np.arange(time_periods)
+    data = {
+        "TIME": time,
+        "E": np.linspace(1000, 1500, time_periods),  # Energy consumed increases (more efficient energy use)
+        "D": np.linspace(1000, 1500, time_periods),  # Distance increases
+        "L": np.linspace(1000, 1500, time_periods),  # Load increases
+        "C": np.linspace(500, 200, time_periods),    # CO2 emissions decrease rapidly
+        "M": np.linspace(0.8, 0.95, time_periods),   # Material sustainability increases
+        "Y": np.linspace(0.8, 0.95, time_periods)    # Environmental impact improves
+    }
+    return pd.DataFrame(data)
+
+def generate_cr_sac_rapid_growth_data(time_periods=100):
+    time = np.arange(time_periods)
+    data = {
+        "TIME": time,
+        "A": np.linspace(1000, 1500, time_periods),  # Positive feedback increases rapidly
+        "B": np.linspace(200, 100, time_periods),    # Negative feedback decreases
+    }
+    return pd.DataFrame(data)
+
+def generate_cr_tfe_rapid_growth_data(time_periods=100):
+    time = np.arange(time_periods)
+    data = {
+        "TIME": time,
+        "T": np.linspace(7, 10, time_periods),  # TRL increases rapidly
+        "P": np.linspace(7, 10, time_periods),  # Target TRL increases rapidly
+        "L": np.linspace(8, 12, time_periods),  # Engineering challenges resolved increases
+        "C": np.linspace(5, 2, time_periods)    # Challenges decrease rapidly
+    }
+    return pd.DataFrame(data)
+
+def generate_cr_sfy_rapid_growth_data(time_periods=100):
+    time = np.arange(time_periods)
+    data = {
+        "TIME": time,
+        "R": np.linspace(0.7, 0.95, time_periods),  # Risk score decreases rapidly (improved safety)
+        "MinR": np.full(time_periods, 0.2),         # Minimum risk remains low
+        "MaxR": np.full(time_periods, 0.9)          # Maximum risk remains high
+    }
+    return pd.DataFrame(data)
+
+def generate_cr_reg_rapid_growth_data(time_periods=100):
+    time = np.arange(time_periods)
+    data = {
+        "TIME": time,
+        "EC": np.linspace(0.7, 0.95, time_periods),  # Ethical compliance increases rapidly
+        "LC": np.linspace(0.7, 0.95, time_periods),  # Legal norms compliance increases rapidly
+        "LU": np.linspace(0.7, 0.95, time_periods),  # Land usage compliance increases rapidly
+        "IL": np.linspace(0.7, 0.95, time_periods),  # International laws compliance increases rapidly
+    }
+    return pd.DataFrame(data)
+
+def generate_cr_qmf_rapid_growth_data(time_periods=100):
+    time = np.arange(time_periods)
+    data = {
+        "TIME": time,
+        "S": np.full(time_periods, 1),               # Disruptive technology use is high
+        "D": np.linspace(5, 10, time_periods)        # Number of disruptive technologies increases rapidly
+    }
+    return pd.DataFrame(data)
+
+def generate_cr_ecv_rapid_growth_data(time_periods=100):
+    time = np.arange(time_periods)
+    data = {
+        "TIME": time,
+        "REVENUE": np.linspace(500000, 1000000, time_periods),   # Revenue increases rapidly
+        "OPEX": np.linspace(300000, 200000, time_periods),       # Operational expenditure decreases rapidly
+        "CAPEX": np.full(time_periods, 1000000),                 # Capital expenditure remains constant
+        "DISCOUNT_RATE": np.linspace(0.06, 0.05, time_periods),  # Discount rate decreases slightly
+        "PROJECT_LIFETIME": np.full(time_periods, 25)            # Project lifetime remains constant
+    }
+    return pd.DataFrame(data)
+
+def generate_cr_usb_rapid_growth_data(time_periods=100):
+    time = np.arange(time_periods)
+    data = {
+        "TIME": time,
+        "PRODUCTION_OUTPUT": np.linspace(1.2, 1.8, time_periods),  # Production output increases rapidly
+        "USER_EXP_RATIO": np.linspace(1.2, 1.8, time_periods),      # User experience ratio increases rapidly
+        "ACCESSIBILITY_AGEING": np.linspace(1.2, 1.8, time_periods) # Accessibility by aging population increases rapidly
+    }
+    return pd.DataFrame(data)
+
+def generate_cr_rlb_rapid_growth_data(time_periods=100):
+    time = np.arange(time_periods)
+    data = {
+        "TIME": time,
+        "DURABILITY": np.linspace(1.2, 1.8, time_periods),             # Durability increases rapidly
+        "DIGITAL_RELIABILITY": np.linspace(1.2, 1.8, time_periods),    # Digital reliability increases rapidly
+        "WEATHER_DISASTER_RESILIENCE": np.linspace(1.2, 1.8, time_periods), # Weather and disaster resilience increases rapidly
+        "POLLUTION_PRODUCED": np.linspace(0.6, 0.4, time_periods)      # Pollution produced decreases rapidly
+    }
+    return pd.DataFrame(data)
+
+def generate_cr_inf_rapid_growth_data(time_periods=100):
+    time = np.arange(time_periods)
+    data = {
+        "TIME": time,
+        "COMMON_INFRA_FEATURES": np.linspace(1.2, 1.8, time_periods),  # Common infrastructure features increase rapidly
+        "CONSTRUCTION_BARRIERS": np.linspace(0.6, 0.4, time_periods),  # Barriers to construction decrease rapidly
+        "INTERMODAL_CONNECTIONS": np.linspace(1.2, 1.8, time_periods), # Intermodal connections increase rapidly
+        "INFRA_ADAPTABILITY_FEATURES": np.linspace(1.2, 1.8, time_periods) # Adaptability increases rapidly
+    }
+    return pd.DataFrame(data)
+
+def generate_cr_scl_rapid_growth_data(time_periods=100):
+    time = np.arange(time_periods)
+    data = {
+        "TIME": time,
+        "RESOURCE_MILEAGE": np.linspace(1.2, 1.8, time_periods),    # Resource mileage increases rapidly
+        "PLANNED_VOLUME": np.linspace(1.2, 1.8, time_periods),      # Planned volume increases rapidly
+        "ADJUSTMENT_COEF_1": np.linspace(1.2, 1.8, time_periods),   # Adjustment coefficient increases rapidly
+        "ADJUSTMENT_COEF_2": np.linspace(1.2, 1.8, time_periods),   # Adjustment coefficient increases rapidly
+        "ADJUSTMENT_COEF_3": np.linspace(1.2, 1.8, time_periods)    # Adjustment coefficient increases rapidly
+    }
+    return pd.DataFrame(data)
