@@ -429,7 +429,7 @@ def render_homepage():
             st.session_state['page'] = 'upload_data'
 
     with col2:
-        if st.button("📊\n\nHyperloop Project System Dynamics Project", use_container_width=True):
+        if st.button("📊\n\nHyperloop Project System Dynamics", use_container_width=True):
             st.session_state['page'] = 'visualizations'
 
     if st.button("SCENARIOS SIMULATION 🌐"):
