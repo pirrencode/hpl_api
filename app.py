@@ -661,8 +661,8 @@ def render_visualizations_page():
     if st.button("HYPERLOOP SUCCESS FACTORS DASHBOARD"):
         visualize_all_success_factors()
 
-    if st.button("Visualize all DMMI factors"):
-        visualize_dmmi_dashboard()
+    if st.button("HYPERLOOP PROJECT DMMI DASHBOARD"):
+        render_ddmi_dashboard()
 
     if st.button("Visualize Safety Criterion"):
         crt = "SFY"
