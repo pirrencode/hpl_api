@@ -163,33 +163,40 @@ def calculate_cr_qmf():
     return df_result
 
 def calculate_cr_ecv():
-
     session = Session.builder.configs(get_snowflake_connection_params()).create()
 
+    # Fetch the data from Snowflake
     cr_ecv_source_df = session.table("CR_ECV_SOURCE").to_pandas()
     st.write("DF is defined")
 
     calc_data = []
     
-    # Iterate over the rows of the CR_ECV_SOURCE DataFrame
     for _, row in cr_ecv_source_df.iterrows():
-        time = row['TIME']
-        revenue = row['REVENUE']
-        opex = row['OPEX']
-        capex = row['CAPEX']
-        discount_rate = row['DISCOUNT_RATE']
-        project_lifetime = row['PROJECT_LIFETIME']
+        # Convert values to appropriate data types
+        time = int(row['TIME'])
+        revenue = float(row['REVENUE'])
+        opex = float(row['OPEX'])
+        capex = float(row['CAPEX'])
+        discount_rate = float(row['DISCOUNT_RATE'])
+        project_lifetime = int(row['PROJECT_LIFETIME'])
+
+        # Check for invalid project_lifetime
+        if project_lifetime <= 0:
+            st.error(f"Invalid project lifetime {project_lifetime} for time {time}. Skipping this record.")
+            continue
         
         # Calculate NPV
-        npv = sum((revenue - opex) / ((1 + discount_rate) ** t) for t in range(1, project_lifetime + 1))
-        
+        try:
+            npv = sum((revenue - opex) / ((1 + discount_rate) ** t) for t in range(1, project_lifetime + 1))
+        except ZeroDivisionError:
+            st.error(f"Discount rate caused a division by zero error at time {time}. Skipping this record.")
+            continue
+
         # Calculate CR_ECV, ensuring it is within the range [0, 1]
         cr_ecv = max(0, min(npv / capex, 1))
         
-        # Append the results to the list
         calc_data.append({"TIME": time, "CR_ECV": cr_ecv})
     
-    # Convert the list to a DataFrame
     calc_df = pd.DataFrame(calc_data)
     
     return calc_df
