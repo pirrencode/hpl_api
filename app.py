@@ -414,7 +414,7 @@ def render_homepage():
             st.session_state['page'] = 'visualizations'
 
     if st.button("SCENARIOS SIMULATION 🌐"):
-        render_scenarios_simulation_page()            
+        render_scenarios_simulation_page()           
 
 ##############################################################
 # Data upload and management page
@@ -898,18 +898,18 @@ def render_scenarios_simulation_page():
         if st.button("RAPID DECLINE 📉"):
             generate_rapid_decline_scenario()
 
-    #     if st.button("SUSTAINABLE GROWTH 🌱"):
-    #         generate_sustainable_growth_scenario()
+        if st.button("SUSTAINABLE GROWTH 🌱"):
+            st.write("Hello")
+            # generate_sustainable_growth_scenario()
     
-    # with col2:
-    #     if st.button("DECLINE OVER TIME ⏳"):
-    #         generate_decline_over_time_scenario()
+    with col2:
+        if st.button("DECLINE OVER TIME ⏳"):
+            st.write("Hello")
+            # generate_decline_over_time_scenario()
 
-    #     if st.button("RAPID GROWTH 🚀"):
-    #         generate_rapid_growth_scenario()
-
-# Function to be called from the homepage
-render_scenarios_simulation_page()
+        if st.button("RAPID GROWTH 🚀"):
+            st.write("Hello")
+            # generate_rapid_growth_scenario()
 
 #######################################
 # APPLICATION NAVIGATION
