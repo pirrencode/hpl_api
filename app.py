@@ -166,7 +166,7 @@ def calculate_cr_ecv():
 
     session = Session.builder.configs(get_snowflake_connection_params()).create()
 
-    cr_ecv_source_df = session.table("CR_QMF_SOURCE").to_pandas()
+    cr_ecv_source_df = session.table("CR_ECV_SOURCE").to_pandas()
     st.write("DF is defined")
 
     calc_data = []
