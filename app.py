@@ -6,7 +6,7 @@ import tempfile
 import logging
 from io import BytesIO
 from snowflake.snowpark import Session
-from criterion_factors_logic import generate_safety_data, generate_environmental_impact_data, generate_social_acceptance_data, generate_technical_feasibility_data, generate_regulatory_approval_data, generate_quantum_factor_data, generate_economic_viability_data, generate_usability_data
+from criterion_factors_logic import generate_safety_data, generate_environmental_impact_data, generate_social_acceptance_data, generate_technical_feasibility_data, generate_regulatory_approval_data, generate_quantum_factor_data, generate_economic_viability_data, generate_usability_data, generate_reliability_data
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -223,6 +223,29 @@ def calculate_cr_usb():
      
     return calc_df
 
+def calculate_cr_rlb():
+    session = Session.builder.configs(get_snowflake_connection_params()).create()
+    
+    cr_rlb_source_df = session.table("CR_RLB_SOURCE").to_pandas()
+    st.write("CR_RLB_SOURCE DataFrame Loaded")
+    
+    calc_data = []
+    
+    for _, row in cr_rlb_source_df.iterrows():
+        time = int(row['TIME'])
+        d = float(row['DURABILITY'])
+        c = float(row['DIGITAL_RELIABILITY'])
+        w = float(row['WEATHER_DISASTER_RESILIENCE'])
+        u = float(row['POLLUTION_PRODUCED'])
+
+        cr_rlb = max(0, min((d + c + w + u) / 4, 1))
+        
+        calc_data.append({"TIME": time, "CR_RLB": cr_rlb})
+    
+    calc_df = pd.DataFrame(calc_data)
+    
+    return calc_df
+
 def load_data_from_snowflake(table_name):
     session = Session.builder.configs(get_snowflake_connection_params()).create()
     df = session.table(table_name).to_pandas()
@@ -304,6 +327,7 @@ def render_upload_data_page():
                                                   "Quantum Factor",
                                                   "Economical Viability",
                                                   "Usability",
+                                                  "Reliability",
                                                   ])
 
     source_table_mapping = {
@@ -315,6 +339,7 @@ def render_upload_data_page():
         "Quantum Factor": "CR_QMF_SOURCE",
         "Economical Viability": "CR_ECV_SOURCE",
         "Usability": "CR_USB_SOURCE",
+        "Reliability": "CR_RLB_SOURCE",
     }
 
     criterion_table_mapping = {
@@ -326,6 +351,7 @@ def render_upload_data_page():
         "Quantum Factor": "CALC_CR_QMF",
         "Economical Viability": "CALC_CR_ECV",
         "Usability": "CALC_CR_USB",
+        "Reliability": "CALC_CR_RLB",
     }    
 
     generate_function_mapping = {
@@ -337,6 +363,7 @@ def render_upload_data_page():
         "Quantum Factor": generate_quantum_factor_data,
         "Economical Viability": generate_economic_viability_data,      
         "Usability": generate_usability_data,
+        "Reliability": generate_reliability_data,
     }
 
     criterion_function_mapping = {
@@ -348,6 +375,7 @@ def render_upload_data_page():
         "Quantum Factor": calculate_cr_qmf,
         "Economical Viability": calculate_cr_ecv,
         "Usability": calculate_cr_usb,
+        "Reliability": calculate_cr_rlb,
     }    
 
     selected_source_table = source_table_mapping.get(criterion, "CR_SFY_SOURCE")
@@ -495,7 +523,17 @@ def render_visualizations_page():
         for component in ["PRODUCTION_OUTPUT", "USER_EXP_RATIO", "ACCESSIBILITY_AGEING"]:
             component_visualization(df_source,component)
 
-        criterion_visualization(df_summary, crt)          
+        criterion_visualization(df_summary, crt)
+
+    if st.button("Reliability"):
+        crt = "RLB"
+        df_source = load_data_from_snowflake(f"CR_{crt}_SOURCE")
+        df_summary = load_data_from_snowflake(f"CALC_CR_{crt}")
+
+        for component in ["PRODUCTION_OUTPUT", "USER_EXP_RATIO", "ACCESSIBILITY_AGEING"]:
+            component_visualization(df_source,component)
+
+        criterion_visualization(df_summary, crt)               
 
     if st.button("⬅️ Back"):
         st.session_state['page'] = 'home'        

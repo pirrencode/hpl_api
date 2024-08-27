@@ -183,3 +183,15 @@ def generate_usability_data(time_periods=100):
     df = pd.DataFrame(data)
     
     return df
+
+def generate_reliability_data(time_periods=100):
+    data = {
+        "TIME": list(range(1, time_periods + 1)),
+        "DURABILITY": [round(random.uniform(0.5, 1.5), 2) for _ in range(time_periods)],            # d: values between 0.5 and 1.5
+        "DIGITAL_RELIABILITY": [round(random.uniform(0.5, 1.5), 2) for _ in range(time_periods)],   # c: values between 0.5 and 1.5
+        "WEATHER_DISASTER_RESILIENCE": [round(random.uniform(0.5, 1.5), 2) for _ in range(time_periods)], # w: values between 0.5 and 1.5
+        "POLLUTION_PRODUCED": [round(random.uniform(0.5, 1.5), 2) for _ in range(time_periods)]    # u: values between 0.5 and 1.5
+    }
+    
+    df = pd.DataFrame(data)
+    return df
