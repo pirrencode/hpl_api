@@ -8,6 +8,7 @@ from io import BytesIO
 from snowflake.snowpark import Session
 from criterion_factors_logic import generate_safety_data, generate_environmental_impact_data, generate_social_acceptance_data, generate_technical_feasibility_data, generate_regulatory_approval_data, generate_quantum_factor_data, generate_economic_viability_data, generate_usability_data, generate_reliability_data, generate_infrastructure_integration_data, generate_scalability_data
 import openai
+import time
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -54,6 +55,30 @@ def get_openai_api_key():
 #OPENAI INSIGHTS GENERATION
 ############################################
 
+def test_openai_connection():
+    # Set up the OpenAI API key
+    openai.api_key = get_openai_api_key()
+
+    try:
+        # Send a simple test prompt to the OpenAI API
+        response = openai.Completion.create(
+            engine="text-davinci-003",  # or use another model like "gpt-3.5-turbo"
+            prompt="This is a test to verify the connection to the OpenAI API.",
+            max_tokens=10  # Keep the token count low for a quick response
+        )
+
+        # Extract the response text
+        test_result = response.choices[0].text.strip()
+
+        # Display the test result
+        st.write("OpenAI API connection successful!")
+        st.write(f"Test Response: {test_result}")
+        return True
+
+    except Exception as e:
+        st.error(f"Failed to connect to the OpenAI API: {str(e)}")
+        return False
+
 def get_genai_insights(dataframe):
 
     data_summary = dataframe.describe().to_string()
@@ -85,11 +110,20 @@ def get_genai_insights(dataframe):
 
 def analyze_hyperloop_project():
     df = load_data_from_snowflake("ALLIANCE_STORE.HPL_SD_CRS_ALLIANCE")
+
+    if test_openai_connection():
+        st.write("Proceeding with further processing...")
+    else:
+        st.error("Cannot proceed without a successful connection to OpenAI API.")
+
     if df is not None:
         st.write("Data loaded successfully.")
         st.dataframe(df)
 
+        start_time = time.time()
         insights = get_genai_insights(df)
+        st.write(f"ChatGPT response time: {time.time() - start_time} seconds")
+        
         if insights:
             st.write("GenAI Insights:")
             st.write(insights)
