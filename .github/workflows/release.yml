@@ -1,0 +1,51 @@
+name: Create Release on Main Branch Push
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  release:
+    name: Create GitHub Release
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout the repository
+        uses: actions/checkout@v3
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '14'
+
+      - name: Get the latest tag
+        id: get_tag
+        run: |
+          echo "##[set-output name=tag;]$(git describe --tags --abbrev=0)"
+
+      - name: Increment version number
+        id: increment_version
+        run: |
+          IFS='.' read -r -a version_parts <<< "${{ steps.get_tag.outputs.tag }}"
+          new_version="${version_parts[0]}.$((version_parts[1]+1)).0"
+          echo "##[set-output name=new_version;]$new_version"
+
+      - name: Create new tag
+        id: create_tag
+        run: |
+          git config user.name "github-actions"
+          git config user.email "github-actions@github.com"
+          git tag -a ${{ steps.increment_version.outputs.new_version }} -m "Release ${{ steps.increment_version.outputs.new_version }}"
+          git push origin ${{ steps.increment_version.outputs.new_version }}
+
+      - name: Create GitHub Release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ steps.increment_version.outputs.new_version }}
+          release_name: "Release ${{ steps.increment_version.outputs.new_version }}"
+          body: "New release for version ${{ steps.increment_version.outputs.new_version }}"
+          draft: false
+          prerelease: false
