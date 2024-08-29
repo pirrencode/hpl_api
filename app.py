@@ -55,6 +55,15 @@ def get_openai_api_key():
 #OPENAI INSIGHTS GENERATION
 ############################################
 
+def test_openai_api_key():
+    try:
+        api_key = st.secrets["openai_api_key"]
+        st.write(f"API Key successfully retrieved: {api_key[:5]}...")  # Display only the first few characters
+    except KeyError:
+        st.error("API Key not found. Please check the secrets configuration.")
+    except Exception as e:
+        st.error(f"An error occurred: {str(e)}")
+
 def test_openai_connection():
     # Set up the OpenAI API key
     openai.api_key = get_openai_api_key()
@@ -123,7 +132,7 @@ def analyze_hyperloop_project():
         start_time = time.time()
         insights = get_genai_insights(df)
         st.write(f"ChatGPT response time: {time.time() - start_time} seconds")
-        
+
         if insights:
             st.write("GenAI Insights:")
             st.write(insights)
@@ -670,6 +679,7 @@ def render_homepage():
         st.session_state['page'] = 'scenarious'    
 
     if st.button("ANALYZE HYPERLOOP PROJECT 📦"):
+        test_openai_api_key()
         analyze_hyperloop_project()
 
     if st.button("BACKUP DATA 📦"):
