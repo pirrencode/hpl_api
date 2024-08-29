@@ -7,6 +7,7 @@ import logging
 from io import BytesIO
 from snowflake.snowpark import Session
 from criterion_factors_logic import generate_safety_data, generate_environmental_impact_data, generate_social_acceptance_data, generate_technical_feasibility_data, generate_regulatory_approval_data, generate_quantum_factor_data, generate_economic_viability_data, generate_usability_data, generate_reliability_data, generate_infrastructure_integration_data, generate_scalability_data
+import openai
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -41,6 +42,59 @@ def get_snowflake_connection_params():
         "database": st.secrets["snowflake"]["database"],
         # "schema": st.secrets["snowflake"]["schema"]
     }
+
+############################################
+#OPENAI INTEGRATION
+############################################
+
+def get_openai_api_key():
+    return st.secrets["openai_api_key"]
+
+############################################
+#OPENAI INSIGHTS GENERATION
+############################################
+
+def get_genai_insights(dataframe):
+
+    data_summary = dataframe.describe().to_string()
+
+    prompt = (
+        "This is data for a Hyperloop project performance. Each field represents a criterion over time. "
+        "Based on the following data summary, please provide insights on how the project is performing "
+        "and recommendations for improvement:\n\n"
+        f"{data_summary}"
+    )
+
+    openai.api_key = get_openai_api_key()
+
+    try:
+        response = openai.Completion.create(
+            engine="text-davinci-003",  # You can use a different model if preferred
+            prompt=prompt,
+            max_tokens=150,  # Adjust based on desired length of response
+            n=1,
+            stop=None,
+            temperature=0.7,
+        )
+
+        insights = response.choices[0].text.strip()
+        return insights
+    except Exception as e:
+        st.error(f"An error occurred while fetching insights from ChatGPT: {str(e)}")
+        return None
+
+def analyze_hyperloop_project():
+    df = load_data_from_snowflake("ALLIANCE_STORE.HPL_SD_CRS_ALLIANCE")
+    if df is not None:
+        st.write("Data loaded successfully.")
+        st.dataframe(df)
+
+        insights = get_genai_insights(df)
+        if insights:
+            st.write("GenAI Insights:")
+            st.write(insights)
+    else:
+        st.error("Failed to load data, analysis cannot proceed.")
 
 #############################################
 # MIGRATION SCRIPTS
@@ -561,7 +615,7 @@ def populate_hpl_sd_crs():
 
 def render_homepage():
     st.title("HDME")
-    st.subheader("v0.07-dev")
+    st.subheader("v0.08-dev")
     st.write("""
         Welcome to the Hyperloop Project System Dynamics Dashboard. 
         This application allows you to upload, manage, and visualize data related to various criteria 
