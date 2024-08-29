@@ -145,7 +145,7 @@ def clean_data_with_chatgpt(df):
         return None
 
 def normalize_cr_scl_data():
-    # Load data from STAGING_STORE.CALC_CR_SCL_STAGING
+
     df = load_data_from_snowflake("STAGING_STORE.CALC_CR_SCL_STAGING")
 
     if df is not None:
