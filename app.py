@@ -80,10 +80,10 @@ def get_genai_insights(dataframe):
     try:
         # Send the prompt to ChatGPT using the updated ChatCompletion API
         response = openai.chat.completions.create(
-            model="gpt-4",
+            model="gpt-3.5-turbo",
             messages=[
                 {"role": "system", "content": "You are a helpful assistant."},
-                {"role": "user", "content": prompt}
+                {"role": "user", "content": "Test connection to OpenAI API"}
             ]
         )
 
