@@ -102,17 +102,19 @@ def get_genai_insights(dataframe):
     openai.api_key = get_openai_api_key()
 
     try:
-        response = openai.Completion.create(
-            engine="text-davinci-003",  # You can use a different model if preferred
-            prompt=prompt,
-            max_tokens=150,  # Adjust based on desired length of response
-            n=1,
-            stop=None,
-            temperature=0.7,
+        # Send the prompt to ChatGPT using the updated ChatCompletion API
+        response = openai.ChatCompletion.create(
+            model="gpt-4",
+            messages=[
+                {"role": "system", "content": "You are a helpful assistant."},
+                {"role": "user", "content": prompt}
+            ]
         )
 
-        insights = response.choices[0].text.strip()
+        # Extract the response text
+        insights = response['choices'][0]['message']['content'].strip()
         return insights
+
     except Exception as e:
         st.error(f"An error occurred while fetching insights from ChatGPT: {str(e)}")
         return None
