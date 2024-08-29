@@ -1,5 +1,9 @@
 # Hyperloop decision making ecosystem changelog
 
+## v0.08-dev
+
+- Implemented project analysis using GenAI
+
 ## v0.07-dev
 
 - Implemented backup functionality
