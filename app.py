@@ -47,29 +47,73 @@ def get_snowflake_connection_params():
 #############################################
 
 def fusion_to_staging_migration(source_table, dest_table):
-    conn = get_snowflake_connection_params()
-    cursor = conn.cursor()
+    # conn = get_snowflake_connection_params()
+    # cursor = conn.cursor()
+    
+    session = Session.builder.configs(get_snowflake_connection_params()).create()
 
     try:
-
-        copy_sql = f"""
-        INSERT INTO {dest_table}
-        SELECT * FROM {source_table};
-        """
-
-        cursor.execute(copy_sql)
-        conn.commit()
+        session.sql(f"INSERT INTO {dest_table} SELECT * FROM {source_table};")
         print(f"Data successfully copied from {source_table} to {dest_table}.")
     except Exception as e:
-        print(f"An error occurred: {e}")
-        conn.rollback()
+        logging.error(f"Error saving data to Snowflake: {e}")
+        st.error(f"An error occurred while saving data to Snowflake: {str(e)}")
     finally:
-        cursor.close()
-        conn.close()
+        if session:
+            session.close()
 
 # source_table = "FUSION_STORE.CR_REG_SOURCE"
 # dest_table = "STAGING_STORE.CR_REG_SOURCE"
 # copy_data_between_schemas(source_table, dest_table)
+
+def load_data_from_snowflake(table_name):
+    session = Session.builder.configs(get_snowflake_connection_params()).create()
+    df = session.table(table_name).to_pandas()
+    session.close()
+    return df
+
+def save_data_to_snowflake(df, table_name):
+    try:
+        csv_buffer = BytesIO()
+        df.to_csv(csv_buffer, index=False)
+        csv_buffer.seek(0)  # Reset buffer to start
+
+        session = Session.builder.configs(get_snowflake_connection_params()).create()
+
+        session.sql(f"USE SCHEMA FUSION_STORE").collect()
+        stage_name = "my_temp_stage"
+        
+        session.sql(f"CREATE TEMPORARY STAGE IF NOT EXISTS {stage_name}").collect()
+        logging.info("Temporary stage created or already exists.")
+
+        # Upload the in-memory file to the stage
+        put_result = session.file.put_stream(csv_buffer, f"@{stage_name}/temp_file.csv")
+        logging.info(f"PUT command result: {put_result}")
+
+        delete_data = session.sql(f"TRUNCATE TABLE IF EXISTS {table_name}").collect()
+        logging.info(f"TRUNCATE command result: {delete_data}")
+
+        # Load the data into the Snowflake table
+        copy_result = session.sql(f"""
+            COPY INTO {table_name}
+            FROM @{stage_name}/temp_file.csv
+            FILE_FORMAT = (TYPE = 'CSV' FIELD_OPTIONALLY_ENCLOSED_BY='"' SKIP_HEADER=1)
+        """).collect()
+        logging.info(f"COPY command result: {copy_result}")
+
+        # Clean up: remove the file from the stage
+        session.sql(f"REMOVE @{stage_name}/temp_file.csv").collect()
+        logging.info("Temporary file removed from stage.")
+
+    except Exception as e:
+        logging.error(f"Error saving data to Snowflake: {e}")
+        st.error(f"An error occurred while saving data to Snowflake: {str(e)}")
+    finally:
+        if session:
+            session.close()
+        csv_buffer.close()
+
+    st.success(f"Data successfully saved to {table_name} in Snowflake!")
 
 #############################################
 # CRITERION CALCULATION
@@ -398,55 +442,6 @@ def populate_hpl_sd_crs():
     st.dataframe(combined_df.head())
 
     return combined_df
-
-def load_data_from_snowflake(table_name):
-    session = Session.builder.configs(get_snowflake_connection_params()).create()
-    df = session.table(table_name).to_pandas()
-    session.close()
-    return df
-
-def save_data_to_snowflake(df, table_name):
-    try:
-        csv_buffer = BytesIO()
-        df.to_csv(csv_buffer, index=False)
-        csv_buffer.seek(0)  # Reset buffer to start
-
-        session = Session.builder.configs(get_snowflake_connection_params()).create()
-
-        session.sql(f"USE SCHEMA FUSION_STORE").collect()
-        stage_name = "my_temp_stage"
-        
-        session.sql(f"CREATE TEMPORARY STAGE IF NOT EXISTS {stage_name}").collect()
-        logging.info("Temporary stage created or already exists.")
-
-        # Upload the in-memory file to the stage
-        put_result = session.file.put_stream(csv_buffer, f"@{stage_name}/temp_file.csv")
-        logging.info(f"PUT command result: {put_result}")
-
-        delete_data = session.sql(f"TRUNCATE TABLE IF EXISTS {table_name}").collect()
-        logging.info(f"TRUNCATE command result: {delete_data}")
-
-        # Load the data into the Snowflake table
-        copy_result = session.sql(f"""
-            COPY INTO {table_name}
-            FROM @{stage_name}/temp_file.csv
-            FILE_FORMAT = (TYPE = 'CSV' FIELD_OPTIONALLY_ENCLOSED_BY='"' SKIP_HEADER=1)
-        """).collect()
-        logging.info(f"COPY command result: {copy_result}")
-
-        # Clean up: remove the file from the stage
-        session.sql(f"REMOVE @{stage_name}/temp_file.csv").collect()
-        logging.info("Temporary file removed from stage.")
-
-    except Exception as e:
-        logging.error(f"Error saving data to Snowflake: {e}")
-        st.error(f"An error occurred while saving data to Snowflake: {str(e)}")
-    finally:
-        if session:
-            session.close()
-        csv_buffer.close()
-
-    st.success(f"Data successfully saved to {table_name} in Snowflake!")
 
 ##############################################################
 # HOMEPAGE CREATION
