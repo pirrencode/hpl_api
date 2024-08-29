@@ -41,7 +41,6 @@ def get_snowflake_connection_params():
         "role": st.secrets["snowflake"]["role"],
         "warehouse": st.secrets["snowflake"]["warehouse"],
         "database": st.secrets["snowflake"]["database"],
-        # "schema": st.secrets["snowflake"]["schema"]
     }
 
 ############################################
@@ -127,7 +126,7 @@ def clean_data_with_chatgpt(df):
     openai.api_key = get_openai_api_key()
 
     try:
-        response = openai.ChatCompletion.create(
+        response = openai.chat.completions.create(
             model="gpt-3.5-turbo",
             messages=[
                 {"role": "system", "content": "You are a helpful assistant."},
