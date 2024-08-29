@@ -1386,6 +1386,6 @@ elif st.session_state['page'] == 'upload_data':
 elif st.session_state['page'] == 'visualizations':
     render_visualizations_page()
 elif st.session_state['page'] == 'scenarious':
-    render_scenarios_simulation_page()
+    render_utility_page()
 elif st.session_state['page'] == 'utility':
     render_scenarios_simulation_page()    
