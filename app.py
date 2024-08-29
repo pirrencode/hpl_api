@@ -1369,6 +1369,10 @@ def render_utility_page():
         raw_df = populate_calc_cr_scl_staging()              
         save_data_to_snowflake(raw_df, "STAGING_STORE.CALC_CR_SCL_STAGING")
 
+    if st.button("APPLY EXPLORATIVE ANALYSIS USING GEN AI 📦"):
+        cleaned_df = normalize_cr_scl_data()            
+        save_data_to_snowflake(cleaned_df, "STAGING_STORE.CALC_CR_SCL_STAGING")        
+
     if st.button("⬅️ BACK"):
         st.session_state['page'] = 'home'  
 
