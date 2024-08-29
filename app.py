@@ -39,8 +39,41 @@ def get_snowflake_connection_params():
         "role": st.secrets["snowflake"]["role"],
         "warehouse": st.secrets["snowflake"]["warehouse"],
         "database": st.secrets["snowflake"]["database"],
-        "schema": st.secrets["snowflake"]["schema"]
+        # "schema": st.secrets["snowflake"]["schema"]
     }
+
+#############################################
+# MIGRATION SCRIPTS
+#############################################
+
+def fusion_to_staging_migration(source_table, dest_table):
+    conn = get_snowflake_connection_params()
+    cursor = conn.cursor()
+
+    try:
+
+        copy_sql = f"""
+        INSERT INTO {dest_table}
+        SELECT * FROM {source_table};
+        """
+
+        cursor.execute(copy_sql)
+        conn.commit()
+        print(f"Data successfully copied from {source_table} to {dest_table}.")
+    except Exception as e:
+        print(f"An error occurred: {e}")
+        conn.rollback()
+    finally:
+        cursor.close()
+        conn.close()
+
+# source_table = "FUSION_STORE.CR_REG_SOURCE"
+# dest_table = "STAGING_STORE.CR_REG_SOURCE"
+# copy_data_between_schemas(source_table, dest_table)
+
+#############################################
+# CRITERION CALCULATION
+#############################################
 
 def calculate_cr_env():
     """
@@ -54,8 +87,8 @@ def calculate_cr_env():
     :return: DataFrame correlating to the CALC_CR_ENV schema
     """
     session = Session.builder.configs(get_snowflake_connection_params()).create()
-    df_source = session.table("CR_ENV_SOURCE").to_pandas()
-    # Calculate the CR_ENV using the formula
+    df_source = session.table("STAGING_STORE.CR_ENV_STAGING").to_pandas()
+
     w1, w2, w3, w4 = 0.25, 0.25, 0.25, 0.25
     df_result = pd.DataFrame()
     df_result['TIME'] = df_source['TIME']
@@ -71,7 +104,7 @@ def calculate_cr_sfy():
     session = Session.builder.configs(get_snowflake_connection_params()).create()
 
     # Load data from CR_SFY_SOURCE table
-    df = session.table("CR_SFY_SOURCE").to_pandas()
+    df = session.table("STAGING_STORE.CR_SFY_STAGING").to_pandas()
     st.write("DF is defined")
     # Calculate CR_SFY for each time period
     epsilon = 1e-6  # Avoid division by zero
@@ -92,7 +125,7 @@ def calculate_cr_sac():
 
     session = Session.builder.configs(get_snowflake_connection_params()).create()
 
-    df_source = session.table("CR_SAC_SOURCE").to_pandas()
+    df_source = session.table("STAGING_STORE.CR_SAC_STAGING").to_pandas()
     st.write("DF is defined")
 
     df_result = pd.DataFrame()
@@ -114,7 +147,7 @@ def calculate_cr_tfe():
 
     session = Session.builder.configs(get_snowflake_connection_params()).create()
 
-    df_source = session.table("CR_TFE_SOURCE").to_pandas()
+    df_source = session.table("STAGING_STORE.CR_TFE_STAGING").to_pandas()
     st.write("DF is defined")
 
     df_result = pd.DataFrame()
@@ -141,7 +174,7 @@ def calculate_cr_reg():
 
     session = Session.builder.configs(get_snowflake_connection_params()).create()
 
-    df_source = session.table("CR_REG_SOURCE").to_pandas()
+    df_source = session.table("STAGING_STORE.CR_REG_STAGING").to_pandas()
     st.write("DF is defined")
 
     df_result = pd.DataFrame()
@@ -165,7 +198,7 @@ def calculate_cr_qmf():
 
     session = Session.builder.configs(get_snowflake_connection_params()).create()
 
-    df_source = session.table("CR_QMF_SOURCE").to_pandas()
+    df_source = session.table("STAGING_STORE.CR_QMF_STAGING").to_pandas()
     st.write("DF is defined")
 
     df_result = pd.DataFrame()
@@ -185,7 +218,7 @@ def calculate_cr_ecv():
     session = Session.builder.configs(get_snowflake_connection_params()).create()
 
     # Fetch the data from Snowflake
-    cr_ecv_source_df = session.table("CR_ECV_SOURCE").to_pandas()
+    cr_ecv_source_df = session.table("STAGING_STORE.CR_ECV_STAGING").to_pandas()
     st.write("DF is defined")
 
     calc_data = []
@@ -223,7 +256,7 @@ def calculate_cr_ecv():
 def calculate_cr_usb():
     session = Session.builder.configs(get_snowflake_connection_params()).create()
     
-    cr_usb_source_df = session.table("CR_USB_SOURCE").to_pandas()
+    cr_usb_source_df = session.table("STAGING_STORE.CR_USB_STAGING").to_pandas()
     st.write("CR_USB_SOURCE DataFrame Loaded")
     
     calc_data = []
@@ -245,7 +278,7 @@ def calculate_cr_usb():
 def calculate_cr_rlb():
     session = Session.builder.configs(get_snowflake_connection_params()).create()
     
-    cr_rlb_source_df = session.table("CR_RLB_SOURCE").to_pandas()
+    cr_rlb_source_df = session.table("STAGING_STORE.CR_RLB_STAGING").to_pandas()
     st.write("CR_RLB_SOURCE DataFrame Loaded")
     
     calc_data = []
@@ -268,7 +301,7 @@ def calculate_cr_rlb():
 def calculate_cr_inf():
     session = Session.builder.configs(get_snowflake_connection_params()).create()
     
-    cr_inf_source_df = session.table("CR_INF_SOURCE").to_pandas()
+    cr_inf_source_df = session.table("STAGING_STORE.CR_INF_STAGING").to_pandas()
     st.write("CR_INF_SOURCE DataFrame Loaded")
     
     calc_data = []
@@ -291,7 +324,7 @@ def calculate_cr_inf():
 def calculate_cr_scl():
     session = Session.builder.configs(get_snowflake_connection_params()).create()
     
-    cr_scl_source_df = session.table("CR_SCL_SOURCE").to_pandas()
+    cr_scl_source_df = session.table("STAGING_STORE.CR_SCL_STAGING").to_pandas()
     st.write("CR_SCL_SOURCE DataFrame Loaded")
     
     calc_data = []
@@ -312,21 +345,26 @@ def calculate_cr_scl():
     
     return calc_df
 
+
+#############################################
+# ALLIANCE STORE OPERATIONS
+#############################################
+
 def populate_hpl_sd_crs():
     session = Session.builder.configs(get_snowflake_connection_params()).create()
 
     # Load data from each CALC_CR_* table
-    cr_env_df = session.table("CALC_CR_ENV").to_pandas()
-    cr_sac_df = session.table("CALC_CR_SAC").to_pandas()
-    cr_tfe_df = session.table("CALC_CR_TFE").to_pandas()
-    cr_sfy_df = session.table("CALC_CR_SFY").to_pandas()
-    cr_reg_df = session.table("CALC_CR_REG").to_pandas()
-    cr_qmf_df = session.table("CALC_CR_QMF").to_pandas()
-    cr_ecv_df = session.table("CALC_CR_ECV").to_pandas()
-    cr_usb_df = session.table("CALC_CR_USB").to_pandas()
-    cr_rlb_df = session.table("CALC_CR_RLB").to_pandas()
-    cr_inf_df = session.table("CALC_CR_INF").to_pandas()
-    cr_scl_df = session.table("CALC_CR_SCL").to_pandas()
+    cr_env_df = session.table("STAGING_STORE.CALC_CR_ENV_STAGING").to_pandas()
+    cr_sac_df = session.table("STAGING_STORE.CALC_CR_SAC_STAGING").to_pandas()
+    cr_tfe_df = session.table("STAGING_STORE.CALC_CR_TFE_STAGING").to_pandas()
+    cr_sfy_df = session.table("STAGING_STORE.CALC_CR_SFY_STAGING").to_pandas()
+    cr_reg_df = session.table("STAGING_STORE.CALC_CR_REG_STAGING").to_pandas()
+    cr_qmf_df = session.table("STAGING_STORE.CALC_CR_QMF_STAGING").to_pandas()
+    cr_ecv_df = session.table("STAGING_STORE.CALC_CR_ECV_STAGING").to_pandas()
+    cr_usb_df = session.table("STAGING_STORE.CALC_CR_USB_STAGING").to_pandas()
+    cr_rlb_df = session.table("STAGING_STORE.CALC_CR_RLB_STAGING").to_pandas()
+    cr_inf_df = session.table("STAGING_STORE.CALC_CR_INF_STAGING").to_pandas()
+    cr_scl_df = session.table("STAGING_STORE.CALC_CR_SCL_STAGING").to_pandas()
 
     # Start with the first DataFrame and merge sequentially, keeping only TIME and the relevant criterion column
     combined_df = cr_env_df[['TIME', 'CR_ENV']]\
@@ -415,7 +453,7 @@ def save_data_to_snowflake(df, table_name):
 
 def render_homepage():
     st.title("HDME")
-    st.subheader("v0.05-dev")
+    st.subheader("v0.06-dev")
     st.write("""
         Welcome to the Hyperloop Project System Dynamics Dashboard. 
         This application allows you to upload, manage, and visualize data related to various criteria 
@@ -457,31 +495,45 @@ def render_upload_data_page():
                                                   ])
 
     source_table_mapping = {
-        "Safety": "CR_SFY_SOURCE",
-        "Environmental Impact": "CR_ENV_SOURCE",
-        "Social Acceptance": "CR_SAC_SOURCE",
-        "Technical Feasibility": "CR_TFE_SOURCE",
-        "Regulatory Approval": "CR_REG_SOURCE",
-        "Quantum Factor": "CR_QMF_SOURCE",
-        "Economical Viability": "CR_ECV_SOURCE",
-        "Usability": "CR_USB_SOURCE",
-        "Reliability": "CR_RLB_SOURCE",
-        "Infrastructure Integration": "CR_INF_SOURCE",
-        "Scalability": "CR_SCL_SOURCE",
+        "Safety": "FUSION_STORE.CR_SFY_SOURCE",
+        "Environmental Impact": "FUSION_STORE.CR_ENV_SOURCE",
+        "Social Acceptance": "FUSION_STORE.CR_SAC_SOURCE",
+        "Technical Feasibility": "FUSION_STORE.CR_TFE_SOURCE",
+        "Regulatory Approval": "FUSION_STORE.CR_REG_SOURCE",
+        "Quantum Factor": "FUSION_STORE.CR_QMF_SOURCE",
+        "Economical Viability": "FUSION_STORE.CR_ECV_SOURCE",
+        "Usability": "FUSION_STORE.CR_USB_SOURCE",
+        "Reliability": "FUSION_STORE.CR_RLB_SOURCE",
+        "Infrastructure Integration": "FUSION_STORE.CR_INF_SOURCE",
+        "Scalability": "FUSION_STORE.CR_SCL_SOURCE",
     }
 
+    staging_table_mapping = {
+        "Safety": "STAGING_STORE.CR_SFY_STAGING",
+        "Environmental Impact": "STAGING_STORE.CR_ENV_STAGING",
+        "Social Acceptance": "STAGING_STORE.CR_SAC_STAGING",
+        "Technical Feasibility": "STAGING_STORE.CR_TFE_STAGING",
+        "Regulatory Approval": "STAGING_STORE.CR_REG_STAGING",
+        "Quantum Factor": "STAGING_STORE.CR_QMF_STAGING",
+        "Economical Viability": "STAGING_STORE.CR_ECV_STAGING",
+        "Usability": "STAGING_STORE.CR_USB_STAGING",
+        "Reliability": "STAGING_STORE.CR_RLB_STAGING",
+        "Infrastructure Integration": "STAGING_STORE.CR_INF_STAGING",
+        "Scalability": "STAGING_STORE.CR_SCL_STAGING",
+    }    
+
     criterion_table_mapping = {
-        "Safety": "CALC_CR_SFY",
-        "Environmental Impact": "CALC_CR_ENV",
-        "Social Acceptance": "CALC_CR_SAC",
-        "Technical Feasibility": "CALC_CR_TFE",
-        "Regulatory Approval": "CALC_CR_REG",
-        "Quantum Factor": "CALC_CR_QMF",
-        "Economical Viability": "CALC_CR_ECV",
-        "Usability": "CALC_CR_USB",
-        "Reliability": "CALC_CR_RLB",
-        "Infrastructure Integration": "CALC_CR_INF",
-        "Scalability": "CALC_CR_SCL",
+        "Safety": "STAGING_STORE.CALC_CR_SFY_STAGING",
+        "Environmental Impact": "STAGING_STORE.CALC_CR_ENV_STAGING",
+        "Social Acceptance": "STAGING_STORE.CALC_CR_SAC_STAGING",
+        "Technical Feasibility": "STAGING_STORE.CALC_CR_TFE_STAGING",
+        "Regulatory Approval": "STAGING_STORE.CALC_CR_REG_STAGING",
+        "Quantum Factor": "STAGING_STORE.CALC_CR_QMF_STAGING",
+        "Economical Viability": "STAGING_STORE.CALC_CR_ECV_STAGING",
+        "Usability": "STAGING_STORE.CALC_CR_USB_STAGING",
+        "Reliability": "STAGING_STORE.CALC_CR_RLB_STAGING",
+        "Infrastructure Integration": "STAGING_STORE.CALC_CR_INF_STAGING",
+        "Scalability": "STAGING_STORE.CALC_CR_SCL_STAGING",
     }    
 
     generate_function_mapping = {
@@ -512,7 +564,8 @@ def render_upload_data_page():
         "Scalability": calculate_cr_scl,
     }    
 
-    selected_source_table = source_table_mapping.get(criterion, "CR_SFY_SOURCE")
+    selected_source_table = source_table_mapping.get(criterion, "FUSION_STORE.CR_SFY_SOURCE")
+    selected_staging_table = staging_table_mapping.get(criterion, "STAGING_STORE.CR_SFY_STAGING")
 
     selected_criterion_table = criterion_table_mapping.get(criterion, "CALC_CR_SFY")
     
@@ -525,6 +578,8 @@ def render_upload_data_page():
         st.write(f"Data generated for {criterion}:")
         st.dataframe(df.head())
         save_data_to_snowflake(df, selected_source_table)
+        fusion_to_staging_migration(selected_source_table, selected_staging_table)
+        st.write(f"Data loaded for {criterion}:")
 
     if st.button("🔢 Calculate Criterion and Save Data"):
         st.write(f"DEBUG: {criterion_function}")
@@ -533,8 +588,13 @@ def render_upload_data_page():
         st.dataframe(df.head())
         save_data_to_snowflake(df, selected_criterion_table)
 
-    if st.button("🔎View Source Data from Snowflake"):
+    if st.button("🔎 View Fusion Store Data from Snowflake"):
         df = load_data_from_snowflake(selected_source_table)
+        st.write(f"Loading {criterion} data from Snowflake...")
+        st.dataframe(df)
+
+    if st.button("🔎 View Staging Store Data from Snowflake"):
+        df = load_data_from_snowflake(selected_staging_table)
         st.write(f"Loading {criterion} data from Snowflake...")
         st.dataframe(df)
 
@@ -551,12 +611,13 @@ def render_upload_data_page():
         st.dataframe(df_uploaded.head())
         if st.button("Save Uploaded CSV Data to Snowflake"):
             save_data_to_snowflake(df_uploaded, selected_source_table)
+            fusion_to_staging_migration(selected_source_table, selected_staging_table)
 
     if st.button("🗝 POPULATE SUCCESS FACTORS TABLE"):
         df = populate_hpl_sd_crs()
         st.write(f"Criterion data preview.")
         st.dataframe(df.head())
-        save_data_to_snowflake(df, "HPL_SD_CRS")
+        save_data_to_snowflake(df, "ALLIANCE_STORE.HPL_SD_CRS_ALLIANCE")
         st.write(f"Table population completed. Please proceed to visualization tab")
 
     if st.button("⬅️ BACK"):
@@ -577,7 +638,7 @@ def criterion_visualization(df_summary, crt):
 def visualize_all_success_factors():
     # Step 1: Establish Snowflake session and load data from HPL_SD_CRS
     session = Session.builder.configs(get_snowflake_connection_params()).create()
-    hpl_sd_crs_df = session.table("HPL_SD_CRS").to_pandas()
+    hpl_sd_crs_df = session.table("ALLIANCE_STORE.HPL_SD_CRS_ALLIANCE").to_pandas()
 
     # Step 2: Define the criteria to visualize
     criteria = ['CR_ENV', 'CR_SAC', 'CR_TFE', 'CR_SFY', 'CR_REG', 'CR_QMF', 'CR_ECV', 'CR_USB', 'CR_RLB', 'CR_INF', 'CR_SCL']
@@ -652,7 +713,7 @@ def render_ddmi_dashboard():
     st.title("DMMI Factors and Project Maturity Level Visualization")
     
     session = Session.builder.configs(get_snowflake_connection_params()).create()
-    hpl_sd_crs_df = session.table("HPL_SD_CRS").to_pandas()
+    hpl_sd_crs_df = session.table("ALLIANCE_STORE.HPL_SD_CRS_ALLIANCE").to_pandas()
 
     # Calculate DMMI factors
     dmmi_df = pd.DataFrame({
@@ -689,8 +750,8 @@ def render_visualizations_page():
 
     if st.button("🔍 SAFETY CRITERION"):
         crt = "SFY"
-        df_source = load_data_from_snowflake(f"CR_{crt}_SOURCE")
-        df_summary = load_data_from_snowflake(f"CALC_CR_{crt}")
+        df_source = load_data_from_snowflake(f"STAGING_STORE.CR_{crt}_STAGING")
+        df_summary = load_data_from_snowflake(f"STAGING_STORE.CALC_CR_{crt}_STAGING")
 
         for component in ["RISK_SCORE", "MIN_RISK_SCORE", "MAX_RISK_SCORE"]:
             component_visualization(df_source,component)
@@ -699,8 +760,8 @@ def render_visualizations_page():
 
     if st.button("🌍 ENVIRNOMENTAL IMPACT"):
         crt = "ENV"
-        df_source = load_data_from_snowflake(f"CR_{crt}_SOURCE")
-        df_summary = load_data_from_snowflake(f"CALC_CR_{crt}")
+        df_source = load_data_from_snowflake(f"STAGING_STORE.CR_{crt}_STAGING")
+        df_summary = load_data_from_snowflake(f"STAGING_STORE.CALC_CR_{crt}_STAGING")
 
         for component in ["ENERGY_CONSUMED", "DISTANCE", "LOAD_WEIGHT", "CO2_EMISSIONS", "MATERIAL_SUSTAINABILITY"]:
             component_visualization(df_source,component)
@@ -709,8 +770,8 @@ def render_visualizations_page():
 
     if st.button("📰 SOCIAL ACCEPTANCE"):
         crt = "SAC"
-        df_source = load_data_from_snowflake(f"CR_{crt}_SOURCE")
-        df_summary = load_data_from_snowflake(f"CALC_CR_{crt}")
+        df_source = load_data_from_snowflake(f"STAGING_STORE.CR_{crt}_STAGING")
+        df_summary = load_data_from_snowflake(f"STAGING_STORE.CALC_CR_{crt}_STAGING")
 
         for component in ["POSITIVE_FEEDBACK", "NEGATIVE_FEEDBACK"]:
             component_visualization(df_source,component)
@@ -719,8 +780,8 @@ def render_visualizations_page():
 
     if st.button("🔧 TECHNICAL FEASIBILITY"):
         crt = "TFE"
-        df_source = load_data_from_snowflake(f"CR_{crt}_SOURCE")
-        df_summary = load_data_from_snowflake(f"CALC_CR_{crt}")
+        df_source = load_data_from_snowflake(f"STAGING_STORE.CR_{crt}_STAGING")
+        df_summary = load_data_from_snowflake(f"STAGING_STORE.CALC_CR_{crt}_STAGING")
 
         for component in ["CURRENT_TRL", "TARGET_TRL", "ENG_CHALLENGES_RESOLVED", "TARGET_ENG_CHALLENGES"]:
             component_visualization(df_source,component)
@@ -729,8 +790,8 @@ def render_visualizations_page():
 
     if st.button("✔️ REGULATORY APPROVAL"):
         crt = "REG"
-        df_source = load_data_from_snowflake(f"CR_{crt}_SOURCE")
-        df_summary = load_data_from_snowflake(f"CALC_CR_{crt}")
+        df_source = load_data_from_snowflake(f"STAGING_STORE.CR_{crt}_STAGING")
+        df_summary = load_data_from_snowflake(f"STAGING_STORE.CALC_CR_{crt}_STAGING")
 
         for component in ["ETHICAL_COMPLIANCE", "LEGAL_COMPLIANCE", "LAND_USAGE_COMPLIANCE", "INT_LAW_COMPLIANCE", "TRL_COMPLIANCE"]:
             component_visualization(df_source,component)
@@ -739,8 +800,8 @@ def render_visualizations_page():
 
     if st.button("⚛️ QUANTUM FACTOR"):
         crt = "QMF"
-        df_source = load_data_from_snowflake(f"CR_{crt}_SOURCE")
-        df_summary = load_data_from_snowflake(f"CALC_CR_{crt}")
+        df_source = load_data_from_snowflake(f"STAGING_STORE.CR_{crt}_STAGING")
+        df_summary = load_data_from_snowflake(f"STAGING_STORE.CALC_CR_{crt}_STAGING")
 
         for component in ["MAGLEV_LEVITATION", 
                           "AMBIENT_INTELLIGENCE", 
@@ -761,8 +822,8 @@ def render_visualizations_page():
 
     if st.button("💶 ECONOMICAL VIABILITY "):
         crt = "ECV"
-        df_source = load_data_from_snowflake(f"CR_{crt}_SOURCE")
-        df_summary = load_data_from_snowflake(f"CALC_CR_{crt}")
+        df_source = load_data_from_snowflake(f"STAGING_STORE.CR_{crt}_STAGING")
+        df_summary = load_data_from_snowflake(f"STAGING_STORE.CALC_CR_{crt}_STAGING")
 
         for component in ["REVENUE", "OPEX", "CAPEX", "DISCOUNT_RATE", "PROJECT_LIFETIME"]:
             component_visualization(df_source,component)
@@ -771,8 +832,8 @@ def render_visualizations_page():
 
     if st.button("💡USABILITY"):
         crt = "USB"
-        df_source = load_data_from_snowflake(f"CR_{crt}_SOURCE")
-        df_summary = load_data_from_snowflake(f"CALC_CR_{crt}")
+        df_source = load_data_from_snowflake(f"STAGING_STORE.CR_{crt}_STAGING")
+        df_summary = load_data_from_snowflake(f"STAGING_STORE.CALC_CR_{crt}_STAGING")
 
         for component in ["PRODUCTION_OUTPUT", "USER_EXP_RATIO", "ACCESSIBILITY_AGEING"]:
             component_visualization(df_source,component)
@@ -781,8 +842,8 @@ def render_visualizations_page():
 
     if st.button("⚖️ RELIABILITY"):
         crt = "RLB"
-        df_source = load_data_from_snowflake(f"CR_{crt}_SOURCE")
-        df_summary = load_data_from_snowflake(f"CALC_CR_{crt}")
+        df_source = load_data_from_snowflake(f"STAGING_STORE.CR_{crt}_STAGING")
+        df_summary = load_data_from_snowflake(f"STAGING_STORE.CALC_CR_{crt}_STAGING")
 
         for component in ["DURABILITY", "DIGITAL_RELIABILITY", "WEATHER_DISASTER_RESILIENCE", "POLLUTION_PRODUCED"]:
             component_visualization(df_source,component)
@@ -791,8 +852,8 @@ def render_visualizations_page():
 
     if st.button("🏭 INFRASTRUCTURE INTEGRATION"):
         crt = "INF"
-        df_source = load_data_from_snowflake(f"CR_{crt}_SOURCE")
-        df_summary = load_data_from_snowflake(f"CALC_CR_{crt}")
+        df_source = load_data_from_snowflake(f"STAGING_STORE.CR_{crt}_STAGING")
+        df_summary = load_data_from_snowflake(f"STAGING_STORE.CALC_CR_{crt}_STAGING")
 
         for component in ["COMMON_INFRA_FEATURES", "CONSTRUCTION_BARRIERS", "INTERMODAL_CONNECTIONS", "INFRA_ADAPTABILITY_FEATURES"]:
             component_visualization(df_source,component)
@@ -801,8 +862,8 @@ def render_visualizations_page():
 
     if st.button("🛬SCALABILITY"):
         crt = "SCL"
-        df_source = load_data_from_snowflake(f"CR_{crt}_SOURCE")
-        df_summary = load_data_from_snowflake(f"CALC_CR_{crt}")
+        df_source = load_data_from_snowflake(f"STAGING_STORE.CR_{crt}_STAGING")
+        df_summary = load_data_from_snowflake(f"STAGING_STORE.CALC_CR_{crt}_STAGING")
 
         for component in ["RESOURCE_MILEAGE", "PLANNED_VOLUME", "ADJUSTMENT_COEF_1", "ADJUSTMENT_COEF_2", "ADJUSTMENT_COEF_3"]:
             component_visualization(df_source,component)
@@ -927,72 +988,84 @@ def generate_sustainable_growth_scenario():
 
 def scenarios_calculation_to_snowlake(cr_env_df, cr_sac_df, cr_tfe_df, cr_sfy_df, cr_reg_df, cr_qmf_df, cr_ecv_df, cr_usb_df, cr_rlb_df, cr_inf_df, cr_scl_df):
 
-    save_data_to_snowflake(cr_env_df, "CR_ENV_SOURCE")
-    save_data_to_snowflake(cr_sac_df, "CR_SAC_SOURCE")
-    save_data_to_snowflake(cr_tfe_df, "CR_TFE_SOURCE")
-    save_data_to_snowflake(cr_sfy_df, "CR_SFY_SOURCE")
-    save_data_to_snowflake(cr_reg_df, "CR_REG_SOURCE")
-    save_data_to_snowflake(cr_qmf_df, "CR_QMF_SOURCE")
-    save_data_to_snowflake(cr_ecv_df, "CR_ECV_SOURCE")
-    save_data_to_snowflake(cr_usb_df, "CR_USB_SOURCE")
-    save_data_to_snowflake(cr_rlb_df, "CR_RLB_SOURCE")
-    save_data_to_snowflake(cr_inf_df, "CR_INF_SOURCE")
-    save_data_to_snowflake(cr_scl_df, "CR_SCL_SOURCE")    
+    save_data_to_snowflake(cr_env_df, "FUSION_STORE.CR_ENV_SOURCE")
+    save_data_to_snowflake(cr_sac_df, "FUSION_STORE.CR_SAC_SOURCE")
+    save_data_to_snowflake(cr_tfe_df, "FUSION_STORE.CR_TFE_SOURCE")
+    save_data_to_snowflake(cr_sfy_df, "FUSION_STORE.CR_SFY_SOURCE")
+    save_data_to_snowflake(cr_reg_df, "FUSION_STORE.CR_REG_SOURCE")
+    save_data_to_snowflake(cr_qmf_df, "FUSION_STORE.CR_QMF_SOURCE")
+    save_data_to_snowflake(cr_ecv_df, "FUSION_STORE.CR_ECV_SOURCE")
+    save_data_to_snowflake(cr_usb_df, "FUSION_STORE.CR_USB_SOURCE")
+    save_data_to_snowflake(cr_rlb_df, "FUSION_STORE.CR_RLB_SOURCE")
+    save_data_to_snowflake(cr_inf_df, "FUSION_STORE.CR_INF_SOURCE")
+    save_data_to_snowflake(cr_scl_df, "FUSION_STORE.CR_SCL_SOURCE")
+
+    fusion_to_staging_migration("FUSION_STORE.CR_ENV_SOURCE", "STAGING_STORE.CR_ENV_STAGING")
+    fusion_to_staging_migration("FUSION_STORE.CR_SAC_SOURCE", "STAGING_STORE.CR_SAC_STAGING")
+    fusion_to_staging_migration("FUSION_STORE.CR_TFE_SOURCE", "STAGING_STORE.CR_TFE_STAGING")
+    fusion_to_staging_migration("FUSION_STORE.CR_SFY_SOURCE", "STAGING_STORE.CR_SFY_STAGING")
+    fusion_to_staging_migration("FUSION_STORE.CR_REG_SOURCE", "STAGING_STORE.CR_REG_STAGING")
+    fusion_to_staging_migration("FUSION_STORE.CR_QMF_SOURCE", "STAGING_STORE.CR_QMF_STAGING")
+    fusion_to_staging_migration("FUSION_STORE.CR_ECV_SOURCE", "STAGING_STORE.CR_ECV_STAGING")
+    fusion_to_staging_migration("FUSION_STORE.CR_USB_SOURCE", "STAGING_STORE.CR_USB_STAGING")
+    fusion_to_staging_migration("FUSION_STORE.CR_RLB_SOURCE", "STAGING_STORE.CR_RLB_STAGING")
+    fusion_to_staging_migration("FUSION_STORE.CR_INF_SOURCE", "STAGING_STORE.CR_INF_STAGING")
+    fusion_to_staging_migration("FUSION_STORE.CR_SCL_SOURCE", "STAGING_STORE.CR_SCL_STAGING")
 
     rapid_df_env = calculate_cr_env()
     st.write(f"Criterion rapid_df_env data loaded.")
     st.dataframe(rapid_df_env.head())
-    save_data_to_snowflake(rapid_df_env, "CALC_CR_ENV")   
+    save_data_to_snowflake(rapid_df_env, "STAGING_STORE.CALC_CR_ENV_STAGING")   
 
     rapid_df_sac = calculate_cr_sac()
     st.write(f"Criterion rapid_df_sac data loaded.")
     st.dataframe(rapid_df_sac.head())
-    save_data_to_snowflake(rapid_df_sac, "CALC_CR_ENV")  
+    save_data_to_snowflake(rapid_df_sac, "STAGING_STORE.CALC_CR_SAC_STAGING")  
 
     rapid_df_tfe = calculate_cr_tfe()
     st.write(f"Criterion rapid_df_tfe data loaded.")
     st.dataframe(rapid_df_tfe.head())
-    save_data_to_snowflake(rapid_df_tfe, "CALC_CR_TFE")  
+    save_data_to_snowflake(rapid_df_tfe, "STAGING_STORE.CALC_CR_TFE_STAGING")  
 
     rapid_df_sfy = calculate_cr_sfy()
     st.write(f"Criterion rapid_df_sfy data loaded.")
     st.dataframe(rapid_df_sfy.head())
-    save_data_to_snowflake(rapid_df_sfy, "CALC_CR_SFY") 
+    save_data_to_snowflake(rapid_df_sfy, "STAGING_STORE.CALC_CR_SFY_STAGING") 
 
     rapid_df_reg = calculate_cr_reg()
     st.write(f"Criterion rapid_df_reg data loaded.")
     st.dataframe(rapid_df_reg.head())
-    save_data_to_snowflake(rapid_df_reg, "CALC_CR_REG")  
+    save_data_to_snowflake(rapid_df_reg, "STAGING_STORE.CALC_CR_REG_STAGING")  
 
     rapid_df_qmf = calculate_cr_qmf()
     st.write(f"Criterion rapid_df_qmf data loaded.")
     st.dataframe(rapid_df_qmf.head())
-    save_data_to_snowflake(rapid_df_qmf, "CALC_CR_QMF")  
+    save_data_to_snowflake(rapid_df_qmf, "STAGING_STORE.CALC_CR_QMF_STAGING")  
 
     rapid_df_ecv = calculate_cr_ecv()
     st.write(f"Criterion rapid_df_ecv data loaded.")
     st.dataframe(rapid_df_ecv.head())
-    save_data_to_snowflake(rapid_df_ecv, "CALC_CR_ECV") 
+    save_data_to_snowflake(rapid_df_ecv, "STAGING_STORE.CALC_CR_ECV_STAGING") 
 
     rapid_df_usb = calculate_cr_usb()
     st.write(f"Criterion rapid_df_usb data loaded.")
     st.dataframe(rapid_df_usb.head())
-    save_data_to_snowflake(rapid_df_usb, "CALC_CR_USB")  
+    save_data_to_snowflake(rapid_df_usb, "STAGING_STORE.CALC_CR_USB_STAGING")  
 
     rapid_df_rlb = calculate_cr_rlb()
     st.write(f"Criterion rapid_df_rlb data loaded.")
     st.dataframe(rapid_df_rlb.head())
-    save_data_to_snowflake(rapid_df_rlb, "CALC_CR_RLB")        
+    save_data_to_snowflake(rapid_df_rlb, "STAGING_STORE.CALC_CR_RLB_STAGING")        
     
     rapid_df_inf = calculate_cr_inf()
-    st.write(f"Criterion rapid_df_rlb data loaded.")
-    st.dataframe(rapid_df_rlb.head())
-    save_data_to_snowflake(rapid_df_rlb, "CALC_CR_RLB")   
+    st.write(f"Criterion rapid_df_inf data loaded.")
+    st.dataframe(rapid_df_inf.head())
+    save_data_to_snowflake(rapid_df_inf, "STAGING_STORE.CALC_CR_INF_STAGING")   
 
     rapid_df_scl = calculate_cr_scl()
     st.write(f"Criterion rapid_df_scl data loaded.")
     st.dataframe(rapid_df_scl.head())
-    save_data_to_snowflake(rapid_df_scl, "CALC_CR_SCL")   
+    save_data_to_snowflake(rapid_df_scl, "STAGING_STORE.CALC_CR_SCL_STAGING")   
 
     st.success("Scenario data generated and saved.")
 
@@ -1020,7 +1093,7 @@ def render_scenarios_simulation_page():
             df = populate_hpl_sd_crs()
             st.write(f"Criterion data preview.")
             st.dataframe(df.head())
-            save_data_to_snowflake(df, "HPL_SD_CRS")
+            save_data_to_snowflake(df, "ALLIANCE_STORE.HPL_SD_CRS_ALLIANCE")
             st.write(f"Table population completed. Please proceed to visualization tab")            
 
     if st.button("⬅️ BACK"):
