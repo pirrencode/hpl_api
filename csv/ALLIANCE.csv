@@ -1,0 +1,2 @@
+created_on,name,database_name,schema_name,kind,comment,cluster_by,rows,bytes,owner,retention_time,automatic_clustering,change_tracking,search_optimization,search_optimization_progress,search_optimization_bytes,is_external,enable_schema_evolution,owner_role_type,is_event,budget,is_hybrid,is_iceberg,is_dynamic,is_immutable
+2024-08-28 22:54:45.160 -0700,HPL_SD_CRS_ALLIANCE,HPL_SYSTEM_DYNAMICS,ALLIANCE_STORE,TABLE,,,100,9728,ACCOUNTADMIN,1,OFF,OFF,OFF,,,N,N,ROLE,N,,N,N,N,N

@@ -67,10 +67,6 @@ def fusion_to_staging_migration(source_table, dest_table):
         if session:
             session.close()
 
-# source_table = "FUSION_STORE.CR_REG_SOURCE"
-# dest_table = "STAGING_STORE.CR_REG_SOURCE"
-# copy_data_between_schemas(source_table, dest_table)
-
 def load_data_from_snowflake(table_name):
     session = Session.builder.configs(get_snowflake_connection_params()).create()
     df = session.table(table_name).to_pandas()
@@ -119,6 +115,96 @@ def save_data_to_snowflake(df, table_name):
         csv_buffer.close()
 
     st.success(f"Data successfully saved to {table_name} in Snowflake!")
+
+#############################################
+# BACKUP SCRIPTS
+#############################################
+
+def backup_table(source_table, backup_table):
+    
+    session = Session.builder.configs(get_snowflake_connection_params()).create()
+
+    try:
+        truncate_backup_table = session.sql(f"TRUNCATE TABLE {backup_table}")
+        truncate_backup_table.collect()
+        backup_result = session.sql(f"INSERT INTO {backup_table} SELECT * FROM {source_table}")
+        backup_result.collect()
+
+        logging.info(f"BACKUP command executed successfully: Data copied from {source_table} to {backup_table}.")
+        st.write(f"DEBUG: Data successfully copied from {source_table} to {backup_table}.")
+        
+    except Exception as e:
+        logging.error(f"Error saving data to Snowflake: {e}")
+        st.error(f"An error occurred while saving data to Snowflake: {str(e)}")
+        
+    finally:
+        if session:
+            session.close()
+
+def backup_fusion_store():
+
+    tables = [
+        "CR_ECV_SOURCE",
+        "CR_ENV_SOURCE",
+        "CR_INF_SOURCE",
+        "CR_QMF_SOURCE",
+        "CR_REG_SOURCE",
+        "CR_RLB_SOURCE",
+        "CR_SAC_SOURCE",
+        "CR_SCL_SOURCE",
+        "CR_SFY_SOURCE",
+        "CR_TFE_SOURCE",
+        "CR_USB_SOURCE"
+    ]
+
+    for table in tables:
+        source_table = f"FUSION_STORE.{table}"
+        backup_table = f"FUSION_STORE.{table}_BCK"
+        backup_table(source_table, backup_table)
+
+def backup_staging_store():
+    
+    tables = [
+        "CALC_CR_ECV_STAGING",
+        "CALC_CR_ENV_STAGING",
+        "CALC_CR_INF_STAGING",
+        "CALC_CR_QMF_STAGING",
+        "CALC_CR_REG_STAGING",
+        "CALC_CR_RLB_STAGING",
+        "CALC_CR_SAC_STAGING",
+        "CALC_CR_SCL_STAGING",
+        "CALC_CR_SFY_STAGING",
+        "CALC_CR_TFE_STAGING",
+        "CALC_CR_USB_STAGING",
+        "CR_ECV_STAGING",
+        "CR_ENV_STAGING",
+        "CR_INF_STAGING",
+        "CR_QMF_STAGING",
+        "CR_REG_STAGING",
+        "CR_RLB_STAGING",
+        "CR_SAC_STAGING",
+        "CR_SCL_STAGING",
+        "CR_SFY_STAGING",
+        "CR_TFE_STAGING",
+        "CR_USB_STAGING"
+    ]
+
+    for table in tables:
+        source_table = f"STAGING_STORE.{table}"
+        backup_table = f"STAGING_STORE.{table}_BCK"
+        backup_table(source_table, backup_table)      
+
+def backup_alliance_store():
+    
+    tables = [
+        "HPL_SD_CRS_ALLIANCE"
+    ]
+
+    for table in tables:
+        source_table = f"ALLIANCE_STORE.{table}"
+        backup_table = f"ALLIANCE_STORE.{table}_BCK"
+        backup_table(source_table, backup_table)             
+
 
 #############################################
 # CRITERION CALCULATION
@@ -454,7 +540,7 @@ def populate_hpl_sd_crs():
 
 def render_homepage():
     st.title("HDME")
-    st.subheader("v0.06-dev")
+    st.subheader("v0.07-dev")
     st.write("""
         Welcome to the Hyperloop Project System Dynamics Dashboard. 
         This application allows you to upload, manage, and visualize data related to various criteria 
@@ -472,7 +558,15 @@ def render_homepage():
             st.session_state['page'] = 'visualizations'
 
     if st.button("SCENARIOS SIMULATION 🌐"):
-        st.session_state['page'] = 'scenarious'         
+        st.session_state['page'] = 'scenarious'    
+
+    if st.button("BACKUP DATA 📦"):
+        backup_fusion_store()
+        st.write("Fusion store backup is completed.")
+        backup_staging_store               
+        st.write("Staging store backup is completed.")
+        backup_alliance_store()
+        st.write("Alliance store backup is completed.")
 
 ##############################################################
 # Data upload and management page
