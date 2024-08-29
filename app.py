@@ -413,6 +413,7 @@ def save_data_to_snowflake(df, table_name):
 
         session = Session.builder.configs(get_snowflake_connection_params()).create()
 
+        session.sql(f"USE SCHEMA FUSION_STORE").collect()
         stage_name = "my_temp_stage"
         
         session.sql(f"CREATE TEMPORARY STAGE IF NOT EXISTS {stage_name}").collect()
