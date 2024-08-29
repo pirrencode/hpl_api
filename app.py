@@ -129,9 +129,6 @@ def backup_table_script(source_table, backup_table):
         truncate_backup_table.collect()
         backup_result = session.sql(f"INSERT INTO {backup_table} SELECT * FROM {source_table}")
         backup_result.collect()
-
-        logging.info(f"BACKUP command executed successfully: Data copied from {source_table} to {backup_table}.")
-        st.write(f"DEBUG: Data successfully copied from {source_table} to {backup_table}.")
         
     except Exception as e:
         logging.error(f"Error saving data to Snowflake: {e}")
@@ -586,7 +583,7 @@ def render_homepage():
 
     if st.button("BACKUP DATA 📦"):
         backup_fusion_store()
-        backup_staging_store               
+        backup_staging_store()        
         backup_alliance_store()
 
 ##############################################################
