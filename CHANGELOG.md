@@ -1,5 +1,11 @@
 # Hyperloop decision making ecosystem changelog
 
+## v0.06-dev
+
+- Implemented data stores functionality.
+- Implemented fusion_to_staging_migration() script.
+- Added table SQL statements for data stores creation.
+
 ## v0.05-dev
 
 - Added basic unittest.
