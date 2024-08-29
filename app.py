@@ -635,10 +635,13 @@ def render_homepage():
     if st.button("SCENARIOS SIMULATION 🌐"):
         st.session_state['page'] = 'scenarious'    
 
+    if st.button("ANALYZE HYPERLOOP PROJECT 📦"):
+        analyze_hyperloop_project()
+
     if st.button("BACKUP DATA 📦"):
         backup_fusion_store()
         backup_staging_store()        
-        backup_alliance_store()
+        backup_alliance_store()        
 
 ##############################################################
 # Data upload and management page
