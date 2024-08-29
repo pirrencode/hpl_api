@@ -26,9 +26,19 @@ jobs:
 
       - name: Increment version number
         id: increment_version
+      - name: Increment version number
+        id: increment_version
         run: |
-          IFS='.' read -r -a version_parts <<< "${{ steps.get_tag.outputs.tag }}"
-          new_version="${version_parts[0]}.$((version_parts[1]+1)).0"
+          current_version="${{ steps.get_tag.outputs.tag }}"
+          current_version="${current_version#v}"
+          
+          IFS='.' read -r -a version_parts <<< "$current_version"
+          
+          new_patch_version=$((version_parts[2]+1))
+          
+          new_version="v${version_parts[0]}.${version_parts[1]}.$new_patch_version"
+          
+          echo "New version: $new_version"
           echo "##[set-output name=new_version;]$new_version"
 
       - name: Create new tag
