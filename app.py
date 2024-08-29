@@ -166,7 +166,7 @@ def normalize_cr_scl_data():
         return None
 
 # Example usage
-cleaned_df = normalize_cr_scl_data()
+# cleaned_df = normalize_cr_scl_data()
 
 import random
 
