@@ -28,10 +28,16 @@ jobs:
         id: increment_version
         run: |
           current_version="${{ steps.get_tag.outputs.tag }}"
+          echo "Current version: $current_version"
+
           current_version="${current_version#v}"
-          
+          echo "Version without 'v' prefix: $current_version"
+
           IFS='.' read -r -a version_parts <<< "$current_version"
           
+          echo "Version parts: ${version_parts[@]}"
+          echo "Number of version parts: ${#version_parts[@]}"
+
           if [ ${#version_parts[@]} -ne 3 ]; then
             echo "Error: Invalid version format. Expected 'vX.Y.Z'."
             exit 1
