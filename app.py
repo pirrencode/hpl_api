@@ -69,9 +69,7 @@ def get_genai_insights(dataframe):
     data_summary = dataframe.describe().to_string()
 
     prompt = (
-        "This is data for a Hyperloop project performance. Each field represents a criterion over time. "
-        "Based on the following data summary, please provide insights on how the project is performing "
-        "and recommendations for improvement:\n\n"
+        "You are an expert in project performance analysis. Based on the following data summary of a Hyperloop project, please provide detailed insights on how the project is performing and offer recommendations for improvement:\n\n"
         f"{data_summary}"
     )
 
@@ -83,7 +81,7 @@ def get_genai_insights(dataframe):
             model="gpt-3.5-turbo",
             messages=[
                 {"role": "system", "content": "You are a helpful assistant."},
-                {"role": "user", "content": "Test connection to OpenAI API"}
+                {"role": "user", "content": prompt}
             ]
         )
 
