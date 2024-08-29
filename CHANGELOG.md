@@ -1,8 +1,14 @@
 # Hyperloop decision making ecosystem changelog
 
+## v0.09-dev
+
+- Added functionality for clean-up data that is not as per requirements for Scalability criterion.
+- Added functionality to generate dirty data for testing purposes.
+- UI imporvements -> Added Utilities page.
+
 ## v0.08-dev
 
-- Implemented project analysis using GenAI
+- Implemented project analysis using GenAI.
 
 ## v0.07-dev
 
