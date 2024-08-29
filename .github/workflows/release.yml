@@ -32,12 +32,17 @@ jobs:
           
           IFS='.' read -r -a version_parts <<< "$current_version"
           
-          new_patch_version=$((version_parts[2]+1))
+          if [ ${#version_parts[@]} -ne 3 ]; then
+            echo "Error: Invalid version format. Expected 'vX.Y.Z'."
+            exit 1
+          fi
+          
+          new_patch_version=$((version_parts[2] + 1))
           
           new_version="v${version_parts[0]}.${version_parts[1]}.$new_patch_version"
           
           echo "New version: $new_version"
-          echo "##[set-output name=new_version;]$new_version"
+          echo "new_version=$new_version" >> $GITHUB_ENV
 
       - name: Create new tag
         id: create_tag
