@@ -49,7 +49,7 @@ def get_snowflake_connection_params():
 ############################################
 
 def get_openai_api_key():
-    return st.secrets["openai_api_key"]
+    return st.secrets["openai"]["openai_api_key"]
 
 ############################################
 #OPENAI INSIGHTS GENERATION
@@ -57,7 +57,7 @@ def get_openai_api_key():
 
 def test_openai_api_key():
     try:
-        api_key = st.secrets["openai_api_key"]
+        api_key = st.secrets["openai"]["openai_api_key"]
         st.write(f"API Key successfully retrieved: {api_key[:5]}...")  # Display only the first few characters
     except KeyError:
         st.error("API Key not found. Please check the secrets configuration.")
