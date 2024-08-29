@@ -76,7 +76,6 @@ def get_genai_insights(dataframe):
     openai.api_key = get_openai_api_key()
 
     try:
-        # Send the prompt to ChatGPT using the updated ChatCompletion API
         response = openai.chat.completions.create(
             model="gpt-3.5-turbo",
             messages=[
@@ -85,7 +84,6 @@ def get_genai_insights(dataframe):
             ]
         )
 
-        # Extract the response text correctly using attributes
         insights = response.choices[0].message.content.strip()
         return insights
 
@@ -109,6 +107,80 @@ def analyze_hyperloop_project():
             st.write(insights)
     else:
         st.error("Failed to load data, analysis cannot proceed.")
+
+#############################################
+# ETL IMPROVEMENT
+#############################################
+
+def clean_data_with_chatgpt(df):
+    # Convert the DataFrame to a string (JSON format) for better handling by the API
+    data_json = df.to_json(orient='split')
+
+    prompt = (
+        "You are given a dataset in JSON format. Check if the 'CR_SCL' column contains any value larger than 1. "
+        "If so, normalize those values so they fall within the range 0..1. Other values should stay as they are. "
+        "Return the cleaned dataset in JSON format "
+        "without any additional text or explanation.\n\n"
+        f"Dataset: {data_json}"
+    )
+
+    openai.api_key = get_openai_api_key()
+
+    try:
+        response = openai.ChatCompletion.create(
+            model="gpt-3.5-turbo",
+            messages=[
+                {"role": "system", "content": "You are a helpful assistant."},
+                {"role": "user", "content": prompt}
+            ]
+        )
+
+        cleaned_data_json = response.choices[0].message.content.strip()
+
+        cleaned_df = pd.read_json(cleaned_data_json, orient='split')
+        return cleaned_df
+
+    except Exception as e:
+        st.error(f"An error occurred while processing data with ChatGPT: {str(e)}")
+        return None
+
+def normalize_cr_scl_data():
+    # Load data from STAGING_STORE.CALC_CR_SCL_STAGING
+    df = load_data_from_snowflake("STAGING_STORE.CALC_CR_SCL_STAGING")
+
+    if df is not None:
+        st.write("Data loaded successfully.")
+        st.dataframe(df)
+
+        # Clean the data using ChatGPT
+        cleaned_df = clean_data_with_chatgpt(df)
+
+        if cleaned_df is not None:
+            st.write("Data cleaned successfully.")
+            st.dataframe(cleaned_df)
+            return cleaned_df
+        else:
+            st.error("Failed to clean data using ChatGPT.")
+    else:
+        st.error("Failed to load data from Snowflake.")
+        return None
+
+# Example usage
+cleaned_df = normalize_cr_scl_data()
+
+import random
+
+def populate_calc_cr_scl_staging(time_period=100):
+    # Generate random values
+    data = {
+        "TIME_PERIOD": list(range(1, time_period + 1)),
+        "CR_SCL": [random.randint(1, 50) for _ in range(time_period)]
+    }
+
+    # Create DataFrame
+    df = pd.DataFrame(data)
+
+    return df
 
 #############################################
 # MIGRATION SCRIPTS
@@ -629,7 +701,7 @@ def populate_hpl_sd_crs():
 
 def render_homepage():
     st.title("HDME")
-    st.subheader("v0.08-dev")
+    st.subheader("v0.09-dev")
     st.write("""
         Welcome to the Hyperloop Project System Dynamics Dashboard. 
         This application allows you to upload, manage, and visualize data related to various criteria 
@@ -652,10 +724,8 @@ def render_homepage():
     if st.button("ANALYZE HYPERLOOP PROJECT 📦"):
         analyze_hyperloop_project()
 
-    if st.button("BACKUP DATA 📦"):
-        backup_fusion_store()
-        backup_staging_store()        
-        backup_alliance_store()        
+    if st.button("UTILITY 📦"):
+        st.session_state['page'] = 'utility'
 
 ##############################################################
 # Data upload and management page
@@ -1281,7 +1351,26 @@ def render_scenarios_simulation_page():
             st.write(f"Table population completed. Please proceed to visualization tab")            
 
     if st.button("⬅️ BACK"):
-        st.session_state['page'] = 'home'              
+        st.session_state['page'] = 'home' 
+
+#######################################
+# UTILITY PAGE
+#######################################             
+
+def render_utility_page():
+    st.title("UTILITY ")
+
+    if st.button("BACKUP DATA 📦"):
+        backup_fusion_store()
+        backup_staging_store()        
+        backup_alliance_store()     
+    
+    if st.button("GENERATE DIRTY DATA FOR SCALABILITY 📦"):
+        raw_df = populate_calc_cr_scl_staging()              
+        save_data_to_snowflake(raw_df, "STAGING_STORE.CALC_CR_SCL_STAGING")
+
+    if st.button("⬅️ BACK"):
+        st.session_state['page'] = 'home'  
 
 #######################################
 # APPLICATION NAVIGATION
@@ -1298,3 +1387,5 @@ elif st.session_state['page'] == 'visualizations':
     render_visualizations_page()
 elif st.session_state['page'] == 'scenarious':
     render_scenarios_simulation_page()
+elif st.session_state['page'] == 'utility':
+    render_scenarios_simulation_page()    
