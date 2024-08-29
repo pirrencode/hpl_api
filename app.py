@@ -717,7 +717,7 @@ def render_homepage():
     if st.button("SCENARIOS SIMULATION 🌐"):
         st.session_state['page'] = 'scenarious'    
 
-    if st.button("ANALYZE HYPERLOOP PROJECT 📊"):
+    if st.button("ANALYZE HYPERLOOP PROJECT 🧠"):
         analyze_hyperloop_project()
 
     if st.button("UTILITIES 🛠️"):
@@ -1354,7 +1354,7 @@ def render_scenarios_simulation_page():
 #######################################             
 
 def render_utility_page():
-    st.title("UTILITY ")
+    st.title("UTILITIES ")
 
     if st.button("BACKUP DATA 📦"):
         backup_fusion_store()
@@ -1365,7 +1365,7 @@ def render_utility_page():
         raw_df = populate_calc_cr_scl_staging()              
         save_data_to_snowflake(raw_df, "STAGING_STORE.CALC_CR_SCL_STAGING")
 
-    if st.button("APPLY EXPLORATIVE ANALYSIS TO ETL USING GEN AI 🔄"):
+    if st.button("APPLY EXPLORATIVE ANALYSIS TO ETL USING GEN AI 🧩"):
         cleaned_df = normalize_cr_scl_data()            
         save_data_to_snowflake(cleaned_df, "STAGING_STORE.CALC_CR_SCL_STAGING")        
 
