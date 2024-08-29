@@ -98,11 +98,6 @@ def get_genai_insights(dataframe):
 def analyze_hyperloop_project():
     df = load_data_from_snowflake("ALLIANCE_STORE.HPL_SD_CRS_ALLIANCE")
 
-    if test_openai_connection():
-        st.write("Proceeding with further processing...")
-    else:
-        st.error("Cannot proceed without a successful connection to OpenAI API.")
-
     if df is not None:
         st.write("Data loaded successfully.")
         st.dataframe(df)
