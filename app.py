@@ -64,32 +64,6 @@ def test_openai_api_key():
     except Exception as e:
         st.error(f"An error occurred: {str(e)}")
 
-def test_openai_connection():
-    # Set up the OpenAI API key
-    openai.api_key = get_openai_api_key()
-
-    try:
-        # Send a simple test prompt to the OpenAI API
-        response = openai.chat.completions.create(
-            model="gpt-4",  # Use the GPT-4 model
-            messages=[
-                {"role": "system", "content": "You are a helpful assistant."},
-                {"role": "user", "content": prompt}
-            ]
-        )
-
-        # Extract the response text
-        test_result = response.choices[0].text.strip()
-
-        # Display the test result
-        st.write("OpenAI API connection successful!")
-        st.write(f"Test Response: {test_result}")
-        return True
-
-    except Exception as e:
-        st.error(f"Failed to connect to the OpenAI API: {str(e)}")
-        return False
-
 def get_genai_insights(dataframe):
 
     data_summary = dataframe.describe().to_string()
@@ -105,7 +79,7 @@ def get_genai_insights(dataframe):
 
     try:
         # Send the prompt to ChatGPT using the updated ChatCompletion API
-        response = openai.ChatCompletion.create(
+        response = openai.chat.completions.create(
             model="gpt-4",
             messages=[
                 {"role": "system", "content": "You are a helpful assistant."},
@@ -683,7 +657,6 @@ def render_homepage():
         st.session_state['page'] = 'scenarious'    
 
     if st.button("ANALYZE HYPERLOOP PROJECT 📦"):
-        test_openai_api_key()
         analyze_hyperloop_project()
 
     if st.button("BACKUP DATA 📦"):
