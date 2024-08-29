@@ -1,5 +1,10 @@
 # Hyperloop decision making ecosystem changelog
 
+## v0.07-dev
+
+- Implemented backup functionality
+- Added SQL statements for backup structures creation.
+
 ## v0.06-dev
 
 - Implemented data stores functionality.
