@@ -53,8 +53,9 @@ def fusion_to_staging_migration(source_table, dest_table):
     session = Session.builder.configs(get_snowflake_connection_params()).create()
 
     try:
-        session.sql(f"INSERT INTO {dest_table} SELECT * FROM {source_table};")
-        print(f"Data successfully copied from {source_table} to {dest_table}.")
+        migration_result = session.sql(f"INSERT INTO {dest_table} SELECT * FROM {source_table}")
+        logging.info(f"MIGRATION command result: {migration_result}")
+        st.write(f"DEBUG: Data successfully copied from {source_table} to {dest_table}.")
     except Exception as e:
         logging.error(f"Error saving data to Snowflake: {e}")
         st.error(f"An error occurred while saving data to Snowflake: {str(e)}")
@@ -575,7 +576,7 @@ def render_upload_data_page():
         st.dataframe(df.head())
         save_data_to_snowflake(df, selected_source_table)
         fusion_to_staging_migration(selected_source_table, selected_staging_table)
-        st.write(f"Data loaded for {criterion}:")
+        st.write(f"Data loaded for {criterion}.")
 
     if st.button("🔢 Calculate Criterion and Save Data"):
         st.write(f"DEBUG: {criterion_function}")
