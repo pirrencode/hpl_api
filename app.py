@@ -88,7 +88,7 @@ def get_genai_insights(dataframe):
         )
 
         # Extract the response text
-        insights = response['choices'][0]['message']['content'].strip()
+        insights = response.choices[0].message["content"].strip()
         return insights
 
     except Exception as e:
