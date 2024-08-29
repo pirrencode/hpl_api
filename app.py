@@ -120,7 +120,7 @@ def save_data_to_snowflake(df, table_name):
 # BACKUP SCRIPTS
 #############################################
 
-def backup_table(source_table, backup_table):
+def backup_table_script(source_table, backup_table):
     
     session = Session.builder.configs(get_snowflake_connection_params()).create()
 
@@ -160,7 +160,7 @@ def backup_fusion_store():
     for table in tables:
         source_table = f"FUSION_STORE.{table}"
         backup_table = f"FUSION_STORE.{table}_BCK"
-        backup_table(source_table, backup_table)
+        backup_table_script(source_table, backup_table)
 
 def backup_staging_store():
     
@@ -192,7 +192,7 @@ def backup_staging_store():
     for table in tables:
         source_table = f"STAGING_STORE.{table}"
         backup_table = f"STAGING_STORE.{table}_BCK"
-        backup_table(source_table, backup_table)      
+        backup_table_script(source_table, backup_table)      
 
 def backup_alliance_store():
     
@@ -203,7 +203,7 @@ def backup_alliance_store():
     for table in tables:
         source_table = f"ALLIANCE_STORE.{table}"
         backup_table = f"ALLIANCE_STORE.{table}_BCK"
-        backup_table(source_table, backup_table)             
+        backup_table_script(source_table, backup_table)             
 
 
 #############################################
