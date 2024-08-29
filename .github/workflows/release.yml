@@ -26,8 +26,6 @@ jobs:
 
       - name: Increment version number
         id: increment_version
-      - name: Increment version number
-        id: increment_version
         run: |
           current_version="${{ steps.get_tag.outputs.tag }}"
           current_version="${current_version#v}"
