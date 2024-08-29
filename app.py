@@ -111,7 +111,7 @@ def analyze_hyperloop_project():
 # ETL IMPROVEMENT
 #############################################
 
-def clean_data_with_chatgpt(df):
+def clean_data_with_genai(df):
     # Convert the DataFrame to a string (JSON format) for better handling by the API
     data_json = df.to_json(orient='split')
 
@@ -151,9 +151,10 @@ def normalize_cr_scl_data():
         st.write("Data loaded successfully.")
         st.dataframe(df)
 
-        # Clean the data using ChatGPT
-        cleaned_df = clean_data_with_chatgpt(df)
-
+        start_time = time.time()
+        cleaned_df = clean_data_with_genai(df)
+        st.write(f"ChatGPT response time: {time.time() - start_time} seconds")
+        
         if cleaned_df is not None:
             st.write("Data cleaned successfully.")
             st.dataframe(cleaned_df)
@@ -164,19 +165,15 @@ def normalize_cr_scl_data():
         st.error("Failed to load data from Snowflake.")
         return None
 
-# Example usage
-# cleaned_df = normalize_cr_scl_data()
-
 import random
 
 def populate_calc_cr_scl_staging(time_period=100):
-    # Generate random values
+
     data = {
         "TIME_PERIOD": list(range(1, time_period + 1)),
         "CR_SCL": [random.randint(1, 50) for _ in range(time_period)]
     }
 
-    # Create DataFrame
     df = pd.DataFrame(data)
 
     return df
@@ -720,10 +717,10 @@ def render_homepage():
     if st.button("SCENARIOS SIMULATION 🌐"):
         st.session_state['page'] = 'scenarious'    
 
-    if st.button("ANALYZE HYPERLOOP PROJECT 📦"):
+    if st.button("ANALYZE HYPERLOOP PROJECT 📊"):
         analyze_hyperloop_project()
 
-    if st.button("UTILITY 📦"):
+    if st.button("UTILITIES 🛠️"):
         st.session_state['page'] = 'utility'
 
 ##############################################################
@@ -1236,7 +1233,7 @@ def generate_sustainable_growth_scenario():
     scenarios_calculation_to_snowlake(cr_env_df, cr_sac_df, cr_tfe_df, cr_sfy_df, cr_reg_df, cr_qmf_df, cr_ecv_df, cr_usb_df, cr_rlb_df, cr_inf_df, cr_scl_df)    
 
 #######################################
-# UTILITY METHODS FOR SCENARIOS
+# REUSABLE METHODS FOR SCENARIOS
 #######################################
 
 def scenarios_calculation_to_snowlake(cr_env_df, cr_sac_df, cr_tfe_df, cr_sfy_df, cr_reg_df, cr_qmf_df, cr_ecv_df, cr_usb_df, cr_rlb_df, cr_inf_df, cr_scl_df):
@@ -1364,11 +1361,11 @@ def render_utility_page():
         backup_staging_store()        
         backup_alliance_store()     
     
-    if st.button("GENERATE DIRTY DATA FOR SCALABILITY 📦"):
+    if st.button("GENERATE DIRTY DATA FOR SCALABILITY ⚡"):
         raw_df = populate_calc_cr_scl_staging()              
         save_data_to_snowflake(raw_df, "STAGING_STORE.CALC_CR_SCL_STAGING")
 
-    if st.button("APPLY EXPLORATIVE ANALYSIS USING GEN AI 📦"):
+    if st.button("APPLY EXPLORATIVE ANALYSIS TO ETL USING GEN AI 🔄"):
         cleaned_df = normalize_cr_scl_data()            
         save_data_to_snowflake(cleaned_df, "STAGING_STORE.CALC_CR_SCL_STAGING")        
 
