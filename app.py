@@ -47,18 +47,20 @@ def get_snowflake_connection_params():
 #############################################
 
 def fusion_to_staging_migration(source_table, dest_table):
-    # conn = get_snowflake_connection_params()
-    # cursor = conn.cursor()
     
     session = Session.builder.configs(get_snowflake_connection_params()).create()
 
     try:
         migration_result = session.sql(f"INSERT INTO {dest_table} SELECT * FROM {source_table}")
-        logging.info(f"MIGRATION command result: {migration_result}")
+        migration_result.collect()
+
+        logging.info(f"MIGRATION command executed successfully: Data copied from {source_table} to {dest_table}.")
         st.write(f"DEBUG: Data successfully copied from {source_table} to {dest_table}.")
+        
     except Exception as e:
         logging.error(f"Error saving data to Snowflake: {e}")
         st.error(f"An error occurred while saving data to Snowflake: {str(e)}")
+        
     finally:
         if session:
             session.close()
