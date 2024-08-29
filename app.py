@@ -142,7 +142,7 @@ def backup_table_script(source_table, backup_table):
             session.close()
 
 def backup_fusion_store():
-
+    # List of tables in the FUSION_STORE schema
     tables = [
         "CR_ECV_SOURCE",
         "CR_ENV_SOURCE",
@@ -156,11 +156,19 @@ def backup_fusion_store():
         "CR_TFE_SOURCE",
         "CR_USB_SOURCE"
     ]
-
-    for table in tables:
+    
+    progress_bar = st.progress(0)
+    
+    total_tables = len(tables)
+    for index, table in enumerate(tables):
         source_table = f"FUSION_STORE.{table}"
-        backup_table = f"FUSION_STORE.{table}_BCK"
-        backup_table_script(source_table, backup_table)
+        backup_table_name = f"FUSION_STORE.{table}_BCK"
+        backup_table_script(source_table, backup_table_name)
+        
+        progress = (index + 1) / total_tables
+        progress_bar.progress(progress)
+        
+        st.write(f"Backup progress: {int(progress * 100)}%")
 
 def backup_staging_store():
     
@@ -189,10 +197,18 @@ def backup_staging_store():
         "CR_USB_STAGING"
     ]
 
-    for table in tables:
+    progress_bar = st.progress(0)
+    
+    total_tables = len(tables)
+    for index, table in enumerate(tables):
         source_table = f"STAGING_STORE.{table}"
-        backup_table = f"STAGING_STORE.{table}_BCK"
-        backup_table_script(source_table, backup_table)      
+        backup_table_name = f"STAGING_STORE.{table}_BCK"
+        backup_table_script(source_table, backup_table_name)
+        
+        progress = (index + 1) / total_tables
+        progress_bar.progress(progress)
+        
+        st.write(f"Backup progress: {int(progress * 100)}%")   
 
 def backup_alliance_store():
     
@@ -200,10 +216,18 @@ def backup_alliance_store():
         "HPL_SD_CRS_ALLIANCE"
     ]
 
-    for table in tables:
+    progress_bar = st.progress(0)
+    
+    total_tables = len(tables)
+    for index, table in enumerate(tables):
         source_table = f"ALLIANCE_STORE.{table}"
-        backup_table = f"ALLIANCE_STORE.{table}_BCK"
-        backup_table_script(source_table, backup_table)             
+        backup_table_name = f"ALLIANCE_STORE.{table}_BCK"
+        backup_table_script(source_table, backup_table_name)
+        
+        progress = (index + 1) / total_tables
+        progress_bar.progress(progress)
+        
+        st.write(f"Backup progress: {int(progress * 100)}%")            
 
 
 #############################################
@@ -562,11 +586,8 @@ def render_homepage():
 
     if st.button("BACKUP DATA 📦"):
         backup_fusion_store()
-        st.write("Fusion store backup is completed.")
         backup_staging_store               
-        st.write("Staging store backup is completed.")
         backup_alliance_store()
-        st.write("Alliance store backup is completed.")
 
 ##############################################################
 # Data upload and management page
