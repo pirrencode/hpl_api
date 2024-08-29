@@ -165,7 +165,7 @@ def backup_fusion_store():
         progress = (index + 1) / total_tables
         progress_bar.progress(progress)
         
-        st.write(f"Backup progress: {int(progress * 100)}%")
+    st.write(f"Backup for Fusion store is completed")        
 
 def backup_staging_store():
     
@@ -204,8 +204,8 @@ def backup_staging_store():
         
         progress = (index + 1) / total_tables
         progress_bar.progress(progress)
-        
-        st.write(f"Backup progress: {int(progress * 100)}%")   
+         
+    st.write(f"Backup for Staging store is completed")                 
 
 def backup_alliance_store():
     
@@ -223,8 +223,8 @@ def backup_alliance_store():
         
         progress = (index + 1) / total_tables
         progress_bar.progress(progress)
-        
-        st.write(f"Backup progress: {int(progress * 100)}%")            
+         
+    st.write(f"Backup for Alliance store is completed")                           
 
 
 #############################################
