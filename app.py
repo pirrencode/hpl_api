@@ -51,6 +51,8 @@ def fusion_to_staging_migration(source_table, dest_table):
     session = Session.builder.configs(get_snowflake_connection_params()).create()
 
     try:
+        truncate_target_table = session.sql(f"TRUNCATE TABLE {dest_table}")
+        truncate_target_table.collect()
         migration_result = session.sql(f"INSERT INTO {dest_table} SELECT * FROM {source_table}")
         migration_result.collect()
 
