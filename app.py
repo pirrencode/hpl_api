@@ -70,10 +70,12 @@ def test_openai_connection():
 
     try:
         # Send a simple test prompt to the OpenAI API
-        response = openai.ChatCompletion.create(
-            engine="text-davinci-003",  # or use another model like "gpt-3.5-turbo"
-            prompt="This is a test to verify the connection to the OpenAI API.",
-            max_tokens=10  # Keep the token count low for a quick response
+        response = openai.chat.completions.create(
+            model="gpt-4",  # Use the GPT-4 model
+            messages=[
+                {"role": "system", "content": "You are a helpful assistant."},
+                {"role": "user", "content": prompt}
+            ]
         )
 
         # Extract the response text
