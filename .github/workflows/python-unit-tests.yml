@@ -1,4 +1,4 @@
-name: Run Python Unit Tests
+name: Run python unit tests
 
 on:
   push:
