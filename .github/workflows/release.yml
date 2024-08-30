@@ -22,15 +22,21 @@ jobs:
       - name: Get the latest tag
         id: get_tag
         run: |
-          latest_tag=$(git describe --tags --abbrev=0 2>/dev/null || echo "v0.0.0")
+          latest_tag=$(git describe --tags --abbrev=0)
           echo "Latest tag: $latest_tag"
           echo "tag=$latest_tag" >> $GITHUB_ENV
+          echo "##[set-output name=tag;]$latest_tag"
 
       - name: Increment version number
         id: increment_version
         run: |
           current_version="${{ env.tag }}"
           echo "Current version: $current_version"
+          
+          if [ -z "$current_version" ]; then
+            echo "Error: Failed to retrieve the current version."
+            exit 1
+          fi
 
           current_version="${current_version#v}"
           echo "Version without 'v' prefix: $current_version"
