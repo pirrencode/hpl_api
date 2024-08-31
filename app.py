@@ -201,7 +201,7 @@ def clean_data_with_mistral(df, model):
         "For each value x greater than 1, compute the normalized value as x / max(x) where max(x) is the maximum value in the 'CR_SCL' column. "
         "Other values should stay as they are. "
         "Return only the 'data' array from the JSON in the format of a list of lists, without any additional text, columns, or index fields."
-        "Do not include any text, column names or index fields in the output. Output must be dataet - only numerical digits, in dict format."
+        "Do not include any code, text, column names or index fields in the output. Your answer to me must contain only dataset - numerical digits, in dict format."
         "\n\n"
         f"Dataset: {data_json}"
     )
