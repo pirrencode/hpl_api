@@ -24,7 +24,7 @@ def generate_safety_data(time_periods):
 
     return df
 
-def generate_environmental_impact_data(time_periods=100):
+def generate_environmental_impact_data(time_periods):
 
     time = np.arange(0, time_periods)
     energy_consumed = np.random.rand(time_periods)
@@ -49,7 +49,7 @@ def generate_environmental_impact_data(time_periods=100):
 
     return df
 
-def generate_social_acceptance_data(time_periods=100):
+def generate_social_acceptance_data(time_periods):
     time = np.arange(time_periods)
     positive_feedback = np.random.rand(time_periods) * 100
     negative_feedback = np.random.rand(time_periods) * 50
@@ -62,7 +62,7 @@ def generate_social_acceptance_data(time_periods=100):
 
     return data
 
-def generate_technical_feasibility_data(time_periods=100):
+def generate_technical_feasibility_data(time_periods):
     time = np.arange(time_periods)
     current_trl = np.full(time_periods, 6)  
     target_trl = np.random.uniform(6, 11, time_periods)
@@ -79,7 +79,7 @@ def generate_technical_feasibility_data(time_periods=100):
 
     return data
 
-def generate_regulatory_approval_data(time_periods=100):
+def generate_regulatory_approval_data(time_periods):
     time = np.arange(time_periods)
     ethical_compliance = np.random.rand(time_periods)
     legal_compliance = np.random.rand(time_periods)
@@ -98,7 +98,7 @@ def generate_regulatory_approval_data(time_periods=100):
 
     return data
 
-def generate_quantum_factor_data(time_periods=100):
+def generate_quantum_factor_data(time_periods):
     time = np.arange(time_periods)
 
     maglev_levitation = np.random.choice([True, False], time_periods)
@@ -140,7 +140,7 @@ def generate_quantum_factor_data(time_periods=100):
 
     return data
 
-def generate_economic_viability_data(time_periods=100):
+def generate_economic_viability_data(time_periods):
 
     data = {
         "TIME": list(range(time_periods)),
@@ -156,7 +156,7 @@ def generate_economic_viability_data(time_periods=100):
     
     return df
 
-def generate_usability_data(time_periods=100):
+def generate_usability_data(time_periods):
     data = {
         "TIME": list(range(time_periods)),
         "PRODUCTION_OUTPUT": [round(random.uniform(0.5, 1.5), 2) for _ in range(time_periods)],  # p: values between 0.5 and 1.5
@@ -168,7 +168,7 @@ def generate_usability_data(time_periods=100):
     
     return df
 
-def generate_reliability_data(time_periods=100):
+def generate_reliability_data(time_periods):
     data = {
         "TIME": list(range(time_periods)),
         "DURABILITY": [round(random.uniform(0.5, 1.5), 2) for _ in range(time_periods)],            # d: values between 0.5 and 1.5
@@ -180,7 +180,7 @@ def generate_reliability_data(time_periods=100):
     df = pd.DataFrame(data)
     return df
 
-def generate_infrastructure_integration_data(time_periods=100):
+def generate_infrastructure_integration_data(time_periods):
     data = {
         "TIME": list(range(time_periods)),
         "COMMON_INFRA_FEATURES": [round(random.uniform(0.5, 1.5), 2) for _ in range(time_periods)],  # C: values between 0.5 and 1.5
@@ -192,7 +192,7 @@ def generate_infrastructure_integration_data(time_periods=100):
     df = pd.DataFrame(data)
     return df
 
-def generate_scalability_data(time_periods=100):
+def generate_scalability_data(time_periods):
     data = {
         "TIME": list(range(time_periods)),
         "RESOURCE_MILEAGE": [round(random.uniform(0.5, 1.5), 2) for _ in range(time_periods)],    # L1: values between 0.5 and 1.5
