@@ -225,13 +225,53 @@ def clean_data_with_mistral(df, model):
 
         result = response.json()
         insights = result["choices"][0]["message"]["content"].strip()
+        
         st.write(f"DEBUG: {insights}")
-        cleaned_df = pd.read_json(insights, orient='split')
-        return cleaned_df
+        
+        # Clean the JSON output
+        cleaned_json_str = clean_json_output(insights)
+        
+        if cleaned_json_str:
+            # Convert the cleaned JSON string back into a DataFrame
+            cleaned_df = pd.read_json(cleaned_json_str, orient='split')
+            return cleaned_df
+        else:
+            st.error("Failed to clean JSON data.")
+            return None
 
     except requests.exceptions.RequestException as e:
         st.error(f"An error occurred while fetching insights from Mistral AI: {str(e)}")
         return None
+
+import json
+
+def clean_json_output(insights):
+    """
+    Cleans the AI-generated JSON output to ensure it can be parsed correctly.
+    """
+    try:
+        # Try to parse the JSON directly to detect any issues
+        data = json.loads(insights)
+        # Convert it back to a string to standardize the format
+        cleaned_json_str = json.dumps(data)
+    except json.JSONDecodeError:
+        # If there was a JSON decoding error, try to clean it manually
+        st.write("DEBUG: Attempting to clean up the JSON manually.")
+        
+        # Heuristic cleanup: Remove any text before the first '{' and after the last '}'
+        start_index = insights.find('{')
+        end_index = insights.rfind('}') + 1
+        cleaned_json_str = insights[start_index:end_index]
+        
+        # Now, attempt to parse it again to check if it's valid JSON
+        try:
+            data = json.loads(cleaned_json_str)
+            cleaned_json_str = json.dumps(data)  # Reformat
+        except json.JSONDecodeError as e:
+            st.error(f"Error cleaning the JSON data: {str(e)}")
+            return None
+    
+    return cleaned_json_str
 
 def normalize_cr_scl_data(model):
 
