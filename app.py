@@ -220,7 +220,7 @@ def clean_data_with_mistral(df, model):
                 "content": prompt
             }
         ],
-        "max_tokens": 1000,
+        "max_tokens": 10000,
     }
 
     try:
