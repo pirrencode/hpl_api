@@ -225,7 +225,8 @@ def clean_data_with_mistral(df, model):
 
         result = response.json()
         insights = result["choices"][0]["message"]["content"].strip()
-        return insights
+        cleaned_df = pd.read_json(insights, orient='split')
+        return cleaned_df
 
     except requests.exceptions.RequestException as e:
         st.error(f"An error occurred while fetching insights from Mistral AI: {str(e)}")
