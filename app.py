@@ -794,7 +794,7 @@ def render_upload_data_page():
     }    
 
     generate_function_mapping = {
-        "Safety": generate_safety_data(time_periods),
+        "Safety": generate_safety_data,
         "Environmental Impact": generate_environmental_impact_data,
         "Social Acceptance": generate_social_acceptance_data,
         "Technical Feasibility": generate_technical_feasibility_data,
@@ -831,6 +831,7 @@ def render_upload_data_page():
     criterion_function = criterion_function_mapping.get(criterion, calculate_cr_sfy)
 
     if st.button("🗃️ Generate and Save Data"):
+        st.write(f"Generate function: {generate_function}")
         df = generate_function()
         st.write(f"Data generated for {criterion}:")
         st.dataframe(df.head())
