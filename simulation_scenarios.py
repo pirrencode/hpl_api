@@ -5,7 +5,7 @@ import numpy as np
 # RAPID DECLINE SCENARIO
 ####################################
 
-def generate_cr_env_data_rapid_decline(time_periods=100):
+def generate_cr_env_data_rapid_decline(time_periods):
     time = np.arange(time_periods)
     data = {
         "TIME": time,
@@ -18,7 +18,7 @@ def generate_cr_env_data_rapid_decline(time_periods=100):
     }
     return pd.DataFrame(data)
 
-def generate_cr_sac_data_rapid_decline(time_periods=100):
+def generate_cr_sac_data_rapid_decline(time_periods):
     time = np.arange(time_periods)
     data = {
         "TIME": time,
@@ -27,7 +27,7 @@ def generate_cr_sac_data_rapid_decline(time_periods=100):
     }
     return pd.DataFrame(data)
 
-def generate_cr_tfe_data_rapid_decline(time_periods=100):
+def generate_cr_tfe_data_rapid_decline(time_periods):
     time = np.arange(time_periods)
     data = {
         "TIME": time,
@@ -38,7 +38,7 @@ def generate_cr_tfe_data_rapid_decline(time_periods=100):
     }
     return pd.DataFrame(data)
 
-def generate_cr_sfy_data_rapid_decline(time_periods=100):
+def generate_cr_sfy_data_rapid_decline(time_periods):
     time = np.arange(time_periods)
     data = {
         "TIME": time,
@@ -48,7 +48,7 @@ def generate_cr_sfy_data_rapid_decline(time_periods=100):
     }
     return pd.DataFrame(data)
 
-def generate_cr_reg_data_rapid_decline(time_periods=100):
+def generate_cr_reg_data_rapid_decline(time_periods):
     time = np.arange(time_periods)
     data = {
         "TIME": time,
@@ -59,7 +59,7 @@ def generate_cr_reg_data_rapid_decline(time_periods=100):
     }
     return pd.DataFrame(data)
 
-def generate_cr_qmf_data_rapid_decline(time_periods=100):
+def generate_cr_qmf_data_rapid_decline(time_periods):
     time = np.arange(time_periods)
     data = {
         "TIME": time,
@@ -68,7 +68,7 @@ def generate_cr_qmf_data_rapid_decline(time_periods=100):
     }
     return pd.DataFrame(data)
 
-def generate_cr_ecv_data_rapid_decline(time_periods=100):
+def generate_cr_ecv_data_rapid_decline(time_periods):
     time = np.arange(time_periods)
     data = {
         "TIME": time,
@@ -80,7 +80,7 @@ def generate_cr_ecv_data_rapid_decline(time_periods=100):
     }
     return pd.DataFrame(data)
 
-def generate_cr_usb_data_rapid_decline(time_periods=100):
+def generate_cr_usb_data_rapid_decline(time_periods):
     time = np.arange(time_periods)
     data = {
         "TIME": time,
@@ -90,7 +90,7 @@ def generate_cr_usb_data_rapid_decline(time_periods=100):
     }
     return pd.DataFrame(data)
 
-def generate_cr_rlb_data_rapid_decline(time_periods=100):
+def generate_cr_rlb_data_rapid_decline(time_periods):
     time = np.arange(time_periods)
     data = {
         "TIME": time,
@@ -101,7 +101,7 @@ def generate_cr_rlb_data_rapid_decline(time_periods=100):
     }
     return pd.DataFrame(data)
 
-def generate_cr_inf_data_rapid_decline(time_periods=100):
+def generate_cr_inf_data_rapid_decline(time_periods):
     time = np.arange(time_periods)
     data = {
         "TIME": time,
@@ -112,7 +112,7 @@ def generate_cr_inf_data_rapid_decline(time_periods=100):
     }
     return pd.DataFrame(data)
 
-def generate_cr_scl_data_rapid_decline(time_periods=100):
+def generate_cr_scl_data_rapid_decline(time_periods):
     time = np.arange(time_periods)
     data = {
         "TIME": time,
@@ -128,7 +128,7 @@ def generate_cr_scl_data_rapid_decline(time_periods=100):
 # DECLINE OVER TIME SCENARIO
 ####################################
 
-def generate_cr_env_decline_over_time_data(time_periods=100):
+def generate_cr_env_decline_over_time_data(time_periods):
     time = np.arange(time_periods)
     data = {
         "TIME": time,
@@ -141,7 +141,7 @@ def generate_cr_env_decline_over_time_data(time_periods=100):
     }
     return pd.DataFrame(data)
 
-def generate_cr_sac_decline_over_time_data(time_periods=100):
+def generate_cr_sac_decline_over_time_data(time_periods):
     time = np.arange(time_periods)
     data = {
         "TIME": time,
@@ -150,7 +150,7 @@ def generate_cr_sac_decline_over_time_data(time_periods=100):
     }
     return pd.DataFrame(data)
 
-def generate_cr_tfe_decline_over_time_data(time_periods=100):
+def generate_cr_tfe_decline_over_time_data(time_periods):
     time = np.arange(time_periods)
     data = {
         "TIME": time,
@@ -161,7 +161,7 @@ def generate_cr_tfe_decline_over_time_data(time_periods=100):
     }
     return pd.DataFrame(data)
 
-def generate_cr_sfy_decline_over_time_data(time_periods=100):
+def generate_cr_sfy_decline_over_time_data(time_periods):
     time = np.arange(time_periods)
     data = {
         "TIME": time,
@@ -171,7 +171,7 @@ def generate_cr_sfy_decline_over_time_data(time_periods=100):
     }
     return pd.DataFrame(data)
 
-def generate_cr_reg_decline_over_time_data(time_periods=100):
+def generate_cr_reg_decline_over_time_data(time_periods):
     time = np.arange(time_periods)
     data = {
         "TIME": time,
@@ -182,7 +182,7 @@ def generate_cr_reg_decline_over_time_data(time_periods=100):
     }
     return pd.DataFrame(data)
 
-def generate_cr_qmf_decline_over_time_data(time_periods=100):
+def generate_cr_qmf_decline_over_time_data(time_periods):
     time = np.arange(time_periods)
     data = {
         "TIME": time,
@@ -191,7 +191,7 @@ def generate_cr_qmf_decline_over_time_data(time_periods=100):
     }
     return pd.DataFrame(data)
 
-def generate_cr_ecv_decline_over_time_data(time_periods=100):
+def generate_cr_ecv_decline_over_time_data(time_periods):
     time = np.arange(time_periods)
     data = {
         "TIME": time,
@@ -203,7 +203,7 @@ def generate_cr_ecv_decline_over_time_data(time_periods=100):
     }
     return pd.DataFrame(data)
 
-def generate_cr_usb_decline_over_time_data(time_periods=100):
+def generate_cr_usb_decline_over_time_data(time_periods):
     time = np.arange(time_periods)
     data = {
         "TIME": time,
@@ -213,7 +213,7 @@ def generate_cr_usb_decline_over_time_data(time_periods=100):
     }
     return pd.DataFrame(data)
 
-def generate_cr_rlb_decline_over_time_data(time_periods=100):
+def generate_cr_rlb_decline_over_time_data(time_periods):
     time = np.arange(time_periods)
     data = {
         "TIME": time,
@@ -224,7 +224,7 @@ def generate_cr_rlb_decline_over_time_data(time_periods=100):
     }
     return pd.DataFrame(data)
 
-def generate_cr_inf_decline_over_time_data(time_periods=100):
+def generate_cr_inf_decline_over_time_data(time_periods):
     time = np.arange(time_periods)
     data = {
         "TIME": time,
@@ -235,7 +235,7 @@ def generate_cr_inf_decline_over_time_data(time_periods=100):
     }
     return pd.DataFrame(data)
 
-def generate_cr_scl_decline_over_time_data(time_periods=100):
+def generate_cr_scl_decline_over_time_data(time_periods):
     time = np.arange(time_periods)
     data = {
         "TIME": time,
@@ -251,7 +251,7 @@ def generate_cr_scl_decline_over_time_data(time_periods=100):
 # RAPID GROWTH SCENARIO
 ##############################################
 
-def generate_cr_env_rapid_growth_data(time_periods=100):
+def generate_cr_env_rapid_growth_data(time_periods):
     time = np.arange(time_periods)
     data = {
         "TIME": time,
@@ -264,7 +264,7 @@ def generate_cr_env_rapid_growth_data(time_periods=100):
     }
     return pd.DataFrame(data)
 
-def generate_cr_sac_rapid_growth_data(time_periods=100):
+def generate_cr_sac_rapid_growth_data(time_periods):
     time = np.arange(time_periods)
     data = {
         "TIME": time,
@@ -273,7 +273,7 @@ def generate_cr_sac_rapid_growth_data(time_periods=100):
     }
     return pd.DataFrame(data)
 
-def generate_cr_tfe_rapid_growth_data(time_periods=100):
+def generate_cr_tfe_rapid_growth_data(time_periods):
     time = np.arange(time_periods)
     data = {
         "TIME": time,
@@ -284,7 +284,7 @@ def generate_cr_tfe_rapid_growth_data(time_periods=100):
     }
     return pd.DataFrame(data)
 
-def generate_cr_sfy_rapid_growth_data(time_periods=100):
+def generate_cr_sfy_rapid_growth_data(time_periods):
     time = np.arange(time_periods)
     data = {
         "TIME": time,
@@ -294,7 +294,7 @@ def generate_cr_sfy_rapid_growth_data(time_periods=100):
     }
     return pd.DataFrame(data)
 
-def generate_cr_reg_rapid_growth_data(time_periods=100):
+def generate_cr_reg_rapid_growth_data(time_periods):
     time = np.arange(time_periods)
     data = {
         "TIME": time,
@@ -305,7 +305,7 @@ def generate_cr_reg_rapid_growth_data(time_periods=100):
     }
     return pd.DataFrame(data)
 
-def generate_cr_qmf_rapid_growth_data(time_periods=100):
+def generate_cr_qmf_rapid_growth_data(time_periods):
     time = np.arange(time_periods)
     data = {
         "TIME": time,
@@ -314,7 +314,7 @@ def generate_cr_qmf_rapid_growth_data(time_periods=100):
     }
     return pd.DataFrame(data)
 
-def generate_cr_ecv_rapid_growth_data(time_periods=100):
+def generate_cr_ecv_rapid_growth_data(time_periods):
     time = np.arange(time_periods)
     data = {
         "TIME": time,
@@ -326,7 +326,7 @@ def generate_cr_ecv_rapid_growth_data(time_periods=100):
     }
     return pd.DataFrame(data)
 
-def generate_cr_usb_rapid_growth_data(time_periods=100):
+def generate_cr_usb_rapid_growth_data(time_periods):
     time = np.arange(time_periods)
     data = {
         "TIME": time,
@@ -336,7 +336,7 @@ def generate_cr_usb_rapid_growth_data(time_periods=100):
     }
     return pd.DataFrame(data)
 
-def generate_cr_rlb_rapid_growth_data(time_periods=100):
+def generate_cr_rlb_rapid_growth_data(time_periods):
     time = np.arange(time_periods)
     data = {
         "TIME": time,
@@ -347,7 +347,7 @@ def generate_cr_rlb_rapid_growth_data(time_periods=100):
     }
     return pd.DataFrame(data)
 
-def generate_cr_inf_rapid_growth_data(time_periods=100):
+def generate_cr_inf_rapid_growth_data(time_periods):
     time = np.arange(time_periods)
     data = {
         "TIME": time,
@@ -358,7 +358,7 @@ def generate_cr_inf_rapid_growth_data(time_periods=100):
     }
     return pd.DataFrame(data)
 
-def generate_cr_scl_rapid_growth_data(time_periods=100):
+def generate_cr_scl_rapid_growth_data(time_periods):
     time = np.arange(time_periods)
     data = {
         "TIME": time,
@@ -374,7 +374,7 @@ def generate_cr_scl_rapid_growth_data(time_periods=100):
 # SUSTAINABLE GROWTH SCENARIO
 ##########################################
 
-def generate_cr_env_sustainable_growth_data(time_periods=100):
+def generate_cr_env_sustainable_growth_data(time_periods):
     time = np.arange(time_periods)
     data = {
         "TIME": time,
@@ -387,7 +387,7 @@ def generate_cr_env_sustainable_growth_data(time_periods=100):
     }
     return pd.DataFrame(data)
 
-def generate_cr_sac_sustainable_growth_data(time_periods=100):
+def generate_cr_sac_sustainable_growth_data(time_periods):
     time = np.arange(time_periods)
     data = {
         "TIME": time,
@@ -396,7 +396,7 @@ def generate_cr_sac_sustainable_growth_data(time_periods=100):
     }
     return pd.DataFrame(data)
 
-def generate_cr_tfe_sustainable_growth_data(time_periods=100):
+def generate_cr_tfe_sustainable_growth_data(time_periods):
     time = np.arange(time_periods)
     data = {
         "TIME": time,
@@ -407,7 +407,7 @@ def generate_cr_tfe_sustainable_growth_data(time_periods=100):
     }
     return pd.DataFrame(data)
 
-def generate_cr_sfy_sustainable_growth_data(time_periods=100):
+def generate_cr_sfy_sustainable_growth_data(time_periods):
     time = np.arange(time_periods)
     data = {
         "TIME": time,
@@ -417,7 +417,7 @@ def generate_cr_sfy_sustainable_growth_data(time_periods=100):
     }
     return pd.DataFrame(data)
 
-def generate_cr_reg_sustainable_growth_data(time_periods=100):
+def generate_cr_reg_sustainable_growth_data(time_periods):
     time = np.arange(time_periods)
     data = {
         "TIME": time,
@@ -428,7 +428,7 @@ def generate_cr_reg_sustainable_growth_data(time_periods=100):
     }
     return pd.DataFrame(data)
 
-def generate_cr_qmf_sustainable_growth_data(time_periods=100):
+def generate_cr_qmf_sustainable_growth_data(time_periods):
     time = np.arange(time_periods)
     data = {
         "TIME": time,
@@ -437,7 +437,7 @@ def generate_cr_qmf_sustainable_growth_data(time_periods=100):
     }
     return pd.DataFrame(data)
 
-def generate_cr_ecv_sustainable_growth_data(time_periods=100):
+def generate_cr_ecv_sustainable_growth_data(time_periods):
     time = np.arange(time_periods)
     data = {
         "TIME": time,
@@ -449,7 +449,7 @@ def generate_cr_ecv_sustainable_growth_data(time_periods=100):
     }
     return pd.DataFrame(data)
 
-def generate_cr_usb_sustainable_growth_data(time_periods=100):
+def generate_cr_usb_sustainable_growth_data(time_periods):
     time = np.arange(time_periods)
     data = {
         "TIME": time,
@@ -459,7 +459,7 @@ def generate_cr_usb_sustainable_growth_data(time_periods=100):
     }
     return pd.DataFrame(data)
 
-def generate_cr_rlb_sustainable_growth_data(time_periods=100):
+def generate_cr_rlb_sustainable_growth_data(time_periods):
     time = np.arange(time_periods)
     data = {
         "TIME": time,
@@ -470,7 +470,7 @@ def generate_cr_rlb_sustainable_growth_data(time_periods=100):
     }
     return pd.DataFrame(data)
 
-def generate_cr_inf_sustainable_growth_data(time_periods=100):
+def generate_cr_inf_sustainable_growth_data(time_periods):
     time = np.arange(time_periods)
     data = {
         "TIME": time,
@@ -481,7 +481,7 @@ def generate_cr_inf_sustainable_growth_data(time_periods=100):
     }
     return pd.DataFrame(data)
 
-def generate_cr_scl_sustainable_growth_data(time_periods=100):
+def generate_cr_scl_sustainable_growth_data(time_periods):
     time = np.arange(time_periods)
     data = {
         "TIME": time,
