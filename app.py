@@ -197,9 +197,10 @@ def clean_data_with_mistral(df, model):
 
     prompt = (
         "You are given a dataset in JSON format. Check if the 'CR_SCL' column contains any value larger than 1. "
-        "If so, normalize those values so they fall within the range 0..1. Other values should stay as they are. "
-        "Return the cleaned dataset in JSON format "
-        "without any additional text or explanation.\n\n"
+        "If so, normalize those values so they fall within the range 0..1. Value depth must be maximum two decimal values . "
+        " Other values should stay as they are. "
+        "Return the cleaned dataset in JSON format  "
+        "without any additional text or explanation. \n\n"
         f"Dataset: {data_json}"
     )
 
@@ -298,7 +299,7 @@ def normalize_cr_scl_data(model):
             st.dataframe(cleaned_df)
             return cleaned_df
         else:
-            st.error("Failed to clean data using GenAI (Model: {model}).")
+            st.error(f"Failed to clean data using GenAI (Model: {model}).")
     else:
         st.error("Failed to load data from Snowflake.")
         return None
