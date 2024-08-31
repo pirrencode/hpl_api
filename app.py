@@ -200,7 +200,9 @@ def clean_data_with_mistral(df, model):
         "If so, normalize those values so they fall within the range 0 to 1 using the following formula: "
         "For each value x greater than 1, compute the normalized value as x / max(x) where max(x) is the maximum value in the 'CR_SCL' column. "
         "Other values should stay as they are. "
-        "Return only the 'data' array from the JSON in the format of a list of lists, without any additional text, columns, or index fields.\n\n"
+        "Return only the 'data' array from the JSON in the format of a list of lists, without any additional text, columns, or index fields."
+        "Do not include any text, column names or index fields in the output. Output must be dataet - only numerical digits, in dict format."
+        "\n\n"
         f"Dataset: {data_json}"
     )
 
