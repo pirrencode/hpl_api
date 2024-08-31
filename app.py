@@ -102,8 +102,11 @@ def get_mistral_insights(df):
         f"{data_summary}"
     )
 
+    mistral_api_key = get_mistral_api_key()
+    print(f"key: {mistral_api_key}")
+
     headers = {
-        "Authorization": f"Bearer {get_mistral_api_key()}",
+        "Authorization": f"Bearer {mistral_api_key}",
         "Content-Type": "application/json"
     }
 
@@ -123,7 +126,7 @@ def get_mistral_insights(df):
 
     except requests.exceptions.RequestException as e:
         st.error(f"An error occurred while fetching insights from Mistral AI: {str(e)}")
-        return None    
+        return None
 
 def analyze_hyperloop_project(model):
     df = load_data_from_snowflake("ALLIANCE_STORE.HPL_SD_CRS_ALLIANCE")
