@@ -103,7 +103,8 @@ def get_mistral_insights(df):
     )
 
     mistral_api_key = get_mistral_api_key()
-    st.write(f"key: {mistral_api_key[:5]}")
+    st.write(f"DEBUG key: {mistral_api_key[:5]}")
+    st.write(f"DEBUG prompt: {prompt}")
 
     headers = {
         "Authorization": f"Bearer {mistral_api_key}",
