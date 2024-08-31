@@ -102,7 +102,6 @@ def get_mistral_insights(df):
         f"{data_summary}"
     )
 
-    # Prepare headers and data for the request
     headers = {
         "Authorization": f"Bearer {get_mistral_api_key()}",
         "Content-Type": "application/json"
@@ -115,8 +114,8 @@ def get_mistral_insights(df):
     }
 
     try:
-        response = requests.post("https://api.mistral.ai/v1/completions", headers=headers, json=data)
-        response.raise_for_status()  # Raise an exception for HTTP errors
+        response = requests.post("https://api.mistral.ai/v1/chat/completions", headers=headers, json=data)
+        response.raise_for_status()
 
         result = response.json()
         insights = result["choices"][0]["text"].strip()
