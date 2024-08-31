@@ -98,15 +98,16 @@ def get_mistral_insights(df):
     data_summary = df.describe().to_string()
 
     prompt = (
-        f"You are an expert in project performance analysis. Based on the following data summary of a Hyperloop project, please provide detailed insights on how the project is performing and offer recommendations for improvement: {data_summary}"
+        "You are an expert in project performance analysis. Based on the following data summary of a Hyperloop project, please provide detailed insights on how the project is performing and offer recommendations for improvement:\n\n"
+        f"{data_summary}"
     )
 
-    mistral_api_key = get_mistral_api_key()
-    st.write(f"DEBUG key: {mistral_api_key[:5]}")
-    st.write(f"DEBUG prompt: {prompt}")
+    # mistral_api_key = get_mistral_api_key()
+    # st.write(f"DEBUG key: {mistral_api_key[:5]}")
+    # st.write(f"DEBUG prompt: {prompt}")
 
     headers = {
-        "Authorization": f"Bearer {mistral_api_key}",
+        "Authorization": f"Bearer {get_mistral_api_key()}",
         "Content-Type": "application/json"
     }
 
@@ -124,14 +125,13 @@ def get_mistral_insights(df):
     try:
         response = requests.post("https://api.mistral.ai/v1/chat/completions", headers=headers, json=data)
         response.raise_for_status()
-        st.write(response.text)
+        # st.write(response.text)
 
         result = response.json()
-        insights = result["choices"][0]["text"].strip()
+        insights = result["choices"][0]["message"]["content"].strip()
         return insights
 
     except requests.exceptions.RequestException as e:
-        st.write(e)
         st.error(f"An error occurred while fetching insights from Mistral AI: {str(e)}")
         return None
 
