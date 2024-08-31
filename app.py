@@ -112,8 +112,13 @@ def get_mistral_insights(df):
 
     data = {
         "model": "mistral-large",
-        "prompt": prompt,
-        "max_tokens": 300,  # Adjust based on your requirements
+        "messages": [
+            {
+                "role": "user",
+                "content": prompt
+            }
+        ],
+        "max_tokens": 300,
     }
 
     try:
