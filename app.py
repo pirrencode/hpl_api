@@ -198,7 +198,7 @@ def clean_data_with_mistral(df, model):
     prompt = (
         "You are given a dataset in JSON format. Check if the 'CR_SCL' column contains any value larger than 1. "
         "If so, normalize those values so they fall within the range 0 to 1 using the following formula: "
-        "For each value x greater than 1, compute the normalized value as x / max(x) where max(x) is the maximum value in the 'CR_SCL' column. "
+        "For each value x greater than 1, replace with random value in range from 0 to 1. "
         "Other values should stay as they are. "
         "Return only the 'data' array from the JSON in the format of a list of lists, without any additional text, columns, or index fields."
         "Do not include any code, text, column names or index fields in the output. Your answer to me must contain only dataset - numerical digits, in dict format."
@@ -253,28 +253,16 @@ def clean_json_output(insights):
     Cleans the AI-generated JSON output to ensure it can be parsed correctly.
     """
     try:
-        # Try to parse the JSON directly to detect any issues
+        # Attempt to load the output as a list of lists directly
         data = json.loads(insights)
-        # Convert it back to a string to standardize the format
-        cleaned_json_str = json.dumps(data)
-    except json.JSONDecodeError:
-        # If there was a JSON decoding error, try to clean it manually
-        st.write("DEBUG: Attempting to clean up the JSON manually.")
-        
-        # Heuristic cleanup: Remove any text before the first '{' and after the last '}'
-        start_index = insights.find('{')
-        end_index = insights.rfind('}') + 1
-        cleaned_json_str = insights[start_index:end_index]
-        
-        # Now, attempt to parse it again to check if it's valid JSON
-        try:
-            data = json.loads(cleaned_json_str)
-            cleaned_json_str = json.dumps(data)  # Reformat
-        except json.JSONDecodeError as e:
-            st.error(f"Error cleaning the JSON data: {str(e)}")
+        if isinstance(data, list) and all(isinstance(i, list) for i in data):
+            return data
+        else:
+            st.error("Expected a list of lists in the response.")
             return None
-    
-    return cleaned_json_str
+    except json.JSONDecodeError as e:
+        st.error(f"Error parsing the JSON data: {str(e)}")
+        return None
 
 def normalize_cr_scl_data(model):
 
