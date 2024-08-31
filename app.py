@@ -239,10 +239,6 @@ def normalize_cr_scl_data(model):
         st.write("Data loaded successfully.")
         st.dataframe(df)
 
-        cleaned_df = clean_data_with_openai(df, model)
-        st.write(f"ChatGPT response time: {time.time() - start_time} seconds")
-
-
         start_time = time.time()
 
         if model in ["gpt-3.5-turbo", "gpt-4"]:
