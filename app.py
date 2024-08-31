@@ -141,7 +141,7 @@ def analyze_hyperloop_project(model):
 
         if model in ["gpt-3.5-turbo", "gpt-4"]:
             insights = get_insights_using_openai(df, model)
-        elif model == "mistral-small-latest":
+        elif model == "mistral-small":
             insights = get_insights_using_mistral(df, model)
         else:
             st.error("Selected model is not supported.")
@@ -772,7 +772,7 @@ def render_homepage():
 
     model = st.radio(
         "Select GPT model for analysis:",
-        options=["gpt-3.5-turbo", "gpt-4", "mistral-small-latest"],
+        options=["gpt-3.5-turbo", "gpt-4", "mistral-small"],
         index=0
     )
 
@@ -1422,7 +1422,7 @@ def render_experiment_page():
 
     model = st.radio(
         "Select GenAI model for experiment:",
-        options=["gpt-3.5-turbo", "gpt-4", "mistral-small-latest"],
+        options=["gpt-3.5-turbo", "gpt-4", "mistral-small"],
         index=0
     )       
  
