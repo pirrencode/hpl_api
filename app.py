@@ -119,12 +119,14 @@ def get_mistral_insights(df):
     try:
         response = requests.post("https://api.mistral.ai/v1/chat/completions", headers=headers, json=data)
         response.raise_for_status()
+        st.write(response.text)
 
         result = response.json()
         insights = result["choices"][0]["text"].strip()
         return insights
 
     except requests.exceptions.RequestException as e:
+        st.write(e)
         st.error(f"An error occurred while fetching insights from Mistral AI: {str(e)}")
         return None
 
