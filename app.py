@@ -9,6 +9,7 @@ from snowflake.snowpark import Session
 from criterion_factors_logic import generate_safety_data, generate_environmental_impact_data, generate_social_acceptance_data, generate_technical_feasibility_data, generate_regulatory_approval_data, generate_quantum_factor_data, generate_economic_viability_data, generate_usability_data, generate_reliability_data, generate_infrastructure_integration_data, generate_scalability_data
 import openai
 import time
+import requests
 
 # LOG LEVEL SETUP
 logging.basicConfig(level=logging.INFO)
@@ -44,14 +45,17 @@ def get_snowflake_connection_params():
     }
 
 ############################################
-#OPENAI INTEGRATION
+#GEN AI INTEGRATION
 ############################################
 
 def get_openai_api_key():
     return st.secrets["openai"]["openai_api_key"]
 
+def get_mistral_api_key():
+    return st.secrets["mistral"]["mistral_api_key"]
+
 ############################################
-#OPENAI INSIGHTS GENERATION
+#GEN AI INSIGHTS GENERATION
 ############################################
 
 def test_openai_api_key():
@@ -90,6 +94,38 @@ def get_genai_insights(df, model):
         st.error(f"An error occurred while fetching insights from ChatGPT: {str(e)}")
         return None
 
+def get_mistral_insights(df):
+    data_summary = df.describe().to_string()
+
+    prompt = (
+        "You are an expert in project performance analysis. Based on the following data summary of a Hyperloop project, please provide detailed insights on how the project is performing and offer recommendations for improvement:\n\n"
+        f"{data_summary}"
+    )
+
+    # Prepare headers and data for the request
+    headers = {
+        "Authorization": f"Bearer {get_mistral_api_key()}",
+        "Content-Type": "application/json"
+    }
+
+    data = {
+        "model": "mistral-large",
+        "prompt": prompt,
+        "max_tokens": 300,  # Adjust based on your requirements
+    }
+
+    try:
+        response = requests.post("https://api.mistral.ai/v1/completions", headers=headers, json=data)
+        response.raise_for_status()  # Raise an exception for HTTP errors
+
+        result = response.json()
+        insights = result["choices"][0]["text"].strip()
+        return insights
+
+    except requests.exceptions.RequestException as e:
+        st.error(f"An error occurred while fetching insights from Mistral AI: {str(e)}")
+        return None    
+
 def analyze_hyperloop_project(model):
     df = load_data_from_snowflake("ALLIANCE_STORE.HPL_SD_CRS_ALLIANCE")
 
@@ -100,6 +136,23 @@ def analyze_hyperloop_project(model):
         start_time = time.time()
         insights = get_genai_insights(df, model)
         st.write(f"ChatGPT response time: {time.time() - start_time} seconds")
+
+        if insights:
+            st.write("GenAI Insights:")
+            st.write(insights)
+    else:
+        st.error("Failed to load data, analysis cannot proceed.")
+
+def analyze_hyperloop_project_using_mistral(model):
+    df = load_data_from_snowflake("ALLIANCE_STORE.HPL_SD_CRS_ALLIANCE")
+
+    if df is not None:
+        st.write("Data loaded successfully.")
+        st.dataframe(df)
+
+        start_time = time.time()
+        insights = get_mistral_insights(df, model)
+        st.write(f"Gen AI response time: {time.time() - start_time} seconds")
 
         if insights:
             st.write("GenAI Insights:")
@@ -712,6 +765,9 @@ def render_homepage():
 
     if st.button("ANALYZE HYPERLOOP PROJECT 🧠"):
         analyze_hyperloop_project(model)
+
+    if st.button("ANALYZE HYPERLOOP PROJECT USING MISTRAL"):
+        analyze_hyperloop_project_using_mistral()        
 
 ##############################################################
 # Data upload and management page
