@@ -14,7 +14,7 @@ def generate_safety_data(time_periods):
 
     df = pd.DataFrame({
         "TIME": time,
-        "RISK_SCORE": risk_scores.mean(axis=1),  # Average risk score for each time period
+        "RISK_SCORE": risk_scores.mean(axis=1),
         "MIN_RISK_SCORE": min_risks,
         "MAX_RISK_SCORE": max_risks
     })
