@@ -831,8 +831,7 @@ def render_upload_data_page():
     criterion_function = criterion_function_mapping.get(criterion, calculate_cr_sfy)
 
     if st.button("🗃️ Generate and Save Data"):
-        st.write(f"Generate function: {generate_function}")
-        df = generate_function()
+        df = generate_function(time_periods)
         st.write(f"Data generated for {criterion}:")
         st.dataframe(df.head())
         save_data_to_snowflake(df, selected_source_table)
