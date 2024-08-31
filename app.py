@@ -197,9 +197,10 @@ def clean_data_with_mistral(df, model):
 
     prompt = (
         "You are given a dataset in JSON format. Check if the 'CR_SCL' column contains any value larger than 1. "
-        "If so, normalize those values so they fall within the range 0..1 using the following formula: "
+        "If so, normalize those values so they fall within the range 0 to 1 using the following formula: "
         "For each value x greater than 1, compute the normalized value as x / max(x) where max(x) is the maximum value in the 'CR_SCL' column. "
-        "Other values should stay as they are. Return the cleaned dataset in JSON format without any additional text or explanation.\n\n"
+        "Other values should stay as they are. "
+        "Return only the 'data' array from the JSON in the format of a list of lists, without any additional text, columns, or index fields.\n\n"
         f"Dataset: {data_json}"
     )
 
