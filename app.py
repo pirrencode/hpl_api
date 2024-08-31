@@ -143,7 +143,7 @@ def analyze_hyperloop_project(model):
     else:
         st.error("Failed to load data, analysis cannot proceed.")
 
-def analyze_hyperloop_project_using_mistral(model):
+def analyze_hyperloop_project_using_mistral():
     df = load_data_from_snowflake("ALLIANCE_STORE.HPL_SD_CRS_ALLIANCE")
 
     if df is not None:
@@ -151,7 +151,7 @@ def analyze_hyperloop_project_using_mistral(model):
         st.dataframe(df)
 
         start_time = time.time()
-        insights = get_mistral_insights(df, model)
+        insights = get_mistral_insights(df)
         st.write(f"Gen AI response time: {time.time() - start_time} seconds")
 
         if insights:
