@@ -1,5 +1,10 @@
 # Hyperloop decision making ecosystem changelog
 
+## v0.1.1-dev
+
+- Implemented Mistral AI functionality for analysis of Hyperloop project.
+- Implemented Mistral AI for experiments handling.
+
 ## v0.1.0-dev
 
 - Implemented custom periods functionality for loading data.
