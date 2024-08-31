@@ -167,11 +167,11 @@ def normalize_cr_scl_data():
 
 import random
 
-def populate_calc_cr_scl_staging(time_period=100):
+def populate_calc_cr_scl_staging(time_periods):
 
     data = {
-        "TIME_PERIOD": list(range(1, time_period + 1)),
-        "CR_SCL": [random.randint(1, 50) for _ in range(time_period)]
+        "TIME_PERIOD": list(range(1, time_periods + 1)),
+        "CR_SCL": [random.randint(1, 50) for _ in range(time_periods)]
     }
 
     df = pd.DataFrame(data)
@@ -712,7 +712,7 @@ def render_homepage():
 ##############################################################
 
 def render_upload_data_page():
-    st.title("Upload Data to Ecosystem")
+    st.title("Upload data to ecosystem")
 
     # Criterion selection
     criterion = st.selectbox("Select Criterion", ["Safety", 
@@ -1343,9 +1343,13 @@ def render_scenarios_simulation_page():
 
 def render_experiment_page():
     st.title("EGTL EXPERIMENT ⚗️")
+
+    # Handling custom time periods logic
+    time_period_raw = st.text_input('Time period:', value='100')
+    time_periods = int(time_period_raw)       
  
     if st.button("GENERATE DIRTY DATA FOR SCALABILITY 🧪"):
-        raw_df = populate_calc_cr_scl_staging()              
+        raw_df = populate_calc_cr_scl_staging(time_periods)              
         save_data_to_snowflake(raw_df, "STAGING_STORE.CALC_CR_SCL_STAGING")
 
     if st.button("APPLY EXPLORATIVE ANALYSIS TO ETL USING GEN AI 🧩"):
@@ -1365,15 +1369,7 @@ def render_utility_page():
     if st.button("BACKUP DATA 📦"):
         backup_fusion_store()
         backup_staging_store()        
-        backup_alliance_store()     
-    
-    if st.button("GENERATE DIRTY DATA FOR SCALABILITY ⚡"):
-        raw_df = populate_calc_cr_scl_staging()              
-        save_data_to_snowflake(raw_df, "STAGING_STORE.CALC_CR_SCL_STAGING")
-
-    if st.button("APPLY EXPLORATIVE ANALYSIS TO ETL USING GEN AI 🧩"):
-        cleaned_df = normalize_cr_scl_data()            
-        save_data_to_snowflake(cleaned_df, "STAGING_STORE.CALC_CR_SCL_STAGING")        
+        backup_alliance_store()
 
     if st.button("⬅️ BACK"):
         st.session_state['page'] = 'home'  
