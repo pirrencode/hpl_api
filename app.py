@@ -697,7 +697,7 @@ def populate_hpl_sd_crs():
 
 def render_homepage():
     st.title("HDME")
-    st.subheader("v0.09-dev")
+    st.subheader("v0.1.0-dev")
     st.write("""
         Welcome to the Hyperloop Project System Dynamics Dashboard. 
         This application allows you to upload, manage, and visualize data related to various criteria 
@@ -719,6 +719,9 @@ def render_homepage():
 
     if st.button("ANALYZE HYPERLOOP PROJECT 🧠"):
         analyze_hyperloop_project()
+
+    if st.button("EGTL EXPERIMENT ⚗️"):
+        st.session_state['page'] = 'experiment'
 
     if st.button("UTILITIES 🛠️"):
         st.session_state['page'] = 'utility'
@@ -743,6 +746,8 @@ def render_upload_data_page():
                                                   "Infrastructure Integration",
                                                   "Scalability",
                                                   ])
+
+    time_periods = st.text_input('Time period:', value='100')
 
     source_table_mapping = {
         "Safety": "FUSION_STORE.CR_SFY_SOURCE",
@@ -787,7 +792,7 @@ def render_upload_data_page():
     }    
 
     generate_function_mapping = {
-        "Safety": generate_safety_data,
+        "Safety": generate_safety_data(time_periods),
         "Environmental Impact": generate_environmental_impact_data,
         "Social Acceptance": generate_social_acceptance_data,
         "Technical Feasibility": generate_technical_feasibility_data,
@@ -886,26 +891,22 @@ def criterion_visualization(df_summary, crt):
     st.plotly_chart(fig)
 
 def visualize_all_success_factors():
-    # Step 1: Establish Snowflake session and load data from HPL_SD_CRS
     session = Session.builder.configs(get_snowflake_connection_params()).create()
     hpl_sd_crs_df = session.table("ALLIANCE_STORE.HPL_SD_CRS_ALLIANCE").to_pandas()
 
-    # Step 2: Define the criteria to visualize
     criteria = ['CR_ENV', 'CR_SAC', 'CR_TFE', 'CR_SFY', 'CR_REG', 'CR_QMF', 'CR_ECV', 'CR_USB', 'CR_RLB', 'CR_INF', 'CR_SCL']
 
-    # Step 3: Create subplots for each criterion, 3 in a row
-    cols = st.columns(3)  # Creates three columns to place graphs side by side
+    cols = st.columns(3)
     
     for i, criterion in enumerate(criteria):
         fig = px.line(hpl_sd_crs_df, x='TIME', y=criterion, title=f"{criterion} over Time")
-        col_idx = i % 3  # Get column index: 0, 1, 2
-        with cols[col_idx]:  # Place the figure in the corresponding column
+        col_idx = i % 3 
+        with cols[col_idx]: 
             st.plotly_chart(fig)
 
 import plotly.express as px
 
 def calculate_maturity_level(dmmi_df):
-    # Normalize each DMMI factor (ensure values are between 0 and 1)
     dmmi_df['Governance and Management'] = dmmi_df['Governance and Management'].clip(0, 1)
     dmmi_df['Strategy and Planning'] = dmmi_df['Strategy and Planning'].clip(0, 1)
     dmmi_df['Technology and Infrastructure'] = dmmi_df['Technology and Infrastructure'].clip(0, 1)
@@ -914,7 +915,6 @@ def calculate_maturity_level(dmmi_df):
     dmmi_df['Data and Information Management'] = dmmi_df['Data and Information Management'].clip(0, 1)
     dmmi_df['Performance Measurement'] = dmmi_df['Performance Measurement'].clip(0, 1)
     
-    # Assign weights to each factor (weights sum to 1)
     weights = {
         'Governance and Management': 0.15,
         'Strategy and Planning': 0.15,
@@ -925,7 +925,6 @@ def calculate_maturity_level(dmmi_df):
         'Performance Measurement': 0.10,
     }
     
-    # Calculate weighted maturity level score (before scaling)
     dmmi_df['Maturity Level'] = (
         dmmi_df['Governance and Management'] * weights['Governance and Management'] +
         dmmi_df['Strategy and Planning'] * weights['Strategy and Planning'] +
@@ -936,16 +935,13 @@ def calculate_maturity_level(dmmi_df):
         dmmi_df['Performance Measurement'] * weights['Performance Measurement']
     )
     
-    # Scale maturity level to range [1, 5]
     dmmi_df['Maturity Level'] = 1 + 4 * dmmi_df['Maturity Level']
     
     return dmmi_df
 
 def visualize_ddmi_factors(dmmi_df):
-    # Define columns layout
-    cols = st.columns(4)  # Four columns for dashboard layout
+    cols = st.columns(4)
     
-    # Plot each DMMI factor
     factors = [
         'Governance and Management', 'Strategy and Planning', 
         'Technology and Infrastructure', 'Processes and Methodologies',
@@ -965,7 +961,6 @@ def render_ddmi_dashboard():
     session = Session.builder.configs(get_snowflake_connection_params()).create()
     hpl_sd_crs_df = session.table("ALLIANCE_STORE.HPL_SD_CRS_ALLIANCE").to_pandas()
 
-    # Calculate DMMI factors
     dmmi_df = pd.DataFrame({
         'TIME': hpl_sd_crs_df['TIME'],
         'Governance and Management': hpl_sd_crs_df[['CR_REG', 'CR_TFE', 'CR_SFY']].mean(axis=1),
@@ -977,10 +972,8 @@ def render_ddmi_dashboard():
         'Performance Measurement': hpl_sd_crs_df[['CR_ECV', 'CR_USB']].mean(axis=1)
     })
 
-    # Calculate final maturity level
     dmmi_df = calculate_maturity_level(dmmi_df)
 
-    # Display DMMI factor visualizations and overall maturity level
     visualize_ddmi_factors(dmmi_df)          
 
 ########################
@@ -1322,7 +1315,6 @@ def scenarios_calculation_to_snowlake(cr_env_df, cr_sac_df, cr_tfe_df, cr_sfy_df
 def render_scenarios_simulation_page():
     st.title("Simulation Scenarios 🌍")
     
-    # Define columns layout for the buttons
     col1, col2 = st.columns(2)
     with col1:
         if st.button("RAPID DECLINE 📉"):
@@ -1345,6 +1337,24 @@ def render_scenarios_simulation_page():
             st.dataframe(df.head())
             save_data_to_snowflake(df, "ALLIANCE_STORE.HPL_SD_CRS_ALLIANCE")
             st.write(f"Table population completed. Please proceed to visualization tab")            
+
+    if st.button("⬅️ BACK"):
+        st.session_state['page'] = 'home' 
+
+#######################################
+# EGTL EXPERIMENT PAGE
+#######################################             
+
+def render_experiment_page():
+    st.title("EGTL EXPERIMENT ⚗️")
+ 
+    if st.button("GENERATE DIRTY DATA FOR SCALABILITY 🧪"):
+        raw_df = populate_calc_cr_scl_staging()              
+        save_data_to_snowflake(raw_df, "STAGING_STORE.CALC_CR_SCL_STAGING")
+
+    if st.button("APPLY EXPLORATIVE ANALYSIS TO ETL USING GEN AI 🧩"):
+        cleaned_df = normalize_cr_scl_data()            
+        save_data_to_snowflake(cleaned_df, "STAGING_STORE.CALC_CR_SCL_STAGING")        
 
     if st.button("⬅️ BACK"):
         st.session_state['page'] = 'home' 
@@ -1387,5 +1397,7 @@ elif st.session_state['page'] == 'visualizations':
     render_visualizations_page()
 elif st.session_state['page'] == 'scenarious':
     render_scenarios_simulation_page()
+elif st.session_state['page'] == 'experiment':
+    render_experiment_page()    
 elif st.session_state['page'] == 'utility':
     render_utility_page()    

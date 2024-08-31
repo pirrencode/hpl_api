@@ -3,7 +3,7 @@ import pandas as pd
 import streamlit as st
 import random
 
-def generate_safety_data(time_periods=100):
+def generate_safety_data(time_periods):
 
     time = np.arange(0, time_periods)
 
