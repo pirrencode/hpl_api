@@ -67,7 +67,7 @@ def test_openai_api_key():
     except Exception as e:
         st.error(f"An error occurred: {str(e)}")
 
-def get_genai_insights(df, model):
+def get_insights_using_openai(df, model):
 
     data_summary = df.describe().to_string()
 
@@ -94,7 +94,7 @@ def get_genai_insights(df, model):
         st.error(f"An error occurred while fetching insights from ChatGPT: {str(e)}")
         return None
 
-def get_mistral_insights(df):
+def get_insights_using_mistral(df, model):
     data_summary = df.describe().to_string()
 
     prompt = (
@@ -102,30 +102,25 @@ def get_mistral_insights(df):
         f"{data_summary}"
     )
 
-    # mistral_api_key = get_mistral_api_key()
-    # st.write(f"DEBUG key: {mistral_api_key[:5]}")
-    # st.write(f"DEBUG prompt: {prompt}")
-
     headers = {
         "Authorization": f"Bearer {get_mistral_api_key()}",
         "Content-Type": "application/json"
     }
 
     data = {
-        "model": "mistral-small-latest",
+        "model": model,
         "messages": [
             {
                 "role": "user",
                 "content": prompt
             }
         ],
-        "max_tokens": 300,
+        "max_tokens": 1000,
     }
 
     try:
         response = requests.post("https://api.mistral.ai/v1/chat/completions", headers=headers, json=data)
         response.raise_for_status()
-        # st.write(response.text)
 
         result = response.json()
         insights = result["choices"][0]["message"]["content"].strip()
@@ -143,8 +138,17 @@ def analyze_hyperloop_project(model):
         st.dataframe(df)
 
         start_time = time.time()
-        insights = get_genai_insights(df, model)
-        st.write(f"ChatGPT response time: {time.time() - start_time} seconds")
+
+        if model in ["gpt-3.5-turbo", "gpt-4"]:
+            insights = get_insights_using_openai(df, model)
+        elif model == "mistral-small-latest":
+            insights = get_insights_using_mistral(df, model)
+        else:
+            st.error("Selected model is not supported.")
+            return
+
+        insights = get_insights_using_openai(df, model)
+        st.write(f"GenAI response time: {time.time() - start_time} seconds")
 
         if insights:
             st.write("GenAI Insights:")
@@ -152,22 +156,22 @@ def analyze_hyperloop_project(model):
     else:
         st.error("Failed to load data, analysis cannot proceed.")
 
-def analyze_hyperloop_project_using_mistral():
-    df = load_data_from_snowflake("ALLIANCE_STORE.HPL_SD_CRS_ALLIANCE")
+# def analyze_hyperloop_project_using_mistral():
+#     df = load_data_from_snowflake("ALLIANCE_STORE.HPL_SD_CRS_ALLIANCE")
 
-    if df is not None:
-        st.write("Data loaded successfully.")
-        st.dataframe(df)
+#     if df is not None:
+#         st.write("Data loaded successfully.")
+#         st.dataframe(df)
 
-        start_time = time.time()
-        insights = get_mistral_insights(df)
-        st.write(f"Gen AI response time: {time.time() - start_time} seconds")
+#         start_time = time.time()
+#         insights = get_insights_using_mistral(df)
+#         st.write(f"Gen AI response time: {time.time() - start_time} seconds")
 
-        if insights:
-            st.write("GenAI Insights:")
-            st.write(insights)
-    else:
-        st.error("Failed to load data, analysis cannot proceed.")
+#         if insights:
+#             st.write("GenAI Insights:")
+#             st.write(insights)
+#     else:
+#         st.error("Failed to load data, analysis cannot proceed.")
 
 #############################################
 # ETL IMPROVEMENT
@@ -768,15 +772,12 @@ def render_homepage():
 
     model = st.radio(
         "Select GPT model for analysis:",
-        options=["gpt-3.5-turbo", "gpt-4", ],
+        options=["gpt-3.5-turbo", "gpt-4", "mistral-small-latest"],
         index=0
     )
 
     if st.button("ANALYZE HYPERLOOP PROJECT 🧠"):
-        analyze_hyperloop_project(model)
-
-    if st.button("ANALYZE HYPERLOOP PROJECT USING MISTRAL"):
-        analyze_hyperloop_project_using_mistral()        
+        analyze_hyperloop_project(model)      
 
 ##############################################################
 # Data upload and management page
@@ -1421,7 +1422,7 @@ def render_experiment_page():
 
     model = st.radio(
         "Select GenAI model for experiment:",
-        options=["gpt-3.5-turbo", "gpt-4", ],
+        options=["gpt-3.5-turbo", "gpt-4", "mistral-small-latest"],
         index=0
     )       
  
