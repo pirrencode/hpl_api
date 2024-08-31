@@ -805,7 +805,7 @@ def populate_hpl_sd_crs():
 
 def render_homepage():
     st.title("HDME")
-    st.subheader("v0.1.1-dev")
+    st.subheader("v0.1.2-dev")
     st.write("""
         Welcome to the Hyperloop Project System Dynamics Dashboard. 
         This application allows you to upload, manage, and visualize data related to various criteria 
