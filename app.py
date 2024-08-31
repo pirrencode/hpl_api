@@ -111,7 +111,7 @@ def analyze_hyperloop_project(model):
 # ETL IMPROVEMENT
 #############################################
 
-def clean_data_with_genai(df):
+def clean_data_with_genai(df, model):
     # Convert the DataFrame to a string (JSON format) for better handling by the API
     data_json = df.to_json(orient='split')
 
@@ -127,7 +127,7 @@ def clean_data_with_genai(df):
 
     try:
         response = openai.chat.completions.create(
-            model="gpt-3.5-turbo",
+            model=model,
             messages=[
                 {"role": "system", "content": "You are a helpful assistant."},
                 {"role": "user", "content": prompt}
@@ -143,7 +143,7 @@ def clean_data_with_genai(df):
         st.error(f"An error occurred while processing data with ChatGPT: {str(e)}")
         return None
 
-def normalize_cr_scl_data():
+def normalize_cr_scl_data(model):
 
     df = load_data_from_snowflake("STAGING_STORE.CALC_CR_SCL_STAGING")
 
@@ -152,7 +152,7 @@ def normalize_cr_scl_data():
         st.dataframe(df)
 
         start_time = time.time()
-        cleaned_df = clean_data_with_genai(df)
+        cleaned_df = clean_data_with_genai(df, model)
         st.write(f"ChatGPT response time: {time.time() - start_time} seconds")
         
         if cleaned_df is not None:
@@ -706,8 +706,8 @@ def render_homepage():
 
     model = st.radio(
         "Select GPT model for analysis:",
-        options=["gpt-4", "gpt-3.5-turbo"],
-        index=0  # Default selection is gpt-4
+        options=["gpt-3.5-turbo", "gpt-4", ],
+        index=0
     )
 
     if st.button("ANALYZE HYPERLOOP PROJECT 🧠"):
@@ -1352,14 +1352,20 @@ def render_experiment_page():
 
     # Handling custom time periods logic
     time_period_raw = st.text_input('Time period:', value='100')
-    time_periods = int(time_period_raw)       
+    time_periods = int(time_period_raw)    
+
+    model = st.radio(
+        "Select GenAI model for experiment:",
+        options=["gpt-3.5-turbo", "gpt-4", ],
+        index=0
+    )       
  
     if st.button("GENERATE DIRTY DATA FOR SCALABILITY 🧪"):
         raw_df = populate_calc_cr_scl_staging(time_periods)              
         save_data_to_snowflake(raw_df, "STAGING_STORE.CALC_CR_SCL_STAGING")
 
     if st.button("APPLY EXPLORATIVE ANALYSIS TO ETL USING GEN AI 🧩"):
-        cleaned_df = normalize_cr_scl_data()            
+        cleaned_df = normalize_cr_scl_data(model)            
         save_data_to_snowflake(cleaned_df, "STAGING_STORE.CALC_CR_SCL_STAGING")        
 
     if st.button("⬅️ BACK"):
