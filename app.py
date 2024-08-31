@@ -147,7 +147,7 @@ def analyze_hyperloop_project(model):
             st.error("Selected model is not supported.")
             return
 
-        st.write(f"GenAI response time: {time.time() - start_time} seconds")
+        st.write(f"GenAI (Model: {model}) response time: {time.time() - start_time} seconds")
 
         if insights:
             st.write("GenAI Insights:")
@@ -155,29 +155,12 @@ def analyze_hyperloop_project(model):
     else:
         st.error("Failed to load data, analysis cannot proceed.")
 
-# def analyze_hyperloop_project_using_mistral():
-#     df = load_data_from_snowflake("ALLIANCE_STORE.HPL_SD_CRS_ALLIANCE")
-
-#     if df is not None:
-#         st.write("Data loaded successfully.")
-#         st.dataframe(df)
-
-#         start_time = time.time()
-#         insights = get_insights_using_mistral(df)
-#         st.write(f"Gen AI response time: {time.time() - start_time} seconds")
-
-#         if insights:
-#             st.write("GenAI Insights:")
-#             st.write(insights)
-#     else:
-#         st.error("Failed to load data, analysis cannot proceed.")
-
 #############################################
 # ETL IMPROVEMENT
 #############################################
 
-def clean_data_with_genai(df, model):
-    # Convert the DataFrame to a string (JSON format) for better handling by the API
+def clean_data_with_openai(df, model):
+
     data_json = df.to_json(orient='split')
 
     prompt = (
@@ -207,6 +190,46 @@ def clean_data_with_genai(df, model):
     except Exception as e:
         st.error(f"An error occurred while processing data with ChatGPT: {str(e)}")
         return None
+    
+def clean_data_with_mistral(df, model):
+
+    data_json = df.to_json(orient='split')
+
+    prompt = (
+        "You are given a dataset in JSON format. Check if the 'CR_SCL' column contains any value larger than 1. "
+        "If so, normalize those values so they fall within the range 0..1. Other values should stay as they are. "
+        "Return the cleaned dataset in JSON format "
+        "without any additional text or explanation.\n\n"
+        f"Dataset: {data_json}"
+    )
+
+    headers = {
+        "Authorization": f"Bearer {get_mistral_api_key()}",
+        "Content-Type": "application/json"
+    }
+
+    data = {
+        "model": model,
+        "messages": [
+            {
+                "role": "user",
+                "content": prompt
+            }
+        ],
+        "max_tokens": 1000,
+    }
+
+    try:
+        response = requests.post("https://api.mistral.ai/v1/chat/completions", headers=headers, json=data)
+        response.raise_for_status()
+
+        result = response.json()
+        insights = result["choices"][0]["message"]["content"].strip()
+        return insights
+
+    except requests.exceptions.RequestException as e:
+        st.error(f"An error occurred while fetching insights from Mistral AI: {str(e)}")
+        return None
 
 def normalize_cr_scl_data(model):
 
@@ -216,16 +239,28 @@ def normalize_cr_scl_data(model):
         st.write("Data loaded successfully.")
         st.dataframe(df)
 
-        start_time = time.time()
-        cleaned_df = clean_data_with_genai(df, model)
+        cleaned_df = clean_data_with_openai(df, model)
         st.write(f"ChatGPT response time: {time.time() - start_time} seconds")
+
+
+        start_time = time.time()
+
+        if model in ["gpt-3.5-turbo", "gpt-4"]:
+            cleaned_df = clean_data_with_openai(df, model)
+        elif model == "mistral-small":
+            cleaned_df = clean_data_with_mistral(df, model)
+        else:
+            st.error("Selected model is not supported.")
+            return
+
+        st.write(f"GenAI (Model: {model}) response time: {time.time() - start_time} seconds")
         
         if cleaned_df is not None:
             st.write("Data cleaned successfully.")
             st.dataframe(cleaned_df)
             return cleaned_df
         else:
-            st.error("Failed to clean data using ChatGPT.")
+            st.error("Failed to clean data using GenAI (Model: {model}).")
     else:
         st.error("Failed to load data from Snowflake.")
         return None
