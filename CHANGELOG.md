@@ -1,5 +1,12 @@
 # Hyperloop decision making ecosystem changelog
 
+## v0.1.0-dev
+
+- Implemented custom periods functionality for loading data.
+- Implemented custom periods functionality for simulation modelling.
+- Added page responsible for experiments handling.
+- Logging reorganized.
+
 ## v0.0.9-dev
 
 - Added functionality for clean-up data that is not as per requirements for Scalability criterion.
