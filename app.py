@@ -220,7 +220,7 @@ def clean_data_with_mistral(df, model):
                 "content": prompt
             }
         ],
-        "max_tokens": 10000,
+        "max_tokens": 1000,
     }
 
     try:
@@ -229,14 +229,21 @@ def clean_data_with_mistral(df, model):
 
         result = response.json()
         insights = result["choices"][0]["message"]["content"].strip()
-        
+
         st.write(f"DEBUG: {insights}")
+        
+        # Clean the JSON output and load it into a DataFrame
+        cleaned_data = clean_json_output(insights)
+        if cleaned_data:
+            # Convert the cleaned JSON data into a DataFrame
+            cleaned_df = pd.DataFrame(cleaned_data, columns=["TIME", "CR_SCL"])
+            return cleaned_df
+        else:
+            st.error("Failed to clean the data or parse it into a DataFrame.")
+            return None
 
-        cleaned_df = pd.read_json(insights, orient='split')
-        return cleaned_df
-
-    except Exception as e:
-        st.error(f"An error occurred while processing data with ChatGPT: {str(e)}")
+    except requests.exceptions.RequestException as e:
+        st.error(f"An error occurred while fetching insights from Mistral AI: {str(e)}")
         return None
 
         # Clean the JSON output
