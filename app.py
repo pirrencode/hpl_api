@@ -98,8 +98,7 @@ def get_mistral_insights(df):
     data_summary = df.describe().to_string()
 
     prompt = (
-        "You are an expert in project performance analysis. Based on the following data summary of a Hyperloop project, please provide detailed insights on how the project is performing and offer recommendations for improvement:\n\n"
-        f"{data_summary}"
+        f"You are an expert in project performance analysis. Based on the following data summary of a Hyperloop project, please provide detailed insights on how the project is performing and offer recommendations for improvement: {data_summary}"
     )
 
     mistral_api_key = get_mistral_api_key()
