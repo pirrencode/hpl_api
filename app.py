@@ -10,7 +10,7 @@ from criterion_factors_logic import generate_safety_data, generate_environmental
 import openai
 import time
 
-# Configure logging
+# LOG LEVEL SETUP
 logging.basicConfig(level=logging.INFO)
 
 ##################################
@@ -388,7 +388,6 @@ def calculate_cr_env():
                            w2 * (df_source['CO2_EMISSIONS'] / (df_source['DISTANCE'] * df_source['LOAD_WEIGHT'])) +
                            w3 * df_source['MATERIAL_SUSTAINABILITY'] +
                            w4 * df_source['ENV_IMPACT_SCORE'])
-    st.write("df_result is created")
 
     return df_result
 
@@ -397,7 +396,6 @@ def calculate_cr_sfy():
 
     # Load data from CR_SFY_SOURCE table
     df = session.table("STAGING_STORE.CR_SFY_STAGING").to_pandas()
-    st.write("DF is defined")
     # Calculate CR_SFY for each time period
     epsilon = 1e-6  # Avoid division by zero
     cr_sfy = np.array([1 / np.sum((df.iloc[t]["RISK_SCORE"] - df.iloc[t]["MIN_RISK_SCORE"]) / 
@@ -409,7 +407,6 @@ def calculate_cr_sfy():
         "TIME": df["TIME"],
         "CR_SFY": cr_sfy
     })
-    st.write("df_cr_sfy is created")
 
     return df_cr_sfy
 
@@ -418,7 +415,6 @@ def calculate_cr_sac():
     session = Session.builder.configs(get_snowflake_connection_params()).create()
 
     df_source = session.table("STAGING_STORE.CR_SAC_STAGING").to_pandas()
-    st.write("DF is defined")
 
     df_result = pd.DataFrame()
     df_result['TIME'] = df_source['TIME']
@@ -431,8 +427,6 @@ def calculate_cr_sac():
     cr_sac_max = cr_sac_raw.max()
     df_result['CR_SAC'] = (cr_sac_raw - cr_sac_min) / (cr_sac_max - cr_sac_min)
 
-    st.write("df_result is created")
-
     return df_result
 
 def calculate_cr_tfe():
@@ -440,7 +434,6 @@ def calculate_cr_tfe():
     session = Session.builder.configs(get_snowflake_connection_params()).create()
 
     df_source = session.table("STAGING_STORE.CR_TFE_STAGING").to_pandas()
-    st.write("DF is defined")
 
     df_result = pd.DataFrame()
     df_result['TIME'] = df_source['TIME']
@@ -458,8 +451,6 @@ def calculate_cr_tfe():
     cr_tfe_max = cr_tfe_raw.max()
     df_result['CR_TFE'] = (cr_tfe_raw - cr_tfe_min) / (cr_tfe_max - cr_tfe_min)
 
-    st.write("df_result is created")
-
     return df_result
 
 def calculate_cr_reg():
@@ -467,12 +458,11 @@ def calculate_cr_reg():
     session = Session.builder.configs(get_snowflake_connection_params()).create()
 
     df_source = session.table("STAGING_STORE.CR_REG_STAGING").to_pandas()
-    st.write("DF is defined")
 
     df_result = pd.DataFrame()
     df_result['TIME'] = df_source['TIME']
 
-    # Evenly distributed weights
+    # Weights
     w1 = w2 = w3 = w4 = w5 = 0.2
     
     # Formula implementation
@@ -482,8 +472,6 @@ def calculate_cr_reg():
                            w4 * df_source['INT_LAW_COMPLIANCE'] +
                            w5 * df_source['TRL_COMPLIANCE'])
     
-    st.write("df_result is created")    
-    
     return df_result
 
 def calculate_cr_qmf():
@@ -491,27 +479,20 @@ def calculate_cr_qmf():
     session = Session.builder.configs(get_snowflake_connection_params()).create()
 
     df_source = session.table("STAGING_STORE.CR_QMF_STAGING").to_pandas()
-    st.write("DF is defined")
 
     df_result = pd.DataFrame()
     df_result['TIME'] = df_source['TIME']
 
-    # Calculate CR_QMF as TOTAL_DISRUPTIVE_TECH / 12 (max possible value)
     df_result['CR_QMF'] = df_source['TOTAL_DISRUPTIVE_TECH'] / 12.0
 
-    # Ensure CR_QMF is in the range [0, 1]
-    df_result['CR_QMF'] = df_result['CR_QMF'].clip(0, 1)
-
-    st.write("df_result is created")      
+    df_result['CR_QMF'] = df_result['CR_QMF'].clip(0, 1) 
     
     return df_result
 
 def calculate_cr_ecv():
     session = Session.builder.configs(get_snowflake_connection_params()).create()
 
-    # Fetch the data from Snowflake
     cr_ecv_source_df = session.table("STAGING_STORE.CR_ECV_STAGING").to_pandas()
-    st.write("DF is defined")
 
     calc_data = []
     
@@ -1153,6 +1134,8 @@ from simulation_scenarios import (
 
 def generate_rapid_decline_scenario(time_periods):
 
+    st.write("Executed rapid decline scenario for simulation model.")
+
     cr_env_df = generate_cr_env_data_rapid_decline(time_periods)
     cr_sac_df = generate_cr_sac_data_rapid_decline(time_periods)
     cr_tfe_df = generate_cr_tfe_data_rapid_decline(time_periods)
@@ -1172,6 +1155,8 @@ def generate_rapid_decline_scenario(time_periods):
 #######################################
 
 def generate_decline_over_time_scenario(time_periods):
+
+    st.write("Executed decline over time scenario for simulation model.")
 
     cr_env_df = generate_cr_env_decline_over_time_data(time_periods)
     cr_sac_df = generate_cr_sac_decline_over_time_data(time_periods)
@@ -1193,6 +1178,8 @@ def generate_decline_over_time_scenario(time_periods):
 
 def generate_rapid_growth_scenario(time_periods):
 
+    st.write("Executed rapid growth scenario for simulation model.")    
+
     cr_env_df = generate_cr_env_rapid_growth_data(time_periods)
     cr_sac_df = generate_cr_sac_rapid_growth_data(time_periods)
     cr_tfe_df = generate_cr_tfe_rapid_growth_data(time_periods)
@@ -1212,6 +1199,8 @@ def generate_rapid_growth_scenario(time_periods):
 #######################################
 
 def generate_sustainable_growth_scenario(time_periods):
+
+    st.write("Executed sustainable growth scenario for simulation model.")   
 
     cr_env_df = generate_cr_env_sustainable_growth_data(time_periods)
     cr_sac_df = generate_cr_sac_sustainable_growth_data(time_periods)
@@ -1257,60 +1246,60 @@ def scenarios_calculation_to_snowlake(cr_env_df, cr_sac_df, cr_tfe_df, cr_sfy_df
     fusion_to_staging_migration("FUSION_STORE.CR_INF_SOURCE", "STAGING_STORE.CR_INF_STAGING")
     fusion_to_staging_migration("FUSION_STORE.CR_SCL_SOURCE", "STAGING_STORE.CR_SCL_STAGING")
 
-    rapid_df_env = calculate_cr_env()
-    st.write(f"Criterion rapid_df_env data loaded.")
-    st.dataframe(rapid_df_env.head())
-    save_data_to_snowflake(rapid_df_env, "STAGING_STORE.CALC_CR_ENV_STAGING")   
+    scenario_df_env = calculate_cr_env()
+    st.write(f"Criterion scenario_df_env data loaded.")
+    st.dataframe(scenario_df_env.head())
+    save_data_to_snowflake(scenario_df_env, "STAGING_STORE.CALC_CR_ENV_STAGING")   
 
-    rapid_df_sac = calculate_cr_sac()
-    st.write(f"Criterion rapid_df_sac data loaded.")
-    st.dataframe(rapid_df_sac.head())
-    save_data_to_snowflake(rapid_df_sac, "STAGING_STORE.CALC_CR_SAC_STAGING")  
+    scenario_df_sac = calculate_cr_sac()
+    st.write(f"Criterion scenario_df_sac data loaded.")
+    st.dataframe(scenario_df_sac.head())
+    save_data_to_snowflake(scenario_df_sac, "STAGING_STORE.CALC_CR_SAC_STAGING")  
 
-    rapid_df_tfe = calculate_cr_tfe()
-    st.write(f"Criterion rapid_df_tfe data loaded.")
-    st.dataframe(rapid_df_tfe.head())
-    save_data_to_snowflake(rapid_df_tfe, "STAGING_STORE.CALC_CR_TFE_STAGING")  
+    scenario_df_tfe = calculate_cr_tfe()
+    st.write(f"Criterion scenario_df_tfe data loaded.")
+    st.dataframe(scenario_df_tfe.head())
+    save_data_to_snowflake(scenario_df_tfe, "STAGING_STORE.CALC_CR_TFE_STAGING")  
 
-    rapid_df_sfy = calculate_cr_sfy()
-    st.write(f"Criterion rapid_df_sfy data loaded.")
-    st.dataframe(rapid_df_sfy.head())
-    save_data_to_snowflake(rapid_df_sfy, "STAGING_STORE.CALC_CR_SFY_STAGING") 
+    scenario_df_sfy = calculate_cr_sfy()
+    st.write(f"Criterion scenario_df_sfy data loaded.")
+    st.dataframe(scenario_df_sfy.head())
+    save_data_to_snowflake(scenario_df_sfy, "STAGING_STORE.CALC_CR_SFY_STAGING") 
 
-    rapid_df_reg = calculate_cr_reg()
-    st.write(f"Criterion rapid_df_reg data loaded.")
-    st.dataframe(rapid_df_reg.head())
-    save_data_to_snowflake(rapid_df_reg, "STAGING_STORE.CALC_CR_REG_STAGING")  
+    scenario_df_reg = calculate_cr_reg()
+    st.write(f"Criterion scenario_df_reg data loaded.")
+    st.dataframe(scenario_df_reg.head())
+    save_data_to_snowflake(scenario_df_reg, "STAGING_STORE.CALC_CR_REG_STAGING")  
 
-    rapid_df_qmf = calculate_cr_qmf()
-    st.write(f"Criterion rapid_df_qmf data loaded.")
-    st.dataframe(rapid_df_qmf.head())
-    save_data_to_snowflake(rapid_df_qmf, "STAGING_STORE.CALC_CR_QMF_STAGING")  
+    scenario_df_qmf = calculate_cr_qmf()
+    st.write(f"Criterion scenario_df_qmf data loaded.")
+    st.dataframe(scenario_df_qmf.head())
+    save_data_to_snowflake(scenario_df_qmf, "STAGING_STORE.CALC_CR_QMF_STAGING")  
 
-    rapid_df_ecv = calculate_cr_ecv()
-    st.write(f"Criterion rapid_df_ecv data loaded.")
-    st.dataframe(rapid_df_ecv.head())
-    save_data_to_snowflake(rapid_df_ecv, "STAGING_STORE.CALC_CR_ECV_STAGING") 
+    scenario_df_ecv = calculate_cr_ecv()
+    st.write(f"Criterion scenario_df_ecv data loaded.")
+    st.dataframe(scenario_df_ecv.head())
+    save_data_to_snowflake(scenario_df_ecv, "STAGING_STORE.CALC_CR_ECV_STAGING") 
 
-    rapid_df_usb = calculate_cr_usb()
-    st.write(f"Criterion rapid_df_usb data loaded.")
-    st.dataframe(rapid_df_usb.head())
-    save_data_to_snowflake(rapid_df_usb, "STAGING_STORE.CALC_CR_USB_STAGING")  
+    scenario_df_usb = calculate_cr_usb()
+    st.write(f"Criterion scenario_df_usb data loaded.")
+    st.dataframe(scenario_df_usb.head())
+    save_data_to_snowflake(scenario_df_usb, "STAGING_STORE.CALC_CR_USB_STAGING")  
 
-    rapid_df_rlb = calculate_cr_rlb()
-    st.write(f"Criterion rapid_df_rlb data loaded.")
-    st.dataframe(rapid_df_rlb.head())
-    save_data_to_snowflake(rapid_df_rlb, "STAGING_STORE.CALC_CR_RLB_STAGING")        
+    scenario_df_rlb = calculate_cr_rlb()
+    st.write(f"Criterion scenario_df_rlb data loaded.")
+    st.dataframe(scenario_df_rlb.head())
+    save_data_to_snowflake(scenario_df_rlb, "STAGING_STORE.CALC_CR_RLB_STAGING")        
     
-    rapid_df_inf = calculate_cr_inf()
-    st.write(f"Criterion rapid_df_inf data loaded.")
-    st.dataframe(rapid_df_inf.head())
-    save_data_to_snowflake(rapid_df_inf, "STAGING_STORE.CALC_CR_INF_STAGING")   
+    scenario_df_inf = calculate_cr_inf()
+    st.write(f"Criterion scenario_df_inf data loaded.")
+    st.dataframe(scenario_df_inf.head())
+    save_data_to_snowflake(scenario_df_inf, "STAGING_STORE.CALC_CR_INF_STAGING")   
 
-    rapid_df_scl = calculate_cr_scl()
-    st.write(f"Criterion rapid_df_scl data loaded.")
-    st.dataframe(rapid_df_scl.head())
-    save_data_to_snowflake(rapid_df_scl, "STAGING_STORE.CALC_CR_SCL_STAGING")   
+    scenario_df_scl = calculate_cr_scl()
+    st.write(f"Criterion scenario_df_scl data loaded.")
+    st.dataframe(scenario_df_scl.head())
+    save_data_to_snowflake(scenario_df_scl, "STAGING_STORE.CALC_CR_SCL_STAGING")   
 
     st.success("Scenario data generated and saved.")
 
