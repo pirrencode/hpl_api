@@ -111,7 +111,7 @@ def get_mistral_insights(df):
     }
 
     data = {
-        "model": "mistral-large",
+        "model": "mistral-small-latest",
         "messages": [
             {
                 "role": "user",
