@@ -747,7 +747,9 @@ def render_upload_data_page():
                                                   "Scalability",
                                                   ])
 
-    time_periods = st.text_input('Time period:', value='100')
+    # Handling custom time periods logic
+    time_period_raw = st.text_input('Time period:', value='100')
+    time_periods = int(time_period_raw)   
 
     source_table_mapping = {
         "Safety": "FUSION_STORE.CR_SFY_SOURCE",
