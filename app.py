@@ -147,7 +147,6 @@ def analyze_hyperloop_project(model):
             st.error("Selected model is not supported.")
             return
 
-        insights = get_insights_using_openai(df, model)
         st.write(f"GenAI response time: {time.time() - start_time} seconds")
 
         if insights:
