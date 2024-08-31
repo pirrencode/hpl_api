@@ -63,9 +63,9 @@ def test_openai_api_key():
     except Exception as e:
         st.error(f"An error occurred: {str(e)}")
 
-def get_genai_insights(dataframe):
+def get_genai_insights(df, model):
 
-    data_summary = dataframe.describe().to_string()
+    data_summary = df.describe().to_string()
 
     prompt = (
         "You are an expert in project performance analysis. Based on the following data summary of a Hyperloop project, please provide detailed insights on how the project is performing and offer recommendations for improvement:\n\n"
@@ -76,7 +76,7 @@ def get_genai_insights(dataframe):
 
     try:
         response = openai.chat.completions.create(
-            model="gpt-3.5-turbo",
+            model=model,
             messages=[
                 {"role": "system", "content": "You are a helpful assistant."},
                 {"role": "user", "content": prompt}
@@ -90,7 +90,7 @@ def get_genai_insights(dataframe):
         st.error(f"An error occurred while fetching insights from ChatGPT: {str(e)}")
         return None
 
-def analyze_hyperloop_project():
+def analyze_hyperloop_project(model):
     df = load_data_from_snowflake("ALLIANCE_STORE.HPL_SD_CRS_ALLIANCE")
 
     if df is not None:
@@ -98,7 +98,7 @@ def analyze_hyperloop_project():
         st.dataframe(df)
 
         start_time = time.time()
-        insights = get_genai_insights(df)
+        insights = get_genai_insights(df, model)
         st.write(f"ChatGPT response time: {time.time() - start_time} seconds")
 
         if insights:
@@ -678,7 +678,7 @@ def populate_hpl_sd_crs():
 
 def render_homepage():
     st.title("HDME")
-    st.subheader("v0.1.0-dev")
+    st.subheader("v0.1.1-dev")
     st.write("""
         Welcome to the Hyperloop Project System Dynamics Dashboard. 
         This application allows you to upload, manage, and visualize data related to various criteria 
@@ -698,14 +698,20 @@ def render_homepage():
     if st.button("SCENARIOS SIMULATION 🌐"):
         st.session_state['page'] = 'scenarious'    
 
-    if st.button("ANALYZE HYPERLOOP PROJECT 🧠"):
-        analyze_hyperloop_project()
-
     if st.button("EGTL EXPERIMENT ⚗️"):
         st.session_state['page'] = 'experiment'
 
     if st.button("UTILITIES 🛠️"):
         st.session_state['page'] = 'utility'
+
+    model = st.radio(
+        "Select GPT model for analysis:",
+        options=["gpt-4", "gpt-3.5-turbo"],
+        index=0  # Default selection is gpt-4
+    )
+
+    if st.button("ANALYZE HYPERLOOP PROJECT 🧠"):
+        analyze_hyperloop_project(model)
 
 ##############################################################
 # Data upload and management page
