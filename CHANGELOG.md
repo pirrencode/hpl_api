@@ -1,5 +1,9 @@
 # Hyperloop decision making ecosystem changelog
 
+## v0.1.2-dev
+
+- Code cleanup
+
 ## v0.1.1-dev
 
 - Implemented Mistral AI functionality for analysis of Hyperloop project.
