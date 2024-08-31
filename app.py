@@ -197,9 +197,9 @@ def clean_data_with_mistral(df, model):
 
     prompt = (
         "You are given a dataset in JSON format. Check if the 'CR_SCL' column contains any value larger than 1. "
-        "If so, clean those values so they fall within the range from 0 to 1, depth of float must be maximum two values after 0. Example: 0.24 "
-        " Other values should stay as they are. "
-        "Return only the cleaned dataset in JSON format without any additional text or explanation.\n\n "
+        "If so, normalize those values so they fall within the range 0..1 using the following formula: "
+        "For each value x greater than 1, compute the normalized value as x / max(x) where max(x) is the maximum value in the 'CR_SCL' column. "
+        "Other values should stay as they are. Return the cleaned dataset in JSON format without any additional text or explanation.\n\n"
         f"Dataset: {data_json}"
     )
 
