@@ -10,6 +10,7 @@ from criterion_factors_logic import generate_safety_data, generate_environmental
 import openai
 import time
 import requests
+import json
 
 # LOG LEVEL SETUP
 logging.basicConfig(level=logging.INFO)
@@ -230,23 +231,28 @@ def clean_data_with_mistral(df, model):
         insights = result["choices"][0]["message"]["content"].strip()
         
         st.write(f"DEBUG: {insights}")
-        
+
+        cleaned_df = pd.read_json(insights, orient='split')
+        return cleaned_df
+
+    except Exception as e:
+        st.error(f"An error occurred while processing data with ChatGPT: {str(e)}")
+        return None
+
         # Clean the JSON output
-        cleaned_json_str = clean_json_output(insights)
+        # cleaned_json_str = clean_json_output(insights)
         
-        if cleaned_json_str:
-            # Convert the cleaned JSON string back into a DataFrame
-            cleaned_df = pd.read_json(cleaned_json_str, orient='split')
-            return cleaned_df
-        else:
-            st.error("Failed to clean JSON data.")
-            return None
+        # if cleaned_json_str:
+        #     # Convert the cleaned JSON string back into a DataFrame
+        #     cleaned_df = pd.read_json(cleaned_json_str, orient='split')
+        #     return cleaned_df
+        # else:
+        #     st.error("Failed to clean JSON data.")
+        #     return None
 
     except requests.exceptions.RequestException as e:
         st.error(f"An error occurred while fetching insights from Mistral AI: {str(e)}")
         return None
-
-import json
 
 def clean_json_output(insights):
     """
