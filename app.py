@@ -494,7 +494,7 @@ def normalize_data_for_egtl_experiment(model):
         if normalized_data is not None:
             st.write("Data cleaning is completed.")
             st.dataframe(normalized_data)
-            df_correctness_check = check_df_for_correctness()
+            df_correctness_check = check_df_for_correctness(normalized_data)
             return normalized_data, genai_response_time, input_df_size, output_volume, df_correctness_check, normalized_data_volume 
         else:
             st.error(f"Failed to clean data using GenAI (Model: {model}).")
