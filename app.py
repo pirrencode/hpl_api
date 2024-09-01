@@ -232,8 +232,14 @@ def clean_data_with_gemini(df, model):
 
         cleaned_data_json = response.text
         st.write(f"DEBUG.Responce: {cleaned_data_json}")
-        cleaned_df = pd.read_json(cleaned_data_json, orient='split')
-        return cleaned_df
+        cleaned_data = clean_json_output(cleaned_data_json)
+        if cleaned_data:
+            # Convert the cleaned JSON data into a DataFrame
+            cleaned_df = pd.DataFrame(cleaned_data, columns=["TIME", "CR_SCL"])
+            return cleaned_df
+        else:
+            st.error("Failed to clean the data or parse it into a DataFrame.")
+            return None
 
     except Exception as e:
         st.error(f"An error occurred while processing data with Google: {str(e)}")
@@ -298,7 +304,6 @@ def clean_json_output(insights):
     Cleans the AI-generated JSON output to ensure it can be parsed correctly.
     """
     try:
-        # Attempt to load the output as a list of lists directly
         data = json.loads(insights)
         if isinstance(data, list) and all(isinstance(i, list) for i in data):
             return data
