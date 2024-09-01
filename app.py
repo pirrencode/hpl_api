@@ -274,7 +274,7 @@ def generate_data_with_openai(model, time_periods):
         "}\n\n"
         "Where:\n"
         f'- \"TIME\" must be populated as a sequence of integers from 1 to {time_periods}.\n'
-        '- \"CR_SCL\" must be populated with random floating-point numbers between 0 and 100, showing a positive trend (i.e., the values generally increase over time).\n\n'
+        '- \"CR_SCL\" must be populated with random numbers in a range between 0 and 100, showing a positive trend (i.e., the values generally increase over time).\n\n'
         'Return only the JSON object with both \"TIME\" and \"CR_SCL\" keys and their respective lists of values, and do not include any additional text, explanations, or code in the response.'
     )
 
@@ -294,7 +294,11 @@ def generate_data_with_openai(model, time_periods):
         st.write(f"The {model} response: {generated_data}")
 
         # Parse the generated JSON data
-        data_dict = json.loads(generated_data)
+        try:
+            data_dict = json.loads(generated_data)
+        except json.JSONDecodeError as e:
+            st.error(f"An error occurred while parsing the JSON data: {str(e)}")
+            return None, None, None
 
         # Convert the dictionary into a DataFrame
         gen_ai_df = pd.DataFrame(data_dict)
