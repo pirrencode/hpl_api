@@ -257,7 +257,8 @@ def clean_data_with_openai(df, model):
 
         cleaned_df = pd.read_json(cleaned_data_json, orient='split')
         output_volume = len(str(cleaned_data_json)) if cleaned_data_json is not None else 0
-        return cleaned_df, output_volume
+        prompt_volume = len(str(prompt)) if prompt is not None else 0
+        return cleaned_df, prompt_volume, output_volume
 
     except Exception as e:
         st.error(f"An error occurred while processing data with ChatGPT: {str(e)}")
@@ -271,7 +272,9 @@ def clean_data_with_gemini(df, model):
 
     gemini_model = gemini.GenerativeModel(model_name=model)
     try:
-        response = gemini_model.generate_content(["You are given a dataset in JSON format. Check if the 'CR_SCL' column contains any value larger than 1. "
+
+        prompt = (
+        "You are given a dataset in JSON format. Check if the 'CR_SCL' column contains any value larger than 1. "
         "If so, normalize those values so they fall within the range 0 to 1 using the following formula: "
         "For each value x greater than 1, compute the normalized value as x / max(x) where max(x) is the maximum value in the 'CR_SCL' column. Decimal precision should be 2."
         "Other values should stay as they are."
@@ -279,16 +282,18 @@ def clean_data_with_gemini(df, model):
         "Do not include any code, text, column names or index fields in the output. Your answer to me must contain only dataset - numerical digits, in dict format."
         "\n\n"
         f"Dataset: {data_json}"
-        ])
+        )
+
+        response = gemini_model.generate_content([prompt])
 
         cleaned_data_json = response.text
         st.write(f"The {model} response: {cleaned_data_json}")
         cleaned_data = clean_json_output(cleaned_data_json)
         if cleaned_data:
-            # Convert the cleaned JSON data into a DataFrame
             cleaned_df = pd.DataFrame(cleaned_data, columns=["TIME", "CR_SCL"])
             output_volume = len(str(cleaned_data_json)) if cleaned_data_json is not None else 0
-            return cleaned_df, output_volume
+            prompt_volume = len(str(prompt)) if prompt is not None else 0
+            return cleaned_df, prompt_volume, output_volume
         else:
             st.error("Failed to clean the data or parse it into a DataFrame.")
             return None
@@ -341,7 +346,8 @@ def clean_data_with_mistral(df, model):
         if cleaned_data:
             cleaned_df = pd.DataFrame(cleaned_data, columns=["TIME", "CR_SCL"])
             output_volume = len(str(insights)) if insights is not None else 0
-            return cleaned_df, output_volume
+            prompt_volume = len(str(prompt)) if prompt is not None else 0
+            return cleaned_df, prompt_volume, output_volume
         else:
             st.error("Failed to clean the data or parse it into a DataFrame.")
             return None
@@ -376,16 +382,16 @@ def normalize_cr_scl_data(model):
         start_time = time.time()
 
         if model in ["gpt-3.5-turbo", "gpt-4"]:
-            cleaned_df, output_volume = clean_data_with_openai(df, model)
+            cleaned_df, prompt_volume, output_volume = clean_data_with_openai(df, model)
         elif model == "mistral-small":
-            cleaned_df, output_volume = clean_data_with_mistral(df, model)
+            cleaned_df, prompt_volume, output_volume = clean_data_with_mistral(df, model)
         elif model == "gemini-1.5-flash":
-            cleaned_df, output_volume = clean_data_with_gemini(df, model)            
+            cleaned_df, prompt_volume, output_volume = clean_data_with_gemini(df, model)            
         else:
             st.error("Selected model is not supported.")
             return
 
-        st.write(f"GenAI (Model: {model}) response time: {time.time() - start_time} seconds. GenAI Response size: {output_volume}")
+        st.write(f"GenAI (Model: {model}) response time: {time.time() - start_time} seconds. Prompt size: {prompt_volume}. GenAI Response size: {output_volume}. ")
         
         if cleaned_df is not None:
             st.write("Data cleaned successfully.")
@@ -429,7 +435,7 @@ def egtl_quantative_data_experiment(model):
     
     try:
         start_time = time.time()
-        normalized_data, genai_response_time, input_df_size, output_volume, df_correctness_check, normalized_data_volume = normalize_data_for_egtl_experiment(model)
+        normalized_data, genai_response_time, input_df_size, prompt_volume, output_volume, df_correctness_check, normalized_data_volume = normalize_data_for_egtl_experiment(model)
         
         save_start_time = time.time()
         save_data_to_snowflake(normalized_data, criterion_table)
@@ -442,6 +448,7 @@ def egtl_quantative_data_experiment(model):
         error_type = type(e).__name__
         error_message = str(e)
         genai_response_time = 0
+        prompt_volume = 0
         output_volume = 0
         total_time = 0
         normalized_data_volume = 0
@@ -459,7 +466,8 @@ def egtl_quantative_data_experiment(model):
                                                save_data_to_snowflake_time,                                               
                                                total_time,
                                                rows_processed,  
-                                               input_df_size,    
+                                               input_df_size,
+                                               prompt_volume,    
                                                output_volume,
                                                normalized_data_volume,                                                                                                                                        
                                                correctness,
@@ -479,11 +487,11 @@ def normalize_data_for_egtl_experiment(model):
         start_time = time.time()
 
         if model in ["gpt-3.5-turbo", "gpt-4"]:
-            normalized_data, output_volume = clean_data_with_openai(df, model)
+            normalized_data, prompt_volume, output_volume = clean_data_with_openai(df, model)
         elif model == "mistral-small":
-            normalized_data, output_volume = clean_data_with_mistral(df, model)
+            normalized_data, prompt_volume, output_volume = clean_data_with_mistral(df, model)
         elif model == "gemini-1.5-flash":
-            normalized_data, output_volume = clean_data_with_gemini(df, model)            
+            normalized_data, prompt_volume, output_volume = clean_data_with_gemini(df, model)            
         else:
             st.error("Selected model is not supported.")
             return None, 0, input_df_size, 0
@@ -495,7 +503,7 @@ def normalize_data_for_egtl_experiment(model):
             st.write("Data cleaning is completed.")
             st.dataframe(normalized_data)
             df_correctness_check = check_df_for_correctness(normalized_data)
-            return normalized_data, genai_response_time, input_df_size, output_volume, df_correctness_check, normalized_data_volume 
+            return normalized_data, genai_response_time, input_df_size, prompt_volume, output_volume, df_correctness_check, normalized_data_volume 
         else:
             st.error(f"Failed to clean data using GenAI (Model: {model}).")
             return None, 0, input_df_size, 0
@@ -511,7 +519,8 @@ def insert_data_in_quantative_experiment_table(id,
                                                save_data_to_snowflake_time,                                               
                                                total_time,
                                                rows_processed,  
-                                               input_df_size,    
+                                               input_df_size,
+                                               prompt_volume,    
                                                output_volume,
                                                normalized_df_volume,                                                                                                                                        
                                                correctness,
@@ -529,7 +538,7 @@ def insert_data_in_quantative_experiment_table(id,
              CORRECTNESS, ERROR_ENCOUNTERED, ERROR_TYPE, ERROR_MESSAGE)
             VALUES ({id}, '{model}', '{start_date}', '{end_date}', {genai_response_time}, 
                     {save_data_to_snowflake_time}, {total_time}, {rows_processed}, 
-                    {input_df_size}, {output_volume}, {normalized_df_volume}, 
+                    {input_df_size}, {prompt_volume}, {output_volume}, {normalized_df_volume}, 
                     '{correctness}', {errors_encountered}, '{error_type}', '{error_message}')   
         """
         st.write(f"DEBUG: {insert_query}")
