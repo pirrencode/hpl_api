@@ -208,7 +208,6 @@ def analyze_hyperloop_project(model, report):
                     """
                     st.write(f"DEBUG: {insert_query}")
 
-                    # Execute the query
                     insert_into_table = session.sql(insert_query)
                     insert_into_table.collect()
                 except requests.exceptions.RequestException as e:
@@ -409,6 +408,182 @@ def populate_calc_cr_scl_staging(time_periods):
     df = pd.DataFrame(data)
 
     return df
+
+#############################################
+# EGTL EXPERIMENT
+#############################################
+
+def egtl_quantative_data_experiment(model):
+    criterion_table = "STAGING_STORE.CALC_CR_SCL_STAGING"
+    experiment_table ="ALLIANCE_STORE.EGTL_QUANTATIVE_DATA_EXPERIMENT"
+    experiment_number = get_record_count_for_model(model, experiment_table) + 1
+    experiment_id = get_largest_record_id() + 1
+    st.write(f"Starting quantative experiment for {model} number {experiment_number}, ID {experiment_id}")
+
+    start_date = datetime.now(pytz.utc).strftime('%Y-%B-%d %H:%M:%S')
+    
+    errors_encountered = False
+    error_type = None
+    error_message = None
+    
+    try:
+        start_time = time.time()
+        normalized_data, genai_response_time, input_df_size, output_volume  = normalize_data_for_egtl_experiment(model)
+        normalize_time = time.time() - start_time
+        save_start_time = time.time()
+        save_data_to_snowflake(normalized_data, criterion_table)
+        save_data_to_snowflake_time = time.time() - save_start_time
+    except Exception as e:
+        errors_encountered = True
+        error_type = type(e).__name__
+        error_message = str(e)
+        normalize_time = 0
+        normalized_data = 0
+        save_data_to_snowflake_time = 0
+    
+    genai_time = genai_response_time
+    
+    output_df_size = normalized_data.shape[0] if normalized_data is not None else output_df_size = 0    
+    
+    end_date = datetime.now(pytz.utc).strftime('%Y-%B-%d %H:%M:%S')
+    
+    rows_processed = get_table_row_count(criterion_table)
+
+    insert_data_in_quantative_experiment_table(experiment_id,
+                                               start_date, 
+                                                end_date, 
+                                                normalize_time, 
+                                                genai_time,
+                                                errors_encountered, 
+                                                error_type, 
+                                                error_message, 
+                                                input_df_size, 
+                                                output_volume, 
+                                                output_df_size,
+                                                save_data_to_snowflake_time,
+                                                model,
+                                                rows_processed)    
+
+def normalize_data_for_egtl_experiment(model):
+    df = load_data_from_snowflake("STAGING_STORE.CALC_CR_SCL_STAGING")
+
+    input_df_size = df.shape[0] if df is not None else 0
+
+    if df is not None:
+        st.write("Data loaded successfully.")
+        st.dataframe(df)
+
+        start_time = time.time()
+
+        if model in ["gpt-3.5-turbo", "gpt-4"]:
+            normalized_data = clean_data_with_openai(df, model)
+        elif model == "mistral-small":
+            normalized_data = clean_data_with_mistral(df, model)
+        elif model == "gemini-1.5-flash":
+            normalized_data = clean_data_with_gemini(df, model)            
+        else:
+            st.error("Selected model is not supported.")
+            return
+
+        st.write(f"GenAI (Model: {model}) response time: {time.time() - start_time} seconds")
+        genai_response_time = time.time() - start_time
+
+        output_volume = len(str(normalized_data)) if normalized_data is not None else output_volume = 0
+
+        if normalized_data is not None:
+            st.write("Data cleaned successfully.")
+            st.dataframe(normalized_data)
+            return normalized_data, genai_response_time, input_df_size, output_volume 
+        else:
+            st.error(f"Failed to clean data using GenAI (Model: {model}).")
+    else:
+        st.error("Failed to load data from Snowflake.")
+        return None
+    
+def view_experiment_data(table_name, experiment_name):
+    st.write(f"Experiment name: {experiment_name}")
+    df = load_data_from_snowflake(table_name) 
+    st.write("Experiment data: ")    
+    st.write(df)             
+
+def insert_data_in_quantative_experiment_table(id, 
+                                               start_date, 
+                                               end_date, 
+                                               normalize_time, 
+                                               genai_time,
+                                               errors_encountered, 
+                                               error_type, 
+                                               error_message, 
+                                               input_df_size, 
+                                               output_volume, 
+                                               output_df_size,
+                                               save_data_to_snowflake_time,
+                                               model,
+                                               rows_processed
+                                               ):
+    session = Session.builder.configs(get_snowflake_connection_params()).create()    
+    try:
+        insert_query = f"""
+            INSERT INTO ALLIANCE_STORE.EGTL_QUANTATIVE_DATA_EXPERIMENT 
+            (id, start_date, end_date, normalize_time, genai_time, errors_encountered, 
+            error_type, error_message, input_df_size, output_volume, output_df_size, 
+            save_data_to_snowflake_time, model, rows_processed)
+            VALUES ('{id}', '{start_date}', '{end_date}', '{normalize_time}', '{genai_time}', '{errors_encountered}',
+                    '{error_type}', '{error_message}', '{input_df_size}', '{output_volume}', '{output_df_size}',
+                    '{save_data_to_snowflake_time}', '{model}', '{rows_processed}')    
+        """
+        st.write(f"DEBUG: {insert_query}")
+
+        insert_into_table = session.sql(insert_query)
+        insert_into_table.collect()
+
+    except requests.exceptions.RequestException as e:
+        st.error(f"An error occurred while saving insights to Snowflake: {str(e)}")
+        return None                    
+    finally:
+        if session:
+            session.close()
+
+
+def get_record_count_for_model(model, table_name):
+    session = Session.builder.configs(get_snowflake_connection_params()).create()
+    try:
+        query = f"""
+        SELECT COUNT(*)
+        {table_name}
+        WHERE model = '{model}'
+        """
+        result = session.sql(query).collect()
+        record_count = result[0][0] if result else record_count = 0
+    finally:
+        if session:
+            session.close()
+    return record_count
+
+def get_table_row_count(table_name):
+    session = Session.builder.configs(get_snowflake_connection_params()).create() 
+    try:
+        query = f"SELECT COUNT(*) FROM {table_name}"
+        row_count = session.sql(query)
+        row_count.collect()
+    finally:
+        if session:
+            session.close()        
+    return row_count    
+
+def get_largest_record_id(table_name):
+    session = Session.builder.configs(get_snowflake_connection_params()).create()
+    try:
+        query = f"""
+        SELECT MAX(ID) AS largest_id
+        FROM {table_name}
+        """
+        result = session.sql(query).collect()
+        largest_id = result[0][0] if result and result[0][0] is not None else largest_id = 0
+    finally:
+        if session:
+            session.close()
+    return largest_id
 
 #############################################
 # MIGRATION SCRIPTS
@@ -911,7 +1086,7 @@ def populate_hpl_sd_crs():
 
 def render_homepage():
     st.title("HDME")
-    st.subheader("v0.1.4-dev")
+    st.subheader("v0.1.5-dev")
     st.write("""
         Welcome to the Hyperloop Project System Dynamics Dashboard. 
         This application allows you to upload, manage, and visualize data related to various criteria 
@@ -1585,13 +1760,19 @@ def render_experiment_page():
 
     # Handling custom time periods logic
     time_period_raw = st.text_input('Time period:', value='100')
-    time_periods = int(time_period_raw)    
+    time_periods = int(time_period_raw)   
 
     model = st.radio(
         "Select GenAI model for experiment:",
         options=["gpt-3.5-turbo", "gpt-4", "mistral-small", "gemini-1.5-flash"],
         index=0
     )
+
+    experiment_name = st.radio(
+        "Select experiment:",
+        options=["EGTL_QUANTATIVE_DATA_EXPERIMENT", "EGTL_QUALITATIVE_DATA_EXPERIMENT"],
+        index=0
+    )    
  
     if st.button("GENERATE DIRTY DATA FOR SCALABILITY 🧪"):
         raw_df = populate_calc_cr_scl_staging(time_periods)              
@@ -1604,8 +1785,21 @@ def render_experiment_page():
     if st.button("REPORT HYPERLOOP PROJECT STATUS 🧑‍🔬"):
         cleaned_df = analyze_hyperloop_project(model, report="status")      
 
-    if st.button("VIEW HYPERLOOP PROJECT STATUS 🔍"):
-        cleaned_df = view_hyperloop_project_status()           
+    if st.button("SHOW HYPERLOOP PROJECT STATUS 🔍"):
+        cleaned_df = view_hyperloop_project_status()   
+
+    if st.button("RUN EGTL EXPERIMENT 🥽"):
+        if experiment_name == "EGTL_QUANTATIVE_DATA_EXPERIMENT":
+            egtl_quantative_data_experiment(model)
+        else:
+            st.write("No experiment to conduct.") 
+
+    if st.button("VIEW EGTL EXPERIMENT RESULTS 🔍"):
+        if experiment_name == "EGTL_QUANTATIVE_DATA_EXPERIMENT":
+            table_name = "ALLIANCE_STORE.EGTL_QUANTATIVE_DATA_EXPERIMENT"
+            view_experiment_data(table_name, experiment_name)  
+        else:
+            st.write("No experiment is selected to view.")                                                       
 
     if st.button("⬅️ BACK"):
         st.session_state['page'] = 'home' 
