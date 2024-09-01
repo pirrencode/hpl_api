@@ -1,6 +1,15 @@
 # Hyperloop decision making ecosystem changelog
 
-##v0.1.4-dev
+## v0.2.0-dev
+
+- Implemented quantative experiments functionality.
+- Implemented qualitative experiments functionality.
+- Implemented fusion store experiments functionality.
+- Implemented functionality to generate data using GenAI for scalability criterion.
+- UI reorganized for experiments page.
+- Added CREATE_TABLE statements for experiments tables.
+
+## v0.1.4-dev
 
 - Tuned GPT prompts.
 - Implemented project status functionality.
