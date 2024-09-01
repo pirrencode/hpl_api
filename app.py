@@ -175,17 +175,6 @@ def clean_data_with_openai(df, model):
 
     data_json = df.to_json(orient='split')
 
-    # prompt = (
-    #     "You are given a dataset in JSON format. Check if the 'CR_SCL' column contains any value larger than 1. "
-    #     "If so, normalize those values so they fall within the range 0 to 1 using the following formula: "
-    #     "For each value x greater than 1, compute the normalized value as x / max(x) where max(x) is the maximum value in the 'CR_SCL' column. Decimal precision should be 2. "
-    #     "Other values should stay as they are. "
-    #     "Return only the dataset as a plain list of lists, without any additional text, columns, index fields, words like 'data', or any special characters such as brackets or curly braces. "
-    #     "The output should contain only numerical digits separated by commas."
-    #     "\n\n"
-    #     f"Dataset: {data_json}"
-    # )
-
     prompt = (
         "You are given a dataset in JSON format. Check if the 'CR_SCL' column contains any value larger than 1. "
         "If so, normalize those values so they fall within the range 0..1. Decimal precision should be 2. Other values should stay as they are. "
@@ -208,13 +197,6 @@ def clean_data_with_openai(df, model):
         cleaned_data_json = response.choices[0].message.content.strip()
 
         st.write(f"The {model} response: {cleaned_data_json}")
-        # cleaned_data = clean_json_output(cleaned_data_json)
-        # if cleaned_data:
-        #     cleaned_df = pd.DataFrame(cleaned_data, columns=["TIME", "CR_SCL"])
-        #     return cleaned_df
-        # else:
-        #     st.error("Failed to clean the data or parse it into a DataFrame.")
-        #     return None
 
         cleaned_df = pd.read_json(cleaned_data_json, orient='split')
         return cleaned_df
