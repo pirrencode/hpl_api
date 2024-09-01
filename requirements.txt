@@ -5,3 +5,5 @@ numpy
 pyarrow>=8.0.0
 plotly
 openai
+google
+google-generativeai
