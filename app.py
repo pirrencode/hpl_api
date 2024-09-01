@@ -94,7 +94,9 @@ def get_insights_using_openai(df, model, report):
         )
 
         insights = response.choices[0].message.content.strip()
-        return insights
+        output_volume = len(str(insights)) if insights is not None else 0
+        prompt_volume = len(str(prompt)) if prompt is not None else 0
+        return insights, prompt_volume, output_volume
 
     except Exception as e:
         st.error(f"An error occurred while fetching insights from ChatGPT: {str(e)}")
@@ -142,7 +144,9 @@ def get_insights_using_mistral(df, model, report):
 
         result = response.json()
         insights = result["choices"][0]["message"]["content"].strip()
-        return insights
+        output_volume = len(str(insights)) if insights is not None else 0
+        prompt_volume = len(str(prompt)) if prompt is not None else 0
+        return insights, prompt_volume, output_volume
 
     except requests.exceptions.RequestException as e:
         st.error(f"An error occurred while fetching insights from Mistral AI: {str(e)}")
@@ -154,20 +158,25 @@ def get_insights_using_gemini(df, model, report):
     gemini_model = gemini.GenerativeModel(model_name=model)
 
     if report == "insights":
-        response = gemini_model.generate_content(["You are an expert in project performance analysis. Based on the following data summary of a Hyperloop project, please provide detailed insights on how the project is performing and offer recommendations for improvement:\n\n"
+        prompt = (
+            "You are an expert in project performance analysis. Based on the following data summary of a Hyperloop project, please provide detailed insights on how the project is performing and offer recommendations for improvement:\n\n"
             f"{df}"
-            ])
+            )
     elif report == "status":
-        response = gemini_model.generate_content(["You are an expert in project performance analysis. Based on the following data summary of a Hyperloop project, please provide one word statuson how the project is performing. Possible answers are PROJECT_IS_IN_RAPID_DECLINE, PROJECT_IS_IN_DECLINE, STAGNATION, PROJECT_IS_IMPROVING, PROJECT_IS_AT_MAXIMUM_PERFORMANCE :\n\n"
+        prompt = (
+            "You are an expert in project performance analysis. Based on the following data summary of a Hyperloop project, please provide one word statuson how the project is performing. Possible answers are PROJECT_IS_IN_RAPID_DECLINE, PROJECT_SHOWS_NEGATIVE_TENDENCIES, PROJECT_IS_SUSTAINABLY_GROWING, PROJECT_IS_RAPIDLY_GROWING :\n\n"
             f"{df}"
-            ])        
+            )        
     else:
         st.error("Report type is not provided.")
         return
 
-    insights = response.text
+    response = gemini_model.generate_content([prompt])
 
-    return insights
+    insights = response.text
+    output_volume = len(str(insights)) if insights is not None else 0
+    prompt_volume = len(str(prompt)) if prompt is not None else 0
+    return insights, prompt_volume, output_volume
 
 from datetime import datetime
 import pytz
@@ -182,16 +191,16 @@ def analyze_hyperloop_project(model, report):
         start_time = time.time()
 
         if model in ["gpt-3.5-turbo", "gpt-4"]:
-            insights = get_insights_using_openai(df, model, report)
+            insights, prompt_volume, output_volume = get_insights_using_openai(df, model, report)
         elif model == "mistral-small":
-            insights = get_insights_using_mistral(df, model, report)
+            insights, prompt_volume, output_volume = get_insights_using_mistral(df, model, report)
         elif model == "gemini-1.5-flash":
-            insights = get_insights_using_gemini(df, model, report)            
+            insights, prompt_volume, output_volume = get_insights_using_gemini(df, model, report)            
         else:
             st.error("Selected model is not supported.")
             return
 
-        st.write(f"GenAI (Model: {model}) response time: {time.time() - start_time} seconds")          
+        st.write(f"GenAI (Model: {model}) response time: {time.time() - start_time} seconds. Prompt size: {prompt_volume}. Output size: {output_volume}.")          
 
         if insights:
             st.write("Generative AI response:")
@@ -199,25 +208,28 @@ def analyze_hyperloop_project(model, report):
 
             if report == "status":
                 utc_time = datetime.now(pytz.utc).strftime('%Y-%B-%d %H:%M:%S')
-                session = Session.builder.configs(get_snowflake_connection_params()).create()
+                insert_into_project_status_report(utc_time, insights, model)
 
-                try:
-                    insert_query = f"""
-                    INSERT INTO ALLIANCE_STORE.PROJECT_STATUS (history_date, project_status, reporter)
-                    VALUES ('{utc_time}', '{insights}', '{model}')
-                    """
-                    st.write(f"DEBUG: {insert_query}")
-
-                    insert_into_table = session.sql(insert_query)
-                    insert_into_table.collect()
-                except requests.exceptions.RequestException as e:
-                    st.error(f"An error occurred while saving insights to Snowflake: {str(e)}")
-                    return None                    
-                finally:
-                    if session:
-                        session.close()                
     else:
         st.error("Failed to load data, analysis cannot proceed.")
+
+def insert_into_project_status_report(utc_time, insights, model):
+    session = Session.builder.configs(get_snowflake_connection_params()).create()
+
+    try:
+        insert_query = f"""
+        INSERT INTO ALLIANCE_STORE.PROJECT_STATUS (history_date, project_status, reporter)
+        VALUES ('{utc_time}', '{insights}', '{model}')
+        """
+
+        insert_into_table = session.sql(insert_query)
+        insert_into_table.collect()
+    except requests.exceptions.RequestException as e:
+        st.error(f"An error occurred while saving insights to Snowflake: {str(e)}")
+        return None                    
+    finally:
+        if session:
+            session.close()
 
 def view_hyperloop_project_status():
     df = load_data_from_snowflake("ALLIANCE_STORE.PROJECT_STATUS")
@@ -656,7 +668,7 @@ def egtl_quantative_data_experiment(model):
     total_time = 0
     normalized_data_volume = 0
     save_data_to_snowflake_time = 0
-    correctness = 0  # Assuming this should be initialized to a neutral value
+    correctness = 0
 
     try:
         start_time = time.time()
@@ -668,7 +680,6 @@ def egtl_quantative_data_experiment(model):
             error_type = type(e).__name__
             error_message = str(e)
             st.error(f"Error during normalization: {error_message}")
-            # Log the error and continue
 
         try:
             save_start_time = time.time()
@@ -679,7 +690,6 @@ def egtl_quantative_data_experiment(model):
             error_type = type(e).__name__
             error_message = str(e)
             st.error(f"Error saving data to Snowflake: {error_message}")
-            # Log the error and continue
 
         total_time = time.time() - start_time
     
@@ -816,7 +826,104 @@ def fusion_store_experiment(model, time_periods, load_data_trends):
 
     st.write(f"System has completed quantative experiment for {model} number {experiment_number}. Experiment ID {experiment_id}.")
 
+def egtl_qualitative_data_experiment(model, report, defined_scenario):
+    summary_table = "ALLIANCE_STORE.HPL_SD_CRS_ALLIANCE"
+    experiment_table = "ALLIANCE_STORE.EGTL_QUALITATIVE_DATA_EXPERIMENT"
+    experiment_number = get_record_count_for_model(model, experiment_table) + 1
+    experiment_id = get_largest_record_id(experiment_table) + 1
+    st.write(f"Starting qualitative experiment for {model} number {experiment_number}, ID {experiment_id}")
 
+    start_date = datetime.now(pytz.utc).strftime('%Y-%B-%d %H:%M:%S')
+
+    df_summary = load_data_from_snowflake(summary_table)
+    
+    errors_encountered = False
+    error_type = None
+    error_message = None
+    genai_response_time = 0
+    prompt_volume = 0
+    output_volume = 0
+    total_time = 0
+    save_data_to_snowflake_time = 0
+    status_result = None
+    loaded_scenario = None 
+    insights = None
+
+    try:
+        start_time = time.time()
+        
+        try:
+            if model in ["gpt-3.5-turbo", "gpt-4"]:
+                insights, prompt_volume, output_volume = get_insights_using_openai(df_summary, model, report)
+            elif model == "mistral-small":
+                insights, prompt_volume, output_volume = get_insights_using_mistral(df_summary, model, report)
+            elif model == "gemini-1.5-flash":
+                insights, prompt_volume, output_volume = get_insights_using_gemini(df_summary, model, report)
+            else:
+                st.error("Selected model is not supported.")
+                return None, 0, 0
+        except Exception as e:
+            errors_encountered = True
+            error_type = type(e).__name__
+            error_message = str(e)
+            st.error(f"Error during normalization: {error_message}")
+
+        try:
+            save_start_time = time.time()
+            utc_time = datetime.now(pytz.utc).strftime('%Y-%B-%d %H:%M:%S')
+            insert_into_project_status_report(utc_time, insights, model)
+            save_data_to_snowflake_time = time.time() - save_start_time
+        except Exception as e:
+            errors_encountered = True
+            error_type = type(e).__name__
+            error_message = str(e)
+            st.error(f"Error saving data to Snowflake: {error_message}")
+
+        total_time = time.time() - start_time
+    
+    except Exception as e:
+        errors_encountered = True
+        error_type = type(e).__name__
+        error_message = str(e)
+        st.error(f"An unexpected error occurred: {error_message}")
+    
+    end_date = datetime.now(pytz.utc).strftime('%Y-%B-%d %H:%M:%S')
+
+    try:
+        rows_processed = get_table_row_count(summary_table)
+    except Exception as e:
+        errors_encountered = True
+        error_type = type(e).__name__
+        error_message = str(e)
+        rows_processed = 0
+        st.error(f"Error retrieving row count: {error_message}")
+
+    if not errors_encountered:
+        loaded_scenario = defined_scenario
+
+    input_df_size = len(str(df_summary)) if df_summary is not None else 0
+    status_result = str(insights)
+    try:
+        insert_data_in_qualitative_experiment_table(experiment_id, 
+                                                    model,                                               
+                                                    start_date, 
+                                                    end_date, 
+                                                    genai_response_time, 
+                                                    save_data_to_snowflake_time,                                               
+                                                    total_time,
+                                                    rows_processed,  
+                                                    input_df_size,
+                                                    prompt_volume,    
+                                                    output_volume,
+                                                    loaded_scenario,
+                                                    status_result,                                                                                                                                        
+                                                    errors_encountered, 
+                                                    error_type, 
+                                                    error_message)
+    except Exception as e:
+        st.error(f"Error inserting data into the experiment table: {str(e)}")
+
+    st.write(f"System has completed quantative experiment for {model} number {experiment_number}. Experiment ID {experiment_id}.")
 
 def normalize_data_for_egtl_experiment(model):
     df = load_data_from_snowflake("STAGING_STORE.CALC_CR_SCL_STAGING")
@@ -928,6 +1035,43 @@ def insert_data_in_quantative_experiment_table(id,
     finally:
         if session:
             session.close()
+
+def insert_data_in_qualitative_experiment_table(id, 
+                                               model,                                               
+                                               start_date, 
+                                               end_date, 
+                                               genai_response_time, 
+                                               save_data_to_snowflake_time,                                               
+                                               total_time,
+                                               rows_processed,  
+                                               input_df_size,
+                                               prompt_volume,    
+                                               output_volume,
+                                               loaded_scenario,
+                                               status_result,                                                                                                                                        
+                                               errors_encountered, 
+                                               error_type, 
+                                               error_message):
+    session = Session.builder.configs(get_snowflake_connection_params()).create()
+    try:
+        insert_query = f"""
+            INSERT INTO HPL_SYSTEM_DYNAMICS.ALLIANCE_STORE.EGTL_QUALITATIVE_DATA_EXPERIMENT 
+            (ID, MODEL, EXPERIMENT_START_DATE, EXPERIMENT_END_DATE, MODEL_WORK_TIME, 
+             SAVE_DATA_TO_SNOWFLAKE_TIME, EXPERIMENT_TIME_TOTAL, ROWS_PROCESSED, 
+             INPUT_DF_VOLUME, PROMPT_VOLUME, OUTPUT_VOLUME, LOADED_SCENARIO, 
+             STATUS_RESULT, ERROR_ENCOUNTERED, ERROR_TYPE, ERROR_MESSAGE)
+            VALUES ({id}, '{model}', '{start_date}', '{end_date}', {genai_response_time}, 
+                    {save_data_to_snowflake_time}, {total_time}, {rows_processed}, 
+                    {input_df_size}, {prompt_volume}, {output_volume}, '{loaded_scenario}', 
+                    '{status_result}', {errors_encountered}, '{error_type}', '{error_message}')   
+        """
+        st.write(f"DEBUG: {insert_query}")
+        session.sql(insert_query).collect()
+    except Exception as e:
+        st.error(f"An error occurred while saving insights to Snowflake: {str(e)}")
+    finally:
+        if session:
+            session.close()  
 
 def view_experiment_data(table_name, experiment_name):
     st.write(f"Experiment name: {experiment_name}")
@@ -2208,7 +2352,7 @@ def render_experiment_page():
 
     experiment_name = st.radio(
         "Select experiment:",
-        options=["EGTL_QUANTATIVE_DATA_EXPERIMENT", "EGTL_QUALITATIVE_DATA_EXPERIMENT"],
+        options=["EGTL_QUANTATIVE_DATA_EXPERIMENT", "EGTL_QUALITATIVE_DATA_EXPERIMENT", "FUSION_STORE_EXPERIMENT"],
         index=0
     )  
 
@@ -2216,7 +2360,13 @@ def render_experiment_page():
         "Select data load scenario generation for FUSION STORE experiment:",
         options=["positive", "negative", "very positive", "very negative"],
         index=0
-    )          
+    )   
+
+    defined_scenario = st.radio(
+        "Select scenario that was simulated:",
+        options=["PROJECT RAPID DECLINE", "PROJECT DECLINE OVER TIME", "PROJECT SUSTAINABLE GROWTH", "PROJECT RAPID GROWTH"],
+        index=0
+    )             
  
     if st.button("GENERATE DIRTY DATA FOR SCALABILITY 🧪"):
         raw_df = populate_calc_cr_scl_staging(time_periods)              
@@ -2235,6 +2385,8 @@ def render_experiment_page():
     if st.button("RUN EGTL EXPERIMENT 🥽"):
         if experiment_name == "EGTL_QUANTATIVE_DATA_EXPERIMENT":
             egtl_quantative_data_experiment(model)
+        if experiment_name == "EGTL_QUALITATIVE_DATA_EXPERIMENT":
+            egtl_qualitative_data_experiment(model, defined_scenario)            
         else:
             st.write("No experiment to conduct.") 
 
@@ -2245,6 +2397,12 @@ def render_experiment_page():
         if experiment_name == "EGTL_QUANTATIVE_DATA_EXPERIMENT":
             table_name = "ALLIANCE_STORE.EGTL_QUANTATIVE_DATA_EXPERIMENT"
             view_experiment_data(table_name, experiment_name)  
+        if experiment_name == "EGTL_QUALITATIVE_DATA_EXPERIMENT":
+            table_name = "ALLIANCE_STORE.EGTL_QUALITATIVE_DATA_EXPERIMENT"
+            view_experiment_data(table_name, experiment_name)             
+        elif experiment_name == "FUSION_STORE_EXPERIMENT":
+            table_name = "ALLIANCE_STORE.EGTL_FUSION_STORE_EXPERIMENT"
+            view_experiment_data(table_name, experiment_name)             
         else:
             st.write("No experiment is selected to view.")                                                       
 
