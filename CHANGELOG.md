@@ -1,5 +1,11 @@
 # Hyperloop decision making ecosystem changelog
 
+##v0.1.4-dev
+
+- Tuned GPT prompts.
+- Implemented project status functionality.
+- Added project_status table Snowflake queries.
+
 ## v0.1.3-dev
 
 - Implemented Gemini AI functionality for analysis of Hyperloop project.
