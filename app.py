@@ -264,7 +264,7 @@ def clean_data_with_openai(df, model):
         st.error(f"An error occurred while processing data with ChatGPT: {str(e)}")
         return None
     
-def generate_data_with_openai(model, time_periods):
+def generate_data_with_openai(model, time_periods, load_data_trends):
 
     prompt = (
         "Generate a dataset in JSON format with the following structure:\n\n"
@@ -274,7 +274,7 @@ def generate_data_with_openai(model, time_periods):
         "}\n\n"
         "Where:\n"
         f'- \"TIME\" must be populated as a sequence of integers from 1 to {time_periods}.\n'
-        '- \"CR_SCL\" must be populated with random numbers in a range between 0 and 100, showing a positive trend (i.e., the values generally increase over time).\n\n'
+        f'- \"CR_SCL\" must be populated with random numbers in a range between 0 and 100, showing a {load_data_trends} trend (i.e., the values generally increase over time).\n\n'
         'Return only the JSON object with both \"TIME\" and \"CR_SCL\" keys and their respective lists of values, and do not include any additional text, explanations, or code in the response.'
     )
 
@@ -309,7 +309,8 @@ def generate_data_with_openai(model, time_periods):
         output_volume = len(str(generated_data)) if generated_data is not None else 0
         prompt_volume = len(str(prompt)) if prompt is not None else 0
 
-        return gen_ai_df, prompt_volume, output_volume
+        df_correctness_check = check_df_for_null_values(gen_ai_df)
+        return gen_ai_df, prompt_volume, output_volume, df_correctness_check
 
     except Exception as e:
         st.error(f"An error occurred: {str(e)}")
@@ -353,7 +354,7 @@ def clean_data_with_gemini(df, model):
         st.error(f"An error occurred while processing data with Google: {str(e)}")
         return None  
 
-def generate_data_with_gemini(model, time_periods):
+def generate_data_with_gemini(model, time_periods, load_data_trends):
 
     gemini.configure(api_key=get_google_api_key())
 
@@ -368,7 +369,7 @@ def generate_data_with_gemini(model, time_periods):
             "}\n\n"
             "Where:\n"
             f'- \"TIME\" must be populated as a sequence of integers from 1 to {time_periods}.\n'
-            '- \"CR_SCL\" must be populated with random numbers in a range between 0 and 100, showing a positive trend (i.e., the values generally increase over time).\n\n'
+            f'- \"CR_SCL\" must be populated with random numbers in a range between 0 and 100, showing a {load_data_trends} trend (i.e., the values generally increase over time).\n\n'
             'Return only the JSON object with both \"TIME\" and \"CR_SCL\" keys and their respective lists of values, and do not include any additional text, explanations, or code in the response.'
         )
 
@@ -394,7 +395,8 @@ def generate_data_with_gemini(model, time_periods):
         output_volume = len(str(generated_data)) if generated_data is not None else 0
         prompt_volume = len(str(prompt)) if prompt is not None else 0
 
-        return gen_ai_df, prompt_volume, output_volume
+        df_correctness_check = check_df_for_null_values(gen_ai_df)
+        return gen_ai_df, prompt_volume, output_volume, df_correctness_check
 
     except Exception as e:
         st.error(f"An error occurred: {str(e)}")
@@ -454,7 +456,7 @@ def clean_data_with_mistral(df, model):
         st.error(f"An error occurred while fetching insights from Mistral AI: {str(e)}")
         return None
     
-def generate_data_with_mistral(model, time_periods):
+def generate_data_with_mistral(model, time_periods, load_data_trends):
 
     prompt = (
         "Generate a dataset in JSON format with the following structure:\n\n"
@@ -464,7 +466,7 @@ def generate_data_with_mistral(model, time_periods):
         "}\n\n"
         "Where:\n"
         f'- \"TIME\" must be populated as a sequence of integers from 1 to {time_periods}.\n'
-        '- \"CR_SCL\" must be populated with random numbers in a range between 0 and 100, showing a positive trend (i.e., the values generally increase over time).\n\n'
+        f'- \"CR_SCL\" must be populated with random numbers in a range between 0 and 100, showing a {load_data_trends} trend (i.e., the values generally increase over time).\n\n'
         'Return only the JSON object with both \"TIME\" and \"CR_SCL\" keys and their respective lists of values, and do not include any additional text, explanations, or code in the response.'
     )
 
@@ -509,7 +511,8 @@ def generate_data_with_mistral(model, time_periods):
         output_volume = len(str(generated_data)) if generated_data is not None else 0
         prompt_volume = len(str(prompt)) if prompt is not None else 0
 
-        return gen_ai_df, prompt_volume, output_volume
+        df_correctness_check = check_df_for_null_values(gen_ai_df)
+        return gen_ai_df, prompt_volume, output_volume, df_correctness_check
 
     except Exception as e:
         st.error(f"An error occurred: {str(e)}")
@@ -635,12 +638,13 @@ def egtl_quantative_data_experiment(model):
                                                error_message)
     st.write(f"System has completed quantative experiment for {model} number {experiment_number}. Experiment ID {experiment_id}.")    
 
-def fusion_store_quantative_data_experiment(model, time_periods):
-    criterion_table = "FUSION_STORE.CALC_CR_SCL_FUSION"
-    # experiment_table = "ALLIANCE_STORE.EGTL_QUANTATIVE_DATA_EXPERIMENT"
-    # experiment_number = get_record_count_for_model(model, experiment_table) + 1
-    # experiment_id = get_largest_record_id(experiment_table) + 1
-    # st.write(f"Starting quantative experiment for {model} number {experiment_number}, ID {experiment_id}")
+def fusion_store_experiment(model, time_periods, load_data_trends):
+    fusion_table = "FUSION_STORE.CALC_CR_SCL_FUSION"
+    staging_table = "STAGING_STORE.CALC_CR_SCL_STAGING"
+    experiment_table = "ALLIANCE_STORE.EGTL_FUSION_STORE_EXPERIMENT"
+    experiment_number = get_record_count_for_model(model, experiment_table) + 1
+    experiment_id = get_largest_record_id(experiment_table) + 1
+    st.write(f"Starting Fusion Store experiment for {model} number {experiment_number}, ID {experiment_id}")
 
     start_date = datetime.now(pytz.utc).strftime('%Y-%B-%d %H:%M:%S')
     
@@ -652,18 +656,18 @@ def fusion_store_quantative_data_experiment(model, time_periods):
         start_time = time.time()
 
         if model in ["gpt-3.5-turbo", "gpt-4"]:
-            gen_ai_df, prompt_volume, output_volume = generate_data_with_openai(model,time_periods)
+            gen_ai_df, prompt_volume, output_volume, df_correctness_check = generate_data_with_openai(model,time_periods, load_data_trends)
         elif model == "mistral-small":
-            gen_ai_df, prompt_volume, output_volume = generate_data_with_mistral(model,time_periods)
+            gen_ai_df, prompt_volume, output_volume, df_correctness_check = generate_data_with_mistral(model,time_periods, load_data_trends)
         elif model == "gemini-1.5-flash":
-           gen_ai_df, prompt_volume, output_volume = generate_data_with_gemini(model,time_periods)            
+           gen_ai_df, prompt_volume, output_volume, df_correctness_check = generate_data_with_gemini(model,time_periods, load_data_trends)            
         else:
             st.error("Selected model is not supported.")
             return None, 0, 0
         
         save_start_time = time.time()
         st.write(gen_ai_df)
-        save_data_to_snowflake(gen_ai_df, criterion_table)
+        save_data_to_snowflake(gen_ai_df, fusion_table)
         save_data_to_snowflake_time = time.time() - save_start_time
         
         total_time = time.time() - start_time
@@ -680,26 +684,31 @@ def fusion_store_quantative_data_experiment(model, time_periods):
         save_data_to_snowflake_time = 0
     
     end_date = datetime.now(pytz.utc).strftime('%Y-%B-%d %H:%M:%S')
-    rows_processed = get_table_row_count(criterion_table)
-    # correctness = df_correctness_check
+    rows_processed = get_table_row_count(fusion_table)
+    get_table_row_count(fusion_table, staging_table)
+    correctness = df_correctness_check
 
-    # insert_data_in_quantative_experiment_table(experiment_id, 
-    #                                            model,                                               
-    #                                            start_date, 
-    #                                            end_date, 
-    #                                            genai_response_time, 
-    #                                            save_data_to_snowflake_time,                                               
-    #                                            total_time,
-    #                                            rows_processed,  
-    #                                            input_df_size,
-    #                                            prompt_volume,    
-    #                                            output_volume,
-    #                                            normalized_data_volume,                                                                                                                                        
-    #                                            correctness,
-    #                                            errors_encountered, 
-    #                                            error_type, 
-    #                                            error_message)
-    # st.write(f"System has completed quantative experiment for {model} number {experiment_number}. Experiment ID {experiment_id}.")
+    fusion_transfer_start_time = time.time()
+    transfer_data_from_source_to_target(fusion_table, staging_table)
+    load_to_staging_time = time.time() - fusion_transfer_start_time
+
+    insert_data_in_fusion_experiment_table(experiment_id, 
+                                               model,                                               
+                                               start_date, 
+                                               end_date, 
+                                               genai_response_time, 
+                                               save_data_to_snowflake_time,                                               
+                                               total_time,
+                                               rows_processed,  
+                                               prompt_volume,    
+                                               output_volume,
+                                               normalized_data_volume,
+                                               load_to_staging_time,                                                                                                                                                                                        
+                                               correctness,
+                                               errors_encountered, 
+                                               error_type, 
+                                               error_message)
+    st.write(f"System has completed quantative experiment for {model} number {experiment_number}. Experiment ID {experiment_id}.")
 
 def normalize_data_for_egtl_experiment(model):
     df = load_data_from_snowflake("STAGING_STORE.CALC_CR_SCL_STAGING")
@@ -736,6 +745,43 @@ def normalize_data_for_egtl_experiment(model):
     else:
         st.error("Failed to load data from Snowflake.")
         return None, 0, input_df_size, 0
+
+def insert_data_in_fusion_experiment_table(id, 
+                                           model,                                               
+                                           start_date, 
+                                           end_date, 
+                                           genai_response_time, 
+                                           save_data_to_snowflake_time,                                               
+                                           total_time,
+                                           rows_processed,  
+                                           prompt_volume,    
+                                           output_volume,
+                                           normalized_df_volume,
+                                           load_to_staging_time,                                                                                                                                   
+                                           correctness,
+                                           errors_encountered, 
+                                           error_type, 
+                                           error_message):
+    session = Session.builder.configs(get_snowflake_connection_params()).create()
+    try:
+        insert_query = f"""
+            INSERT INTO HPL_SYSTEM_DYNAMICS.ALLIANCE_STORE.EGTL_FUSION_STORE_EXPERIMENT 
+            (ID, MODEL, EXPERIMENT_START_DATE, EXPERIMENT_END_DATE, MODEL_WORK_TIME, 
+             SAVE_DATA_TO_SNOWFLAKE_TIME, EXPERIMENT_TIME_TOTAL, ROWS_PROCESSED, 
+             PROMPT_VOLUME, OUTPUT_VOLUME, OUTPUT_DF_VOLUME, LOAD_TO_STAGING_TIME, 
+             CORRECTNESS, ERROR_ENCOUNTERED, ERROR_TYPE, ERROR_MESSAGE)
+            VALUES ({id}, '{model}', '{start_date}', '{end_date}', {genai_response_time}, 
+                    {save_data_to_snowflake_time}, {total_time}, {rows_processed}, 
+                    {prompt_volume}, {output_volume}, {normalized_df_volume}, {load_to_staging_time}, 
+                    '{correctness}', {errors_encountered}, '{error_type}', '{error_message}')   
+        """
+        st.write(f"DEBUG: {insert_query}")
+        session.sql(insert_query).collect()
+    except Exception as e:
+        st.error(f"An error occurred while saving insights to Snowflake: {str(e)}")
+    finally:
+        if session:
+            session.close()
 
 def insert_data_in_quantative_experiment_table(id, 
                                                model,                                               
@@ -819,10 +865,10 @@ def get_largest_record_id(table_name):
 
 def check_df_for_correctness(df):
     if df.empty:
-        return 0.0
+        return "empty dataframe"
     
     if df.shape[1] < 2:
-        return 0.0
+        return "wrong schema"
     
     second_column = df.iloc[:, 1]
     
@@ -835,9 +881,49 @@ def check_df_for_correctness(df):
     
     return correct_percentage
 
+def check_df_for_null_values(df):
+    if df.empty:
+        return "empty dataframe"
+    
+    if df.shape[1] < 2:
+        return "wrong schema"
+    
+    second_column = df.iloc[:, 1]
+    
+    incorrect_df = second_column[(second_column.isnull())]
+    
+    total_count = len(second_column)
+    incorrect_count = len(incorrect_df)
+    correct_count = ((total_count - incorrect_count) / total_count) * 100
+    correct_percentage = str(correct_count) + "%"
+    
+    return correct_percentage
+
 #############################################
 # MIGRATION SCRIPTS
 #############################################
+
+def transfer_data_from_source_to_target(source_table, target_table):
+    session = Session.builder.configs(get_snowflake_connection_params()).create()
+
+    try:
+        fetch_query = f"SELECT * FROM {source_table}"
+        data_to_transfer = session.sql(fetch_query).collect()
+
+        if data_to_transfer:
+            insert_query = f"""
+                INSERT INTO {target_table} SELECT * FROM {source_table}
+            """
+            session.sql(insert_query).collect()
+            print(f"Successfully transferred data from {source_table} to {target_table}.")
+        else:
+            print(f"No data found in {source_table} to transfer.")
+
+    except Exception as e:
+        print(f"An error occurred: {str(e)}")
+    finally:
+        if session:
+            session.close()
 
 def fusion_to_staging_migration(source_table, dest_table):
     
@@ -2022,7 +2108,13 @@ def render_experiment_page():
         "Select experiment:",
         options=["EGTL_QUANTATIVE_DATA_EXPERIMENT", "EGTL_QUALITATIVE_DATA_EXPERIMENT"],
         index=0
-    )    
+    )  
+
+    load_data_trends = st.radio(
+        "Select data load scenario generation for FUSION STORE experiment:",
+        options=["positive", "negative", "very positive", "very negative"],
+        index=0
+    )          
  
     if st.button("GENERATE DIRTY DATA FOR SCALABILITY 🧪"):
         raw_df = populate_calc_cr_scl_staging(time_periods)              
@@ -2044,8 +2136,8 @@ def render_experiment_page():
         else:
             st.write("No experiment to conduct.") 
 
-    if st.button("RUN EGTL EXPERIMENT FOR FUSION STORE 🥽"):
-        fusion_store_quantative_data_experiment(model, time_periods)                   
+    if st.button("RUN EGTL EXPERIMENT FOR FUSION STORE ⚛"):
+        fusion_store_experiment(model, time_periods, load_data_trends)                   
 
     if st.button("VIEW EGTL EXPERIMENT RESULTS 🔍"):
         if experiment_name == "EGTL_QUANTATIVE_DATA_EXPERIMENT":
