@@ -293,7 +293,12 @@ def generate_data_with_openai(model, time_periods):
 
         st.write(f"The {model} response: {generated_data}")
 
-        # Parse the generated JSON data
+        # Check if the response is missing the outer braces
+        if not (generated_data.startswith("{") and generated_data.endswith("}")):
+            # Manually wrap the response in braces if they are missing
+            generated_data = "{" + generated_data + "}"
+
+        # Attempt to parse the JSON data
         try:
             data_dict = json.loads(generated_data)
         except json.JSONDecodeError as e:
