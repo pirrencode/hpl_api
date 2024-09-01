@@ -273,10 +273,10 @@ def generate_data_with_openai(model, time_periods):
         '    "CR_SCL": [<float>, <float>, <float>, ..., <float>]\n'
         "}\n\n"
         "Where:\n"
-        f'- "TIME" should be populated as index, in range of {time_periods}.\n'
-        '- "CR_SCL" should be populated with random floating-point numbers between 0 and 100, showing a positive trend (i.e., the values generally increase over time).\n\n'
+        f'- "TIME" must be populated as a sequence of integers from 1 to {time_periods}.\n'
+        '- "CR_SCL" must be populated with random floating-point numbers between 0 and 100, showing a positive trend (i.e., the values generally increase over time).\n\n'
         '"CR_SCL" is a scalability criterion for Hyperloop project evaluation.\n\n'
-        "Return only the two lists in JSON format, without any labels, keys, or additional text."
+        "Return the full JSON object with both 'TIME' and 'CR_SCL' keys and their respective lists of values."
     )
 
     openai.api_key = get_openai_api_key()
@@ -290,18 +290,25 @@ def generate_data_with_openai(model, time_periods):
             ]
         )
 
-        generated_data = response.choices[0].message.content.strip()
+        generated_data = response.choices[0].message.content.strip("{}").strip()
 
         st.write(f"The {model} response: {generated_data}")
 
-        gen_ai_df = pd.read_json(generated_data, orient='split')
+        # Parse the generated JSON data
+        data_dict = json.loads(generated_data)
+
+        # Convert the dictionary into a DataFrame
+        gen_ai_df = pd.DataFrame(data_dict)
+
+        # Calculate volumes
         output_volume = len(str(generated_data)) if generated_data is not None else 0
         prompt_volume = len(str(prompt)) if prompt is not None else 0
+
         return gen_ai_df, prompt_volume, output_volume
 
     except Exception as e:
-        st.error(f"An error occurred while processing data with ChatGPT: {str(e)}")
-        return None    
+        st.error(f"An error occurred: {str(e)}")
+        return None, None, None   
     
 def clean_data_with_gemini(df, model):
 
