@@ -256,7 +256,8 @@ def clean_data_with_openai(df, model):
         st.write(f"The {model} response: {cleaned_data_json}")
 
         cleaned_df = pd.read_json(cleaned_data_json, orient='split')
-        return cleaned_df
+        output_volume = len(str(cleaned_data_json)) if cleaned_data_json is not None else 0
+        return cleaned_df, output_volume
 
     except Exception as e:
         st.error(f"An error occurred while processing data with ChatGPT: {str(e)}")
@@ -286,7 +287,8 @@ def clean_data_with_gemini(df, model):
         if cleaned_data:
             # Convert the cleaned JSON data into a DataFrame
             cleaned_df = pd.DataFrame(cleaned_data, columns=["TIME", "CR_SCL"])
-            return cleaned_df
+            output_volume = len(str(cleaned_data_json)) if cleaned_data_json is not None else 0
+            return cleaned_df, output_volume
         else:
             st.error("Failed to clean the data or parse it into a DataFrame.")
             return None
@@ -335,12 +337,11 @@ def clean_data_with_mistral(df, model):
 
         st.write(f"DEBUG. The {model} response: {insights}")
         
-        # Clean the JSON output and load it into a DataFrame
         cleaned_data = clean_json_output(insights)
         if cleaned_data:
-            # Convert the cleaned JSON data into a DataFrame
             cleaned_df = pd.DataFrame(cleaned_data, columns=["TIME", "CR_SCL"])
-            return cleaned_df
+            output_volume = len(str(insights)) if insights is not None else 0
+            return cleaned_df, output_volume
         else:
             st.error("Failed to clean the data or parse it into a DataFrame.")
             return None
@@ -375,16 +376,16 @@ def normalize_cr_scl_data(model):
         start_time = time.time()
 
         if model in ["gpt-3.5-turbo", "gpt-4"]:
-            cleaned_df = clean_data_with_openai(df, model)
+            cleaned_df, output_volume = clean_data_with_openai(df, model)
         elif model == "mistral-small":
-            cleaned_df = clean_data_with_mistral(df, model)
+            cleaned_df, output_volume = clean_data_with_mistral(df, model)
         elif model == "gemini-1.5-flash":
-            cleaned_df = clean_data_with_gemini(df, model)            
+            cleaned_df, output_volume = clean_data_with_gemini(df, model)            
         else:
             st.error("Selected model is not supported.")
             return
 
-        st.write(f"GenAI (Model: {model}) response time: {time.time() - start_time} seconds")
+        st.write(f"GenAI (Model: {model}) response time: {time.time() - start_time} seconds. GenAI Response size: {output_volume}")
         
         if cleaned_df is not None:
             st.write("Data cleaned successfully.")
@@ -428,42 +429,43 @@ def egtl_quantative_data_experiment(model):
     
     try:
         start_time = time.time()
-        normalized_data, genai_response_time, input_df_size, output_volume = normalize_data_for_egtl_experiment(model)
-        normalize_time = time.time() - start_time
+        normalized_data, genai_response_time, input_df_size, output_volume, df_correctness_check, normalized_data_volume = normalize_data_for_egtl_experiment(model)
         
         save_start_time = time.time()
         save_data_to_snowflake(normalized_data, criterion_table)
         save_data_to_snowflake_time = time.time() - save_start_time
         
-        output_df_size = normalized_data.shape[0] if normalized_data is not None else 0  
+        total_time = time.time() - start_time
     
     except Exception as e:
         errors_encountered = True
         error_type = type(e).__name__
         error_message = str(e)
-        normalize_time = 0
         genai_response_time = 0
         output_volume = 0
-        output_df_size = 0
+        total_time = 0
+        normalized_data_volume = 0
         save_data_to_snowflake_time = 0
     
     end_date = datetime.now(pytz.utc).strftime('%Y-%B-%d %H:%M:%S')
     rows_processed = get_table_row_count(criterion_table)
+    correctness = df_correctness_check
 
-    insert_data_in_quantative_experiment_table(experiment_id,
+    insert_data_in_quantative_experiment_table(experiment_id, 
+                                               model,                                               
                                                start_date, 
                                                end_date, 
-                                               normalize_time, 
-                                               genai_response_time,
+                                               genai_response_time, 
+                                               save_data_to_snowflake_time,                                               
+                                               total_time,
+                                               rows_processed,  
+                                               input_df_size,    
+                                               output_volume,
+                                               normalized_data_volume,                                                                                                                                        
+                                               correctness,
                                                errors_encountered, 
                                                error_type, 
-                                               error_message, 
-                                               input_df_size, 
-                                               output_volume, 
-                                               output_df_size,
-                                               save_data_to_snowflake_time,
-                                               model,
-                                               rows_processed)    
+                                               error_message)    
 
 def normalize_data_for_egtl_experiment(model):
     df = load_data_from_snowflake("STAGING_STORE.CALC_CR_SCL_STAGING")
@@ -477,22 +479,23 @@ def normalize_data_for_egtl_experiment(model):
         start_time = time.time()
 
         if model in ["gpt-3.5-turbo", "gpt-4"]:
-            normalized_data = clean_data_with_openai(df, model)
+            normalized_data, output_volume = clean_data_with_openai(df, model)
         elif model == "mistral-small":
-            normalized_data = clean_data_with_mistral(df, model)
+            normalized_data, output_volume = clean_data_with_mistral(df, model)
         elif model == "gemini-1.5-flash":
-            normalized_data = clean_data_with_gemini(df, model)            
+            normalized_data, output_volume = clean_data_with_gemini(df, model)            
         else:
             st.error("Selected model is not supported.")
             return None, 0, input_df_size, 0
 
         genai_response_time = time.time() - start_time
-        output_volume = len(str(normalized_data)) if normalized_data is not None else 0
-
+        normalized_data_volume = len(str(normalized_data)) if normalized_data is not None else 0
+        
         if normalized_data is not None:
-            st.write("Data cleaned successfully.")
+            st.write("Data cleaning is completed.")
             st.dataframe(normalized_data)
-            return normalized_data, genai_response_time, input_df_size, output_volume 
+            df_correctness_check = check_df_for_correctness()
+            return normalized_data, genai_response_time, input_df_size, output_volume, df_correctness_check, normalized_data_volume 
         else:
             st.error(f"Failed to clean data using GenAI (Model: {model}).")
             return None, 0, input_df_size, 0
@@ -501,29 +504,33 @@ def normalize_data_for_egtl_experiment(model):
         return None, 0, input_df_size, 0
 
 def insert_data_in_quantative_experiment_table(id, 
+                                               model,                                               
                                                start_date, 
                                                end_date, 
-                                               normalize_time, 
-                                               genai_time,
+                                               genai_response_time, 
+                                               save_data_to_snowflake_time,                                               
+                                               total_time,
+                                               rows_processed,  
+                                               input_df_size,    
+                                               output_volume,
+                                               normalized_df_volume,                                                                                                                                        
+                                               correctness,
                                                errors_encountered, 
                                                error_type, 
-                                               error_message, 
-                                               input_df_size, 
-                                               output_volume, 
-                                               output_df_size,
-                                               save_data_to_snowflake_time,
-                                               model,
-                                               rows_processed):
+                                               error_message
+                                               ):
     session = Session.builder.configs(get_snowflake_connection_params()).create()
     try:
         insert_query = f"""
             INSERT INTO ALLIANCE_STORE.EGTL_QUANTATIVE_DATA_EXPERIMENT 
-            ("id", "start_date", "end_date", "normalize_time", "genai_time", "errors_encountered", 
-            "error_type", "error_message", "input_df_size", "output_volume", "output_df_size", 
-            "save_data_to_snowflake_time", "model", "rows_processed")
-            VALUES ({id}, '{start_date}', '{end_date}', {normalize_time}, {genai_time}, {errors_encountered},
-                    '{error_type}', '{error_message}', {input_df_size}, {output_volume}, {output_df_size},
-                    {save_data_to_snowflake_time}, '{model}', {rows_processed})    
+            (ID, MODEL, EXPERIMENT_START_DATE, EXPERIMENT_END_DATE, MODEL_WORK_TIME, 
+             SAVE_DATA_TO_SNOWFLAKE_TIME, EXPERIMENT_TIME_TOTAL, ROWS_PROCESSED, 
+             INPUT_DF_VOLUME, PROMPT_VOLUME, OUTPUT_VOLUME, OUTPUT_DF_VOLUME, 
+             CORRECTNESS, ERROR_ENCOUNTERED, ERROR_TYPE, ERROR_MESSAGE)
+            VALUES ({id}, '{model}', '{start_date}', '{end_date}', {genai_response_time}, 
+                    {save_data_to_snowflake_time}, {total_time}, {rows_processed}, 
+                    {input_df_size}, {output_volume}, {normalized_df_volume}, 
+                    '{correctness}', {errors_encountered}, '{error_type}', '{error_message}')   
         """
         st.write(f"DEBUG: {insert_query}")
         session.sql(insert_query).collect()
@@ -574,6 +581,23 @@ def get_largest_record_id(table_name):
         if session:
             session.close()
     return largest_id
+
+def check_df_for_correctness(df):
+    if df.empty:
+        return False
+    
+    if df.shape[1] < 2:
+        return False
+    
+    second_column = df.iloc[:, 1]
+    
+    if df.isnull().values.any():
+        return False
+    
+    if not (second_column <= 1).all():
+        return False
+    
+    return True
 
 #############################################
 # MIGRATION SCRIPTS
