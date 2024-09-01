@@ -202,14 +202,14 @@ def analyze_hyperloop_project(model, report):
                 session = Session.builder.configs(get_snowflake_connection_params()).create()
 
                 try:
-                    insert_query = """
+                    insert_query = f"""
                     INSERT INTO ALLIANCE_STORE.PROJECT_STATUS (history_date, status)
-                    VALUES (%(history_date)s, %(status)s)
+                    VALUES ('{utc_time}', '{insights}')
                     """
-                    params = {"history_date": utc_time, "status": insights}
                     st.write(f"DEBUG: {insert_query}")
 
-                    insert_into_table = session.sql(insert_query, params=params)
+                    # Execute the query
+                    insert_into_table = session.sql(insert_query)
                     insert_into_table.collect()
                 except requests.exceptions.RequestException as e:
                     st.error(f"An error occurred while saving insights to Snowflake: {str(e)}")
