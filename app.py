@@ -203,10 +203,14 @@ def analyze_hyperloop_project(model, report):
 
                 try:
                     insert_into_table = session.sql(f"""
-                    INSERT INTO HPL_SYSTEM_DYNAMICS.ALLIANCE_STORE.PROJECT_STATUS (history_date, status)
-                    VALUES ({utc_time}, insights)
+                    INSERT INTO ALLIANCE_STORE.PROJECT_STATUS (history_date, status)
+                    VALUES ({utc_time}, {insights})
                     """)
+                    st.write(f"DEBUG: {insert_into_table}")
                     insert_into_table.collect()
+                except requests.exceptions.RequestException as e:
+                    st.error(f"An error occurred while saving insights to Snowflake: {str(e)}")
+                    return None                    
                 finally:
                     if session:
                         session.close()                
