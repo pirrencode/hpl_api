@@ -819,20 +819,21 @@ def get_largest_record_id(table_name):
 
 def check_df_for_correctness(df):
     if df.empty:
-        return False
+        return 0.0
     
     if df.shape[1] < 2:
-        return False
+        return 0.0
     
     second_column = df.iloc[:, 1]
     
-    if df.isnull().values.any():
-        return False
+    incorrect_df = second_column[(second_column.isnull()) | (second_column > 1)]
     
-    if not (second_column <= 1).all():
-        return False
+    total_count = len(second_column)
+    incorrect_count = len(incorrect_df)
+    correct_count = ((total_count - incorrect_count) / total_count) * 100
+    correct_percentage = str(correct_count) + "%"
     
-    return True
+    return correct_percentage
 
 #############################################
 # MIGRATION SCRIPTS
