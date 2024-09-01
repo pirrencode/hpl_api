@@ -1,8 +1,10 @@
 streamlit>=1.3.0
 snowflake-snowpark-python>=1.0.0
+datetime
 pandas
 numpy
 pyarrow>=8.0.0
+pytz
 plotly
 openai
 git+https://github.com/google/generative-ai-python
