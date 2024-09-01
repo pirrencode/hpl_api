@@ -518,9 +518,9 @@ def insert_data_in_quantative_experiment_table(id,
     try:
         insert_query = f"""
             INSERT INTO ALLIANCE_STORE.EGTL_QUANTATIVE_DATA_EXPERIMENT 
-            (id, start_date, end_date, normalize_time, genai_time, errors_encountered, 
-            error_type, error_message, input_df_size, output_volume, output_df_size, 
-            save_data_to_snowflake_time, model, rows_processed)
+            ("id", "start_date", "end_date", "normalize_time", "genai_time", "errors_encountered", 
+            "error_type", "error_message", "input_df_size", "output_volume", "output_df_size", 
+            "save_data_to_snowflake_time", "model", "rows_processed")
             VALUES ({id}, '{start_date}', '{end_date}', {normalize_time}, {genai_time}, {errors_encountered},
                     '{error_type}', '{error_message}', {input_df_size}, {output_volume}, {output_df_size},
                     {save_data_to_snowflake_time}, '{model}', {rows_processed})    
