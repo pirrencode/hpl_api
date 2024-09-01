@@ -473,7 +473,8 @@ def egtl_quantative_data_experiment(model):
                                                correctness,
                                                errors_encountered, 
                                                error_type, 
-                                               error_message)    
+                                               error_message)
+    st.write(f"System has completed quantative experiment for {model} number {experiment_number}. Experiment ID {experiment_id}.")    
 
 def normalize_data_for_egtl_experiment(model):
     df = load_data_from_snowflake("STAGING_STORE.CALC_CR_SCL_STAGING")
@@ -1811,7 +1812,16 @@ def render_experiment_page():
     if st.button("SHOW HYPERLOOP PROJECT STATUS 🔍"):
         cleaned_df = view_hyperloop_project_status()   
 
-    if st.button("RUN EGTL EXPERIMENT 🥽"):
+    st.markdown("""
+        <style>
+        .red-button > button {
+            background-color: red;
+            color: white;
+            font-weight: bold;
+        }
+        </style>""", unsafe_allow_html=True)
+
+    if st.button("RUN EGTL EXPERIMENT 🥽", key="run_egtl_button", help="Run the EGTL experiment with current settings", use_container_width=True):
         if experiment_name == "EGTL_QUANTATIVE_DATA_EXPERIMENT":
             egtl_quantative_data_experiment(model)
         else:
