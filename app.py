@@ -826,11 +826,12 @@ def fusion_store_experiment(model, time_periods, load_data_trends):
 
     st.write(f"System has completed quantative experiment for {model} number {experiment_number}. Experiment ID {experiment_id}.")
 
-def egtl_qualitative_data_experiment(model, report, defined_scenario):
+def egtl_qualitative_data_experiment(model, defined_scenario):
     summary_table = "ALLIANCE_STORE.HPL_SD_CRS_ALLIANCE"
     experiment_table = "ALLIANCE_STORE.EGTL_QUALITATIVE_DATA_EXPERIMENT"
     experiment_number = get_record_count_for_model(model, experiment_table) + 1
     experiment_id = get_largest_record_id(experiment_table) + 1
+    report = "status"
     st.write(f"Starting qualitative experiment for {model} number {experiment_number}, ID {experiment_id}")
 
     start_date = datetime.now(pytz.utc).strftime('%Y-%B-%d %H:%M:%S')
