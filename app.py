@@ -220,6 +220,11 @@ def analyze_hyperloop_project(model, report):
     else:
         st.error("Failed to load data, analysis cannot proceed.")
 
+def view_hyperloop_project_status():
+    df = load_data_from_snowflake("ALLIANCE_STORE.PROJECT_STATUS")
+    st.write("Hyperloop project status history:")
+    st.write(df.head(20))
+
 #############################################
 # ETL IMPROVEMENT
 #############################################
@@ -1598,6 +1603,9 @@ def render_experiment_page():
 
     if st.button("REPORT HYPERLOOP PROJECT STATUS 🧑‍🔬"):
         cleaned_df = analyze_hyperloop_project(model, report="status")      
+
+    if st.button("VIEW HYPERLOOP PROJECT STATUS 🔍"):
+        cleaned_df = view_hyperloop_project_status()           
 
     if st.button("⬅️ BACK"):
         st.session_state['page'] = 'home' 
