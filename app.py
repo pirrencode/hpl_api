@@ -203,7 +203,7 @@ def analyze_hyperloop_project(model, report):
 
                 try:
                     insert_query = f"""
-                    INSERT INTO ALLIANCE_STORE.PROJECT_STATUS (history_date, status)
+                    INSERT INTO ALLIANCE_STORE.PROJECT_STATUS (history_date, project_status)
                     VALUES ('{utc_time}', '{insights}')
                     """
                     st.write(f"DEBUG: {insert_query}")
