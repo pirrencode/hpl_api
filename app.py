@@ -276,7 +276,7 @@ def generate_data_with_openai(model, time_periods):
         f'- "TIME" should be populated as index, in range of {time_periods}.\n'
         '- "CR_SCL" should be populated with random floating-point numbers between 0 and 100, showing a positive trend (i.e., the values generally increase over time).\n\n'
         '"CR_SCL" is a scalability criterion for Hyperloop project evaluation.\n\n'
-        "Return only the JSON dataset, without any additional text or explanation."
+        "Return only the two lists in JSON format, without any labels, keys, or additional text."
     )
 
     openai.api_key = get_openai_api_key()
