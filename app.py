@@ -207,8 +207,17 @@ def clean_data_with_openai(df, model):
 
         cleaned_data_json = response.choices[0].message.content.strip()
 
-        cleaned_df = pd.read_json(cleaned_data_json, orient='split')
-        return cleaned_df
+        st.write(f"The {model} response: {cleaned_data_json}")
+        cleaned_data = clean_json_output(cleaned_data_json)
+        if cleaned_data:
+            cleaned_df = pd.DataFrame(cleaned_data, columns=["TIME", "CR_SCL"])
+            return cleaned_df
+        else:
+            st.error("Failed to clean the data or parse it into a DataFrame.")
+            return None
+
+        # cleaned_df = pd.read_json(cleaned_data_json, orient='split')
+        # return cleaned_df
 
     except Exception as e:
         st.error(f"An error occurred while processing data with ChatGPT: {str(e)}")
