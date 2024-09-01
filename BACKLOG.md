@@ -8,3 +8,4 @@
 7. Enable automated backups.
 8. Improve UI for GenAI project analysis
 9. Add data clean-up functionality for all criterions.
+10. Remove DEBUG level outputs.
