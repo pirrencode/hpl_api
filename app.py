@@ -443,7 +443,7 @@ def egtl_quantative_data_experiment(model):
     
     genai_time = genai_response_time
     
-    output_df_size = normalized_data.shape[0] if normalized_data is not None else output_df_size = 0    
+    output_df_size = normalized_data.shape[0] if normalized_data is not None else 0  
     
     end_date = datetime.now(pytz.utc).strftime('%Y-%B-%d %H:%M:%S')
     
@@ -488,7 +488,7 @@ def normalize_data_for_egtl_experiment(model):
         st.write(f"GenAI (Model: {model}) response time: {time.time() - start_time} seconds")
         genai_response_time = time.time() - start_time
 
-        output_volume = len(str(normalized_data)) if normalized_data is not None else output_volume = 0
+        output_volume = len(str(normalized_data)) if normalized_data is not None else 0
 
         if normalized_data is not None:
             st.write("Data cleaned successfully.")
@@ -554,7 +554,7 @@ def get_record_count_for_model(model, table_name):
         WHERE model = '{model}'
         """
         result = session.sql(query).collect()
-        record_count = result[0][0] if result else record_count = 0
+        record_count = result[0][0] if result else 0
     finally:
         if session:
             session.close()
