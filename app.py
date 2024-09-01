@@ -169,6 +169,9 @@ def get_insights_using_gemini(df, model, report):
 
     return insights
 
+from datetime import datetime
+import pytz
+
 def analyze_hyperloop_project(model, report):
     df = load_data_from_snowflake("ALLIANCE_STORE.HPL_SD_CRS_ALLIANCE")
 
@@ -188,11 +191,25 @@ def analyze_hyperloop_project(model, report):
             st.error("Selected model is not supported.")
             return
 
-        st.write(f"GenAI (Model: {model}) response time: {time.time() - start_time} seconds")
+        st.write(f"GenAI (Model: {model}) response time: {time.time() - start_time} seconds")          
 
         if insights:
             st.write("Generative AI response:")
             st.write(insights)
+
+            if report == "status":
+                utc_time = datetime.now(pytz.utc).strftime('%Y-%B-%d %H:%M:%S')
+                session = Session.builder.configs(get_snowflake_connection_params()).create()
+
+                try:
+                    insert_into_table = session.sql(f"""
+                    INSERT INTO HPL_SYSTEM_DYNAMICS.ALLIANCE_STORE.PROJECT_STATUS (history_date, status)
+                    VALUES ({utc_time}, insights)
+                    """)
+                    insert_into_table.collect()
+                finally:
+                    if session:
+                        session.close()                
     else:
         st.error("Failed to load data, analysis cannot proceed.")
 
@@ -549,7 +566,8 @@ def backup_staging_store():
 def backup_alliance_store():
     
     tables = [
-        "HPL_SD_CRS_ALLIANCE"
+        "HPL_SD_CRS_ALLIANCE",
+        "PROJECT_STATUS"
     ]
 
     progress_bar = st.progress(0)
