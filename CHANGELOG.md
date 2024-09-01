@@ -1,5 +1,11 @@
 # Hyperloop decision making ecosystem changelog
 
+## v0.1.3-dev
+
+- Implemented Gemini AI functionality for analysis of Hyperloop project.
+- Implemented Gemini AI for experiments handling.
+- Requirements updated with installation of generative-ai-python.
+
 ## v0.1.2-dev
 
 - Code cleanup
