@@ -110,7 +110,10 @@ def get_insights_using_mistral(df, model, report):
         )
     elif report == "status":
         prompt = (
-            "You are an expert in project performance analysis. Based on the following data summary of a Hyperloop project, please provide one word statuson how the project is performing. Possible answers are PROJECT_IS_IN_RAPID_DECLINE, PROJECT_IS_IN_DECLINE, STAGNATION, PROJECT_IS_IMPROVING, PROJECT_IS_AT_MAXIMUM_PERFORMANCE :\n\n"
+            "You are an expert in project performance analysis. Based on the following data summary of a Hyperloop project, please provide one word status on how the project is performing."
+            " Report must contain single word."
+            "Possible single words that you can answer to me are PROJECT_IS_IN_RAPID_DECLINE, PROJECT_IS_IN_DECLINE, STAGNATION, PROJECT_IS_IMPROVING, PROJECT_IS_AT_MAXIMUM_PERFORMANCE"
+            "Summary data: \n\n"
             f"{data_summary}"
         )        
     else:
