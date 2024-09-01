@@ -579,7 +579,7 @@ def get_largest_record_id(table_name):
         FROM {table_name}
         """
         result = session.sql(query).collect()
-        largest_id = result[0][0] if result and result[0][0] is not None else largest_id = 0
+        largest_id = result[0][0] if result and result[0][0] is not None else 0
     finally:
         if session:
             session.close()
