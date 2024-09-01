@@ -181,7 +181,8 @@ def clean_data_with_openai(df, model):
         "For each value x greater than 1, compute the normalized value as x / max(x) where max(x) is the maximum value in the 'CR_SCL' column. Decimal precision should be 2."
         "Other values should stay as they are."
         "Return only array from the JSON in the format of a list of lists, without any additional text, columns, or index fields."
-        "Do not include any code, text, column names or index fields in the output. Your answer to me must contain only dataset - numerical digits, in dict format."
+        "Do not include any code, text, column names, words 'data', 'columns' or index fields in the output."
+        " Your reply to me must contain only dataset - numerical digits, in dict format."
         "\n\n"
         f"Dataset: {data_json}"
     )
