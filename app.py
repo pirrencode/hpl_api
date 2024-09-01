@@ -293,9 +293,7 @@ def generate_data_with_openai(model, time_periods):
 
         st.write(f"The {model} response: {generated_data}")
 
-        # Check if the response is missing the outer braces
         if not (generated_data.startswith("{") and generated_data.endswith("}")):
-            # Manually wrap the response in braces if they are missing
             generated_data = "{" + generated_data + "}"
 
         # Attempt to parse the JSON data
@@ -308,7 +306,6 @@ def generate_data_with_openai(model, time_periods):
         # Convert the dictionary into a DataFrame
         gen_ai_df = pd.DataFrame(data_dict)
 
-        # Calculate volumes
         output_volume = len(str(generated_data)) if generated_data is not None else 0
         prompt_volume = len(str(prompt)) if prompt is not None else 0
 
@@ -354,7 +351,54 @@ def clean_data_with_gemini(df, model):
 
     except Exception as e:
         st.error(f"An error occurred while processing data with Google: {str(e)}")
-        return None    
+        return None  
+
+def generate_data_with_gemini(model, time_periods):
+
+    gemini.configure(api_key=get_google_api_key())
+
+    gemini_model = gemini.GenerativeModel(model_name=model)
+    try:
+
+        prompt = (
+            "Generate a dataset in JSON format with the following structure:\n\n"
+            "{\n"
+            f'    "TIME": [1, 2, 3, ..., {time_periods}],\n'
+            '    "CR_SCL": [<float>, <float>, <float>, ..., <float>]\n'
+            "}\n\n"
+            "Where:\n"
+            f'- \"TIME\" must be populated as a sequence of integers from 1 to {time_periods}.\n'
+            '- \"CR_SCL\" must be populated with random numbers in a range between 0 and 100, showing a positive trend (i.e., the values generally increase over time).\n\n'
+            'Return only the JSON object with both \"TIME\" and \"CR_SCL\" keys and their respective lists of values, and do not include any additional text, explanations, or code in the response.'
+        )
+
+
+        response = gemini_model.generate_content([prompt])
+
+        generated_data = response.text
+        st.write(f"The {model} response: {generated_data}")
+
+        if not (generated_data.startswith("{") and generated_data.endswith("}")):
+            generated_data = "{" + generated_data + "}"
+
+        # Attempt to parse the JSON data
+        try:
+            data_dict = json.loads(generated_data)
+        except json.JSONDecodeError as e:
+            st.error(f"An error occurred while parsing the JSON data: {str(e)}")
+            return None, None, None
+
+        # Convert the dictionary into a DataFrame
+        gen_ai_df = pd.DataFrame(data_dict)
+
+        output_volume = len(str(generated_data)) if generated_data is not None else 0
+        prompt_volume = len(str(prompt)) if prompt is not None else 0
+
+        return gen_ai_df, prompt_volume, output_volume
+
+    except Exception as e:
+        st.error(f"An error occurred: {str(e)}")
+        return None, None, None       
     
 def clean_data_with_mistral(df, model):
 
@@ -409,6 +453,67 @@ def clean_data_with_mistral(df, model):
     except requests.exceptions.RequestException as e:
         st.error(f"An error occurred while fetching insights from Mistral AI: {str(e)}")
         return None
+    
+def generate_data_with_mistral(model, time_periods):
+
+    prompt = (
+        "Generate a dataset in JSON format with the following structure:\n\n"
+        "{\n"
+        f'    "TIME": [1, 2, 3, ..., {time_periods}],\n'
+        '    "CR_SCL": [<float>, <float>, <float>, ..., <float>]\n'
+        "}\n\n"
+        "Where:\n"
+        f'- \"TIME\" must be populated as a sequence of integers from 1 to {time_periods}.\n'
+        '- \"CR_SCL\" must be populated with random numbers in a range between 0 and 100, showing a positive trend (i.e., the values generally increase over time).\n\n'
+        'Return only the JSON object with both \"TIME\" and \"CR_SCL\" keys and their respective lists of values, and do not include any additional text, explanations, or code in the response.'
+    )
+
+    headers = {
+        "Authorization": f"Bearer {get_mistral_api_key()}",
+        "Content-Type": "application/json"
+    }
+
+    data = {
+        "model": model,
+        "messages": [
+            {
+                "role": "user",
+                "content": prompt
+            }
+        ],
+        "max_tokens": 10000,
+    }
+
+    try:
+        response = requests.post("https://api.mistral.ai/v1/chat/completions", headers=headers, json=data)
+        response.raise_for_status()
+
+        result = response.json()
+        generated_data = result["choices"][0]["message"]["content"].strip()
+     
+        st.write(f"The {model} response: {generated_data}")
+
+        if not (generated_data.startswith("{") and generated_data.endswith("}")):
+            generated_data = "{" + generated_data + "}"
+
+        # Attempt to parse the JSON data
+        try:
+            data_dict = json.loads(generated_data)
+        except json.JSONDecodeError as e:
+            st.error(f"An error occurred while parsing the JSON data: {str(e)}")
+            return None, None, None
+
+        # Convert the dictionary into a DataFrame
+        gen_ai_df = pd.DataFrame(data_dict)
+
+        output_volume = len(str(generated_data)) if generated_data is not None else 0
+        prompt_volume = len(str(prompt)) if prompt is not None else 0
+
+        return gen_ai_df, prompt_volume, output_volume
+
+    except Exception as e:
+        st.error(f"An error occurred: {str(e)}")
+        return None, None, None      
 
 def clean_json_output(insights):
     """
@@ -545,6 +650,17 @@ def fusion_store_quantative_data_experiment(model, time_periods):
     
     try:
         start_time = time.time()
+
+        if model in ["gpt-3.5-turbo", "gpt-4"]:
+            gen_ai_df, prompt_volume, output_volume = generate_data_with_openai(model,time_periods)
+        elif model == "mistral-small":
+            gen_ai_df, prompt_volume, output_volume = generate_data_with_mistral(model,time_periods)
+        elif model == "gemini-1.5-flash":
+           gen_ai_df, prompt_volume, output_volume = generate_data_with_gemini(model,time_periods)            
+        else:
+            st.error("Selected model is not supported.")
+            return None, 0, 0
+
         gen_ai_df, prompt_volume, output_volume = generate_data_with_openai(model,time_periods)
         
         save_start_time = time.time()
