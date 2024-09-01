@@ -498,13 +498,7 @@ def normalize_data_for_egtl_experiment(model):
             st.error(f"Failed to clean data using GenAI (Model: {model}).")
     else:
         st.error("Failed to load data from Snowflake.")
-        return None
-    
-def view_experiment_data(table_name, experiment_name):
-    st.write(f"Experiment name: {experiment_name}")
-    df = load_data_from_snowflake(table_name) 
-    st.write("Experiment data: ")    
-    st.write(df)             
+        return None        
 
 def insert_data_in_quantative_experiment_table(id, 
                                                start_date, 
@@ -544,15 +538,16 @@ def insert_data_in_quantative_experiment_table(id,
         if session:
             session.close()
 
+def view_experiment_data(table_name, experiment_name):
+    st.write(f"Experiment name: {experiment_name}")
+    df = load_data_from_snowflake(table_name) 
+    st.write("Experiment data: ")    
+    st.write(df)             
 
 def get_record_count_for_model(model, table_name):
     session = Session.builder.configs(get_snowflake_connection_params()).create()
     try:
-        query = f"""
-        SELECT COUNT(*)
-        {table_name}
-        WHERE model = '{model}'
-        """
+        query = f"SELECT COUNT(*) FROM {table_name} WHERE model = '{model}'"
         result = session.sql(query).collect()
         record_count = result[0][0] if result else 0
     finally:
