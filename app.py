@@ -11,6 +11,8 @@ import openai
 import time
 import requests
 import json
+import google.generativeai as gemini
+import os
 
 # LOG LEVEL SETUP
 logging.basicConfig(level=logging.INFO)
@@ -54,6 +56,9 @@ def get_openai_api_key():
 
 def get_mistral_api_key():
     return st.secrets["mistral"]["mistral_api_key"]
+
+def get_google_api_key():
+    return st.secrets["google"]["google_api_key"]
 
 ############################################
 #GEN AI INSIGHTS GENERATION
@@ -130,6 +135,19 @@ def get_insights_using_mistral(df, model):
     except requests.exceptions.RequestException as e:
         st.error(f"An error occurred while fetching insights from Mistral AI: {str(e)}")
         return None
+    
+def get_insights_using_gemini(df, model):
+    gemini.configure(api_key=get_google_api_key())
+
+    gemini_model = gemini.GenerativeModel(model_name=model)
+
+    response = gemini_model.generate_content(["You are an expert in project performance analysis. Based on the following data summary of a Hyperloop project, please provide detailed insights on how the project is performing and offer recommendations for improvement:\n\n"
+        f"{df}"
+        ])
+
+    insights = response.text
+
+    return insights
 
 def analyze_hyperloop_project(model):
     df = load_data_from_snowflake("ALLIANCE_STORE.HPL_SD_CRS_ALLIANCE")
@@ -144,6 +162,8 @@ def analyze_hyperloop_project(model):
             insights = get_insights_using_openai(df, model)
         elif model == "mistral-small":
             insights = get_insights_using_mistral(df, model)
+        elif model == "gemini-1.5-flash":
+            insights = get_insights_using_gemini(df, model)            
         else:
             st.error("Selected model is not supported.")
             return
@@ -805,7 +825,7 @@ def populate_hpl_sd_crs():
 
 def render_homepage():
     st.title("HDME")
-    st.subheader("v0.1.2-dev")
+    st.subheader("v0.1.3-dev")
     st.write("""
         Welcome to the Hyperloop Project System Dynamics Dashboard. 
         This application allows you to upload, manage, and visualize data related to various criteria 
@@ -833,7 +853,7 @@ def render_homepage():
 
     model = st.radio(
         "Select GPT model for analysis:",
-        options=["gpt-3.5-turbo", "gpt-4", "mistral-small"],
+        options=["gpt-3.5-turbo", "gpt-4", "mistral-small", "gemini-1.5-flash"],
         index=0
     )
 
@@ -1483,9 +1503,9 @@ def render_experiment_page():
 
     model = st.radio(
         "Select GenAI model for experiment:",
-        options=["gpt-3.5-turbo", "gpt-4", "mistral-small"],
+        options=["gpt-3.5-turbo", "gpt-4", "mistral-small", "gemini-1.5-flash"],
         index=0
-    )       
+    )
  
     if st.button("GENERATE DIRTY DATA FOR SCALABILITY 🧪"):
         raw_df = populate_calc_cr_scl_staging(time_periods)              
