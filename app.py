@@ -231,7 +231,7 @@ def clean_data_with_gemini(df, model):
         ])
 
         cleaned_data_json = response.text
-        st.write(f"DEBUG.Responce: {cleaned_data_json}")
+        st.write(f"The {model} response: {cleaned_data_json}")
         cleaned_data = clean_json_output(cleaned_data_json)
         if cleaned_data:
             # Convert the cleaned JSON data into a DataFrame
@@ -283,7 +283,7 @@ def clean_data_with_mistral(df, model):
         result = response.json()
         insights = result["choices"][0]["message"]["content"].strip()
 
-        st.write(f"DEBUG: {insights}")
+        st.write(f"DEBUG. The {model} response: {insights}")
         
         # Clean the JSON output and load it into a DataFrame
         cleaned_data = clean_json_output(insights)
