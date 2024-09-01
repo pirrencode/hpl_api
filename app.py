@@ -907,17 +907,11 @@ def transfer_data_from_source_to_target(source_table, target_table):
     session = Session.builder.configs(get_snowflake_connection_params()).create()
 
     try:
-        fetch_query = f"SELECT * FROM {source_table}"
-        data_to_transfer = session.sql(fetch_query).collect()
-
-        if data_to_transfer:
-            insert_query = f"""
-                INSERT INTO {target_table} SELECT * FROM {source_table}
-            """
-            session.sql(insert_query).collect()
-            print(f"Successfully transferred data from {source_table} to {target_table}.")
-        else:
-            print(f"No data found in {source_table} to transfer.")
+        insert_query = f"""
+            INSERT INTO {target_table} SELECT * FROM {source_table}
+        """
+        session.sql(insert_query).collect()
+        print(f"Successfully transferred data from {source_table} to {target_table}.")
 
     except Exception as e:
         print(f"An error occurred: {str(e)}")
