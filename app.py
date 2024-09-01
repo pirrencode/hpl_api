@@ -273,10 +273,9 @@ def generate_data_with_openai(model, time_periods):
         '    "CR_SCL": [<float>, <float>, <float>, ..., <float>]\n'
         "}\n\n"
         "Where:\n"
-        f'- "TIME" must be populated as a sequence of integers from 1 to {time_periods}.\n'
-        '- "CR_SCL" must be populated with random floating-point numbers between 0 and 100, showing a positive trend (i.e., the values generally increase over time).\n\n'
-        '"CR_SCL" is a scalability criterion for Hyperloop project evaluation.\n\n'
-        "Return the full JSON object with both 'TIME' and 'CR_SCL' keys and their respective lists of values."
+        f'- \"TIME\" must be populated as a sequence of integers from 1 to {time_periods}.\n'
+        '- \"CR_SCL\" must be populated with random floating-point numbers between 0 and 100, showing a positive trend (i.e., the values generally increase over time).\n\n'
+        'Return only the JSON object with both \"TIME\" and \"CR_SCL\" keys and their respective lists of values, and do not include any additional text, explanations, or code in the response.'
     )
 
     openai.api_key = get_openai_api_key()
