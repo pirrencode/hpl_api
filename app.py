@@ -64,14 +64,23 @@ def get_google_api_key():
 #GEN AI INSIGHTS GENERATION
 ############################################
 
-def get_insights_using_openai(df, model):
+def get_insights_using_openai(df, model, report):
 
     data_summary = df.describe().to_string()
 
-    prompt = (
-        "You are an expert in project performance analysis. Based on the following data summary of a Hyperloop project, please provide detailed insights on how the project is performing and offer recommendations for improvement:\n\n"
-        f"{data_summary}"
-    )
+    if report == "insights":
+        prompt = (
+            "You are an expert in project performance analysis. Based on the following data summary of a Hyperloop project, please provide detailed insights on how the project is performing and offer recommendations for improvement:\n\n"
+            f"{data_summary}"
+        )
+    elif report == "status":
+        prompt = (
+            "You are an expert in project performance analysis. Based on the following data summary of a Hyperloop project, please provide one word statuson how the project is performing. Possible answers are PROJECT_IS_IN_RAPID_DECLINE, PROJECT_IS_IN_DECLINE, STAGNATION, PROJECT_IS_IMPROVING, PROJECT_IS_AT_MAXIMUM_PERFORMANCE :\n\n"
+            f"{data_summary}"
+        )        
+    else:
+        st.error("Report type is not provided.")
+        return  
 
     openai.api_key = get_openai_api_key()
 
@@ -91,13 +100,22 @@ def get_insights_using_openai(df, model):
         st.error(f"An error occurred while fetching insights from ChatGPT: {str(e)}")
         return None
 
-def get_insights_using_mistral(df, model):
+def get_insights_using_mistral(df, model, report):
     data_summary = df.describe().to_string()
 
-    prompt = (
-        "You are an expert in project performance analysis. Based on the following data summary of a Hyperloop project, please provide detailed insights on how the project is performing and offer recommendations for improvement:\n\n"
-        f"{data_summary}"
-    )
+    if report == "insights":
+        prompt = (
+            "You are an expert in project performance analysis. Based on the following data summary of a Hyperloop project, please provide detailed insights on how the project is performing and offer recommendations for improvement:\n\n"
+            f"{data_summary}"
+        )
+    elif report == "status":
+        prompt = (
+            "You are an expert in project performance analysis. Based on the following data summary of a Hyperloop project, please provide one word statuson how the project is performing. Possible answers are PROJECT_IS_IN_RAPID_DECLINE, PROJECT_IS_IN_DECLINE, STAGNATION, PROJECT_IS_IMPROVING, PROJECT_IS_AT_MAXIMUM_PERFORMANCE :\n\n"
+            f"{data_summary}"
+        )        
+    else:
+        st.error("Report type is not provided.")
+        return  
 
     headers = {
         "Authorization": f"Bearer {get_mistral_api_key()}",
@@ -127,20 +145,28 @@ def get_insights_using_mistral(df, model):
         st.error(f"An error occurred while fetching insights from Mistral AI: {str(e)}")
         return None
     
-def get_insights_using_gemini(df, model):
+def get_insights_using_gemini(df, model, report):
     gemini.configure(api_key=get_google_api_key())
 
     gemini_model = gemini.GenerativeModel(model_name=model)
 
-    response = gemini_model.generate_content(["You are an expert in project performance analysis. Based on the following data summary of a Hyperloop project, please provide detailed insights on how the project is performing and offer recommendations for improvement:\n\n"
-        f"{df}"
-        ])
+    if report == "insights":
+        response = gemini_model.generate_content(["You are an expert in project performance analysis. Based on the following data summary of a Hyperloop project, please provide detailed insights on how the project is performing and offer recommendations for improvement:\n\n"
+            f"{df}"
+            ])
+    elif report == "status":
+        response = gemini_model.generate_content(["You are an expert in project performance analysis. Based on the following data summary of a Hyperloop project, please provide one word statuson how the project is performing. Possible answers are PROJECT_IS_IN_RAPID_DECLINE, PROJECT_IS_IN_DECLINE, STAGNATION, PROJECT_IS_IMPROVING, PROJECT_IS_AT_MAXIMUM_PERFORMANCE :\n\n"
+            f"{df}"
+            ])        
+    else:
+        st.error("Report type is not provided.")
+        return
 
     insights = response.text
 
     return insights
 
-def analyze_hyperloop_project(model):
+def analyze_hyperloop_project(model, report):
     df = load_data_from_snowflake("ALLIANCE_STORE.HPL_SD_CRS_ALLIANCE")
 
     if df is not None:
@@ -150,11 +176,11 @@ def analyze_hyperloop_project(model):
         start_time = time.time()
 
         if model in ["gpt-3.5-turbo", "gpt-4"]:
-            insights = get_insights_using_openai(df, model)
+            insights = get_insights_using_openai(df, model, report)
         elif model == "mistral-small":
-            insights = get_insights_using_mistral(df, model)
+            insights = get_insights_using_mistral(df, model, report)
         elif model == "gemini-1.5-flash":
-            insights = get_insights_using_gemini(df, model)            
+            insights = get_insights_using_gemini(df, model, report)            
         else:
             st.error("Selected model is not supported.")
             return
@@ -162,7 +188,7 @@ def analyze_hyperloop_project(model):
         st.write(f"GenAI (Model: {model}) response time: {time.time() - start_time} seconds")
 
         if insights:
-            st.write("GenAI Insights:")
+            st.write("Generative AI response:")
             st.write(insights)
     else:
         st.error("Failed to load data, analysis cannot proceed.")
@@ -174,17 +200,6 @@ def analyze_hyperloop_project(model):
 def clean_data_with_openai(df, model):
 
     data_json = df.to_json(orient='split')
-
-    # prompt = (
-    #     "You are given a dataset in JSON format. Check if the 'CR_SCL' column contains any value larger than 1. "
-    #     "If so, normalize those values so they fall within the range 0 to 1 using the following formula: "
-    #     "For each value x greater than 1, compute the normalized value as x / max(x) where max(x) is the maximum value in the 'CR_SCL' column. Decimal precision should be 2. "
-    #     "Other values should stay as they are. "
-    #     "Return only the dataset as a plain list of lists, without any additional text, columns, index fields, words like 'data', or any special characters such as brackets or curly braces. "
-    #     "The output should contain only numerical digits separated by commas."
-    #     "\n\n"
-    #     f"Dataset: {data_json}"
-    # )
 
     prompt = (
         "You are given a dataset in JSON format. Check if the 'CR_SCL' column contains any value larger than 1. "
@@ -208,13 +223,6 @@ def clean_data_with_openai(df, model):
         cleaned_data_json = response.choices[0].message.content.strip()
 
         st.write(f"The {model} response: {cleaned_data_json}")
-        # cleaned_data = clean_json_output(cleaned_data_json)
-        # if cleaned_data:
-        #     cleaned_df = pd.DataFrame(cleaned_data, columns=["TIME", "CR_SCL"])
-        #     return cleaned_df
-        # else:
-        #     st.error("Failed to clean the data or parse it into a DataFrame.")
-        #     return None
 
         cleaned_df = pd.read_json(cleaned_data_json, orient='split')
         return cleaned_df
@@ -903,7 +911,7 @@ def render_homepage():
     )
 
     if st.button("ANALYZE HYPERLOOP PROJECT 🧠"):
-        analyze_hyperloop_project(model)      
+        analyze_hyperloop_project(model, report = "insights")      
 
 ##############################################################
 # Data upload and management page
@@ -1558,7 +1566,10 @@ def render_experiment_page():
 
     if st.button("APPLY EXPLORATIVE ANALYSIS TO ETL USING GEN AI 🧩"):
         cleaned_df = normalize_cr_scl_data(model)            
-        save_data_to_snowflake(cleaned_df, "STAGING_STORE.CALC_CR_SCL_STAGING")        
+        save_data_to_snowflake(cleaned_df, "STAGING_STORE.CALC_CR_SCL_STAGING")
+
+    if st.button("REPORT HYPERLOOP PROJECT STATUS 🧑‍🔬"):
+        cleaned_df = analyze_hyperloop_project(model, report="status")      
 
     if st.button("⬅️ BACK"):
         st.session_state['page'] = 'home' 
