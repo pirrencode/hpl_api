@@ -64,15 +64,6 @@ def get_google_api_key():
 #GEN AI INSIGHTS GENERATION
 ############################################
 
-def test_openai_api_key():
-    try:
-        api_key = st.secrets["openai"]["openai_api_key"]
-        st.write(f"API Key successfully retrieved: {api_key[:5]}...")  # Display only the first few characters
-    except KeyError:
-        st.error("API Key not found. Please check the secrets configuration.")
-    except Exception as e:
-        st.error(f"An error occurred: {str(e)}")
-
 def get_insights_using_openai(df, model):
 
     data_summary = df.describe().to_string()
@@ -186,7 +177,7 @@ def clean_data_with_openai(df, model):
 
     prompt = (
         "You are given a dataset in JSON format. Check if the 'CR_SCL' column contains any value larger than 1. "
-        "If so, normalize those values so they fall within the range 0..1. Other values should stay as they are. "
+        "If so, normalize those values so they fall within the range 0..1. Decimal precision should be 2. Other values should stay as they are. "
         "Return the cleaned dataset in JSON format "
         "without any additional text or explanation.\n\n"
         f"Dataset: {data_json}"
@@ -859,7 +850,7 @@ def populate_hpl_sd_crs():
 
 def render_homepage():
     st.title("HDME")
-    st.subheader("v0.1.3-dev")
+    st.subheader("v0.1.4-dev")
     st.write("""
         Welcome to the Hyperloop Project System Dynamics Dashboard. 
         This application allows you to upload, manage, and visualize data related to various criteria 
