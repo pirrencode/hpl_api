@@ -660,8 +660,6 @@ def fusion_store_quantative_data_experiment(model, time_periods):
         else:
             st.error("Selected model is not supported.")
             return None, 0, 0
-
-        gen_ai_df, prompt_volume, output_volume = generate_data_with_openai(model,time_periods)
         
         save_start_time = time.time()
         st.write(gen_ai_df)
