@@ -532,7 +532,7 @@ def insert_data_in_quantative_experiment_table(id,
     finally:
         if session:
             session.close()
-            
+
 def view_experiment_data(table_name, experiment_name):
     st.write(f"Experiment name: {experiment_name}")
     df = load_data_from_snowflake(table_name) 
@@ -553,9 +553,9 @@ def get_record_count_for_model(model, table_name):
 def get_table_row_count(table_name):
     session = Session.builder.configs(get_snowflake_connection_params()).create() 
     try:
-        query = f"SELECT COUNT(*) FROM {table_name}"
-        row_count = session.sql(query)
-        row_count.collect()
+        query = f"SELECT COUNT(*) AS row_count FROM {table_name}"
+        result = session.sql(query).collect()
+        row_count = result[0]['ROW_COUNT'] if result else 0
     finally:
         if session:
             session.close()        
