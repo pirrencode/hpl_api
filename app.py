@@ -264,6 +264,45 @@ def clean_data_with_openai(df, model):
         st.error(f"An error occurred while processing data with ChatGPT: {str(e)}")
         return None
     
+def generate_data_with_openai(model, time_periods):
+
+    prompt = (
+        "Generate a dataset in JSON format with the following structure:\n\n"
+        "{\n"
+        f'    "TIME": [1, 2, 3, ..., {time_periods}],\n'
+        '    "CR_SCL": [<float>, <float>, <float>, ..., <float>]\n'
+        "}\n\n"
+        "Where:\n"
+        f'- "TIME" should be populated as index, in range of {time_periods}.\n'
+        '- "CR_SCL" should be populated with random floating-point numbers between 0 and 100, showing a positive trend (i.e., the values generally increase over time).\n\n'
+        '"CR_SCL" is a scalability criterion for Hyperloop project evaluation.\n\n'
+        "Return only the JSON dataset, without any additional text or explanation."
+    )
+
+    openai.api_key = get_openai_api_key()
+
+    try:
+        response = openai.chat.completions.create(
+            model=model,
+            messages=[
+                {"role": "system", "content": "You are a helpful assistant."},
+                {"role": "user", "content": prompt}
+            ]
+        )
+
+        generated_data = response.choices[0].message.content.strip()
+
+        st.write(f"The {model} response: {generated_data}")
+
+        gen_ai_df = pd.read_json(generated_data, orient='split')
+        output_volume = len(str(generated_data)) if generated_data is not None else 0
+        prompt_volume = len(str(prompt)) if prompt is not None else 0
+        return gen_ai_df, prompt_volume, output_volume
+
+    except Exception as e:
+        st.error(f"An error occurred while processing data with ChatGPT: {str(e)}")
+        return None    
+    
 def clean_data_with_gemini(df, model):
 
     data_json = df.to_json(orient='split')
@@ -475,6 +514,63 @@ def egtl_quantative_data_experiment(model):
                                                error_type, 
                                                error_message)
     st.write(f"System has completed quantative experiment for {model} number {experiment_number}. Experiment ID {experiment_id}.")    
+
+def fusion_store_quantative_data_experiment(model, time_periods):
+    criterion_table = "FUSION_STORE.CALC_CR_SCL_FUSION"
+    # experiment_table = "ALLIANCE_STORE.EGTL_QUANTATIVE_DATA_EXPERIMENT"
+    # experiment_number = get_record_count_for_model(model, experiment_table) + 1
+    # experiment_id = get_largest_record_id(experiment_table) + 1
+    # st.write(f"Starting quantative experiment for {model} number {experiment_number}, ID {experiment_id}")
+
+    start_date = datetime.now(pytz.utc).strftime('%Y-%B-%d %H:%M:%S')
+    
+    errors_encountered = False
+    error_type = None
+    error_message = None
+    
+    try:
+        start_time = time.time()
+        gen_ai_df, prompt_volume, output_volume = generate_data_with_openai(model,time_periods)
+        
+        save_start_time = time.time()
+        st.write(gen_ai_df)
+        save_data_to_snowflake(gen_ai_df, criterion_table)
+        save_data_to_snowflake_time = time.time() - save_start_time
+        
+        total_time = time.time() - start_time
+    
+    except Exception as e:
+        errors_encountered = True
+        error_type = type(e).__name__
+        error_message = str(e)
+        genai_response_time = 0
+        prompt_volume = 0
+        output_volume = 0
+        total_time = 0
+        normalized_data_volume = 0
+        save_data_to_snowflake_time = 0
+    
+    end_date = datetime.now(pytz.utc).strftime('%Y-%B-%d %H:%M:%S')
+    rows_processed = get_table_row_count(criterion_table)
+    # correctness = df_correctness_check
+
+    # insert_data_in_quantative_experiment_table(experiment_id, 
+    #                                            model,                                               
+    #                                            start_date, 
+    #                                            end_date, 
+    #                                            genai_response_time, 
+    #                                            save_data_to_snowflake_time,                                               
+    #                                            total_time,
+    #                                            rows_processed,  
+    #                                            input_df_size,
+    #                                            prompt_volume,    
+    #                                            output_volume,
+    #                                            normalized_data_volume,                                                                                                                                        
+    #                                            correctness,
+    #                                            errors_encountered, 
+    #                                            error_type, 
+    #                                            error_message)
+    # st.write(f"System has completed quantative experiment for {model} number {experiment_number}. Experiment ID {experiment_id}.")
 
 def normalize_data_for_egtl_experiment(model):
     df = load_data_from_snowflake("STAGING_STORE.CALC_CR_SCL_STAGING")
@@ -1812,20 +1908,14 @@ def render_experiment_page():
     if st.button("SHOW HYPERLOOP PROJECT STATUS 🔍"):
         cleaned_df = view_hyperloop_project_status()   
 
-    st.markdown("""
-        <style>
-        .red-button > button {
-            background-color: red;
-            color: white;
-            font-weight: bold;
-        }
-        </style>""", unsafe_allow_html=True)
-
-    if st.button("RUN EGTL EXPERIMENT 🥽", key="run_egtl_button", help="Run the EGTL experiment with current settings", use_container_width=True):
+    if st.button("RUN EGTL EXPERIMENT 🥽"):
         if experiment_name == "EGTL_QUANTATIVE_DATA_EXPERIMENT":
             egtl_quantative_data_experiment(model)
         else:
             st.write("No experiment to conduct.") 
+
+    if st.button("RUN EGTL EXPERIMENT FOR FUSION STORE 🥽"):
+        fusion_store_quantative_data_experiment(model, time_periods)                   
 
     if st.button("VIEW EGTL EXPERIMENT RESULTS 🔍"):
         if experiment_name == "EGTL_QUANTATIVE_DATA_EXPERIMENT":
