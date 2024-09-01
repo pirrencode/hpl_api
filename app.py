@@ -212,6 +212,38 @@ def clean_data_with_openai(df, model):
         st.error(f"An error occurred while processing data with ChatGPT: {str(e)}")
         return None
     
+def clean_data_with_gemini(df, model):
+
+    data_json = df.to_json(orient='split')
+
+    prompt = (
+        "You are given a dataset in JSON format. Check if the 'CR_SCL' column contains any value larger than 1. "
+        "If so, normalize those values so they fall within the range 0..1. Other values should stay as they are. "
+        "Return the cleaned dataset in JSON format "
+        "without any additional text or explanation.\n\n"
+        f"Dataset: {data_json}"
+    )
+
+    gemini.configure(api_key=get_google_api_key())
+
+    gemini_model = gemini.GenerativeModel(model_name=model)
+    try:
+        response = gemini_model.generate_content(["You are given a dataset in JSON format. Check if the 'CR_SCL' column contains any value larger than 1. "
+            "If so, normalize those values so they fall within the range 0..1. Other values should stay as they are. "
+            "Return the cleaned dataset in JSON format "
+            "without any additional text or explanation.\n\n"
+            f"Dataset: {data_json}"
+            ])
+
+        cleaned_data_json = response.text
+
+        cleaned_df = pd.read_json(cleaned_data_json, orient='split')
+        return cleaned_df
+
+    except Exception as e:
+        st.error(f"An error occurred while processing data with Google: {str(e)}")
+        return None    
+    
 def clean_data_with_mistral(df, model):
 
     data_json = df.to_json(orient='split')
@@ -296,6 +328,8 @@ def normalize_cr_scl_data(model):
             cleaned_df = clean_data_with_openai(df, model)
         elif model == "mistral-small":
             cleaned_df = clean_data_with_mistral(df, model)
+        elif model == "gemini-1.5-flash":
+            cleaned_df = clean_data_with_gemini(df, model)            
         else:
             st.error("Selected model is not supported.")
             return
