@@ -780,7 +780,7 @@ def egtl_qualitative_data_experiment(model, defined_scenario):
     except Exception as e:
         st.error(f"Error inserting data into the experiment table: {str(e)}")
 
-    st.write(f"System has completed quantative experiment for {model} number {experiment_number}. Experiment ID {experiment_id}.")
+    st.write(f"System has completed qualitative experiment for {model} number {experiment_number}. Experiment ID {experiment_id}.")
 
 def fusion_store_experiment(model, time_periods, load_data_trends):
     fusion_table = "FUSION_STORE.CALC_CR_SCL_FUSION"
@@ -875,7 +875,34 @@ def fusion_store_experiment(model, time_periods, load_data_trends):
     except Exception as e:
         st.error(f"Error inserting data into the experiment table: {str(e)}")
 
-    st.write(f"System has completed quantative experiment for {model} number {experiment_number}. Experiment ID {experiment_id}.")
+    st.write(f"System has completed fusion store experiment for {model} number {experiment_number}. Experiment ID {experiment_id}.")
+
+def run_multiple_egtl_qualitative_experiments(model, defined_scenario, number_of_experiments):
+    """
+    Executes the egtl_qualitative_data_experiment function 'number_of_experiments' times in a row.
+    
+    Parameters:
+    model (str): The model to be used in the experiment.
+    defined_scenario (str): The scenario to be loaded for the experiment.
+    number_of_experiments (int): The number of times to run the experiment.
+    """
+    for i in range(number_of_experiments):
+        egtl_qualitative_data_experiment(model, defined_scenario)
+        st.write(f"Batch processed experiment N {i+1} of {number_of_experiments}.")   
+
+def run_multiple_fusion_store_experiments(model, time_periods, load_data_trends, number_of_experiments):
+    """
+    Executes the fusion_store_experiment function 'number_of_experiments' times in a row.
+    
+    Parameters:
+    model (str): The model to be used in the experiment.
+    time_periods (list): List of time periods for the experiment.
+    load_data_trends (str): Data trend to be loaded for the experiment.
+    number_of_experiments (int): The number of times to run the experiment.
+    """
+    for i in range(number_of_experiments):
+        fusion_store_experiment(model, time_periods, load_data_trends)
+        st.write(f"Batch processed experiment N {i+1} of {number_of_experiments}.")      
 
 def normalize_data_for_egtl_experiment(model):
     df = load_data_from_snowflake("STAGING_STORE.CALC_CR_SCL_STAGING")
@@ -985,23 +1012,7 @@ def insert_data_in_quantative_experiment_table(id,
         """
         st.write(f"DEBUG: {insert_query}")
         session.sql(insert_query).collect()
-    # try:
-    #     session = Session.builder.configs(get_snowflake_connection_params()).create()
-    #     insert_query = f"""
-    #         INSERT INTO ALLIANCE_STORE.EGTL_QUANTATIVE_DATA_EXPERIMENT 
-    #         (ID, MODEL, EXPERIMENT_START_DATE, EXPERIMENT_END_DATE, MODEL_WORK_TIME, 
-    #          SAVE_DATA_TO_SNOWFLAKE_TIME, EXPERIMENT_TIME_TOTAL, ROWS_PROCESSED, 
-    #          INPUT_DF_VOLUME, PROMPT_VOLUME, OUTPUT_VOLUME, OUTPUT_DF_VOLUME, 
-    #          CORRECTNESS, ERROR_ENCOUNTERED, ERROR_TYPE, ERROR_MESSAGE)
-    #         VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
-    #     """
-    #     # Using parameterized queries to prevent SQL injection and handle any special characters in strings
-    #     session.sql(insert_query, (
-    #         id, model, start_date, end_date, genai_response_time, 
-    #         save_data_to_snowflake_time, total_time, rows_processed, 
-    #         input_df_size, prompt_volume, output_volume, normalized_df_volume, 
-    #         correctness, errors_encountered, error_type, error_message
-    #     )).collect()    
+
     except Exception as e:
         st.error(f"An error occurred while saving insights to Snowflake: {str(e)}")
     finally:
@@ -2335,6 +2346,9 @@ def render_experiment_page():
     time_period_raw = st.text_input('Time period:', value='100')
     time_periods = int(time_period_raw)   
 
+    number_of_experiments_raw = st.text_input('Number of experiments for batch processing:', value='1')
+    number_of_experiments = int(number_of_experiments_raw)       
+
     model = st.radio(
         "Select GenAI model for experiment:",
         options=["gpt-3.5-turbo", "gpt-4", "mistral-small", "gemini-1.5-flash"],
@@ -2381,7 +2395,7 @@ def render_experiment_page():
             view_experiment_data(table_name, experiment_name)             
         elif experiment_name == "FUSION_STORE_EXPERIMENT":
             table_name = "ALLIANCE_STORE.EGTL_FUSION_STORE_EXPERIMENT"
-            view_experiment_data(table_name, experiment_name)                      
+            view_experiment_data(table_name, experiment_name)                    
 
     if st.button("APPLY EXPLORATIVE ANALYSIS TO ETL USING GEN AI 🧩"):
         cleaned_df = normalize_cr_scl_data(model)            
@@ -2391,7 +2405,15 @@ def render_experiment_page():
         cleaned_df = analyze_hyperloop_project(model, report="status")      
 
     if st.button("SHOW HYPERLOOP PROJECT STATUS 🔍"):
-        cleaned_df = view_hyperloop_project_status()                                                        
+        cleaned_df = view_hyperloop_project_status()       
+
+    if st.button("BATCH PROCESS CHOSEN EXPERIMENT"):
+        if experiment_name == "EGTL_QUANTATIVE_DATA_EXPERIMENT":
+            st.write("Feature disabled for quantative experiment") 
+        if experiment_name == "EGTL_QUALITATIVE_DATA_EXPERIMENT":
+            run_multiple_egtl_qualitative_experiments(model, defined_scenario, number_of_experiments)           
+        elif experiment_name == "FUSION_STORE_EXPERIMENT":
+            run_multiple_fusion_store_experiments(model, time_periods, load_data_trends, number_of_experiments)                                                                  
 
     if st.button("⬅️ BACK"):
         st.session_state['page'] = 'home' 
