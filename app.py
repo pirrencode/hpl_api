@@ -962,8 +962,9 @@ def insert_data_in_quantative_experiment_table(id,
                                                error_type, 
                                                error_message
                                                ):
-    session = Session.builder.configs(get_snowflake_connection_params()).create()
+    session = None
     try:
+        session = Session.builder.configs(get_snowflake_connection_params()).create()
         insert_query = f"""
             INSERT INTO ALLIANCE_STORE.EGTL_QUANTATIVE_DATA_EXPERIMENT 
             (ID, MODEL, EXPERIMENT_START_DATE, EXPERIMENT_END_DATE, MODEL_WORK_TIME, 
