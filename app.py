@@ -963,21 +963,6 @@ def insert_data_in_quantative_experiment_table(id,
                                                error_message
                                                ):
     session = None
-    # try:
-    #     session = Session.builder.configs(get_snowflake_connection_params()).create()
-    #     insert_query = f"""
-    #         INSERT INTO ALLIANCE_STORE.EGTL_QUANTATIVE_DATA_EXPERIMENT 
-    #         (ID, MODEL, EXPERIMENT_START_DATE, EXPERIMENT_END_DATE, MODEL_WORK_TIME, 
-    #          SAVE_DATA_TO_SNOWFLAKE_TIME, EXPERIMENT_TIME_TOTAL, ROWS_PROCESSED, 
-    #          INPUT_DF_VOLUME, PROMPT_VOLUME, OUTPUT_VOLUME, OUTPUT_DF_VOLUME, 
-    #          CORRECTNESS, ERROR_ENCOUNTERED, ERROR_TYPE, ERROR_MESSAGE)
-    #         VALUES ({id}, '{model}', '{start_date}', '{end_date}', {genai_response_time}, 
-    #                 {save_data_to_snowflake_time}, {total_time}, {rows_processed}, 
-    #                 {input_df_size}, {prompt_volume}, {output_volume}, {normalized_df_volume}, 
-    #                 '{correctness}', {errors_encountered}, '{error_type}', '{error_message}')   
-    #     """
-    #     # st.write(f"DEBUG: {insert_query}")
-    #     session.sql(insert_query).collect()
     try:
         session = Session.builder.configs(get_snowflake_connection_params()).create()
         insert_query = f"""
@@ -986,15 +971,30 @@ def insert_data_in_quantative_experiment_table(id,
              SAVE_DATA_TO_SNOWFLAKE_TIME, EXPERIMENT_TIME_TOTAL, ROWS_PROCESSED, 
              INPUT_DF_VOLUME, PROMPT_VOLUME, OUTPUT_VOLUME, OUTPUT_DF_VOLUME, 
              CORRECTNESS, ERROR_ENCOUNTERED, ERROR_TYPE, ERROR_MESSAGE)
-            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+            VALUES ('{id}', '{model}', '{start_date}', '{end_date}', {genai_response_time}, 
+                    {save_data_to_snowflake_time}, {total_time}, {rows_processed}, 
+                    {input_df_size}, {prompt_volume}, {output_volume}, {normalized_df_volume}, 
+                    '{correctness}', {errors_encountered}, '{error_type}', '{error_message}')   
         """
-        # Using parameterized queries to prevent SQL injection and handle any special characters in strings
-        session.sql(insert_query, (
-            id, model, start_date, end_date, genai_response_time, 
-            save_data_to_snowflake_time, total_time, rows_processed, 
-            input_df_size, prompt_volume, output_volume, normalized_df_volume, 
-            correctness, errors_encountered, error_type, error_message
-        )).collect()    
+        st.write(f"DEBUG: {insert_query}")
+        session.sql(insert_query).collect()
+    # try:
+    #     session = Session.builder.configs(get_snowflake_connection_params()).create()
+    #     insert_query = f"""
+    #         INSERT INTO ALLIANCE_STORE.EGTL_QUANTATIVE_DATA_EXPERIMENT 
+    #         (ID, MODEL, EXPERIMENT_START_DATE, EXPERIMENT_END_DATE, MODEL_WORK_TIME, 
+    #          SAVE_DATA_TO_SNOWFLAKE_TIME, EXPERIMENT_TIME_TOTAL, ROWS_PROCESSED, 
+    #          INPUT_DF_VOLUME, PROMPT_VOLUME, OUTPUT_VOLUME, OUTPUT_DF_VOLUME, 
+    #          CORRECTNESS, ERROR_ENCOUNTERED, ERROR_TYPE, ERROR_MESSAGE)
+    #         VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+    #     """
+    #     # Using parameterized queries to prevent SQL injection and handle any special characters in strings
+    #     session.sql(insert_query, (
+    #         id, model, start_date, end_date, genai_response_time, 
+    #         save_data_to_snowflake_time, total_time, rows_processed, 
+    #         input_df_size, prompt_volume, output_volume, normalized_df_volume, 
+    #         correctness, errors_encountered, error_type, error_message
+    #     )).collect()    
     except Exception as e:
         st.error(f"An error occurred while saving insights to Snowflake: {str(e)}")
     finally:
