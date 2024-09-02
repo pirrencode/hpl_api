@@ -1,5 +1,12 @@
 # Hyperloop decision making ecosystem changelog
 
+## v0.2.1-dev
+
+- Updated Fusion experiment logic.
+- Rigged timestamp population in all experiments.
+- Introduced streaming tasks feature for fusion and quantative experiments.
+- UI update for experiments page.
+
 ## v0.2.0-dev
 
 - Implemented quantative experiments functionality.
