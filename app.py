@@ -1026,6 +1026,7 @@ def insert_data_in_qualitative_experiment_table(id,
                                                error_message):
     session = None
     sanitized_error_message = sanitize_string(error_message)
+    sanitized_status_result = sanitize_string(status_result)
     try:
         session = Session.builder.configs(get_snowflake_connection_params()).create()
         insert_query = f"""
@@ -1037,9 +1038,9 @@ def insert_data_in_qualitative_experiment_table(id,
             VALUES ({id}, '{model}', '{start_date}', '{end_date}', {genai_response_time}, 
                     {save_data_to_snowflake_time}, {total_time}, {rows_processed}, 
                     {input_df_size}, {prompt_volume}, {output_volume}, '{loaded_scenario}', 
-                    '{status_result}', {errors_encountered}, '{error_type}', '{sanitized_error_message}')   
+                    '{sanitized_status_result}', {errors_encountered}, '{error_type}', '{sanitized_error_message}')   
         """
-        # st.write(f"DEBUG: {insert_query}")
+        st.write(f"DEBUG: {insert_query}")
         session.sql(insert_query).collect()
     except Exception as e:
         st.error(f"An error occurred while saving insights to Snowflake: {str(e)}")
