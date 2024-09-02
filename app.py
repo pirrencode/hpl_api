@@ -387,7 +387,6 @@ def generate_data_with_gemini(model, time_periods, load_data_trends):
             'Return only the JSON object with both \"TIME\" and \"CR_SCL\" keys and their respective lists of values, and do not include any additional text, explanations, or code in the response.'
         )
 
-
         response = gemini_model.generate_content([prompt])
 
         generated_data = response.text
@@ -532,6 +531,165 @@ def generate_data_with_mistral(model, time_periods, load_data_trends):
     except Exception as e:
         st.error(f"An error occurred: {str(e)}")
         return None, None, None      
+
+def extract_hyperloop_specification_with_openai(model, time_periods):
+
+    prompt = (
+        f"Generate a JSON dataset for Hyperloop technology with {time_periods} parameters. "
+        "Each parameter should describe a key aspect of Hyperloop technology, such as speed, price, or capacity. "
+        "The structure should be as follows:\n\n"
+        "{\n"
+        '    "PARAMETER": ["parameter_1", "parameter_2", ..., "parameter_N"],\n'
+        '    "SPECIFICATION": ["specification_1", "specification_2", ..., "specification_N"]\n'
+        "}\n\n"
+        "Return only the JSON object with 'PARAMETER' and 'SPECIFICATION' keys, filled with corresponding values. "
+        "Do not include any additional text, explanations, or code."
+    )
+
+    openai.api_key = get_openai_api_key()
+
+    try:
+        response = openai.ChatCompletion.create(
+            model=model,
+            messages=[
+                {"role": "system", "content": "You are a helpful assistant."},
+                {"role": "user", "content": prompt}
+            ]
+        )
+
+        generated_data = response.choices[0].message.content.strip("{}").strip()
+
+        st.write(f"The {model} response: {generated_data}")
+
+        if not (generated_data.startswith("{") and generated_data.endswith("}")):
+            generated_data = "{" + generated_data + "}"
+
+        try:
+            data_dict = json.loads(generated_data)
+        except json.JSONDecodeError as e:
+            st.error(f"An error occurred while parsing the JSON data: {str(e)}")
+            return None, None, None
+
+        gen_ai_df = pd.DataFrame(data_dict)
+
+        output_volume = len(str(generated_data)) if generated_data is not None else 0
+        prompt_volume = len(str(prompt)) if prompt is not None else 0
+
+        df_correctness_check = check_df_for_null_values(gen_ai_df)
+        return gen_ai_df, prompt_volume, output_volume, df_correctness_check
+
+    except Exception as e:
+        st.error(f"An error occurred: {str(e)}")
+        return None, None, None
+
+def extract_hyperloop_specification_with_gemini(model, time_periods):
+
+    gemini.configure(api_key=get_google_api_key())
+
+    gemini_model = gemini.GenerativeModel(model_name=model)
+    try:
+
+        prompt = (
+            f"Generate a JSON dataset for Hyperloop technology with {time_periods} parameters. "
+            "Each parameter should describe a key aspect of Hyperloop technology, such as speed, price, or capacity. "
+            "The structure should be as follows:\n\n"
+            "{\n"
+            '    "PARAMETER": ["parameter_1", "parameter_2", ..., "parameter_N"],\n'
+            '    "SPECIFICATION": ["specification_1", "specification_2", ..., "specification_N"]\n'
+            "}\n\n"
+            "Return only the JSON object with 'PARAMETER' and 'SPECIFICATION' keys, filled with corresponding values. "
+            "Do not include any additional text, explanations, or code."
+        )
+
+        response = gemini_model.generate_content([prompt])
+
+        generated_data = response.text
+        st.write(f"The {model} response: {generated_data}")
+
+        if not (generated_data.startswith("{") and generated_data.endswith("}")):
+            generated_data = "{" + generated_data + "}"
+
+        # Attempt to parse the JSON data
+        try:
+            data_dict = json.loads(generated_data)
+        except json.JSONDecodeError as e:
+            st.error(f"An error occurred while parsing the JSON data: {str(e)}")
+            return None, None, None
+
+        # Convert the dictionary into a DataFrame
+        gen_ai_df = pd.DataFrame(data_dict)
+
+        output_volume = len(str(generated_data)) if generated_data is not None else 0
+        prompt_volume = len(str(prompt)) if prompt is not None else 0
+
+        df_correctness_check = check_df_for_null_values(gen_ai_df)
+        return gen_ai_df, prompt_volume, output_volume, df_correctness_check
+
+    except Exception as e:
+        st.error(f"An error occurred: {str(e)}")
+        return None, None, None 
+
+def extract_hyperloop_specification_with_mistral(model, time_periods):
+
+    prompt = (
+        f"Generate a JSON dataset for Hyperloop technology with {time_periods} parameters. "
+        "Each parameter should describe a key aspect of Hyperloop technology, such as speed, price, or capacity. "
+        "The structure should be as follows:\n\n"
+        "{\n"
+        '    "PARAMETER": ["parameter_1", "parameter_2", ..., "parameter_N"],\n'
+        '    "SPECIFICATION": ["specification_1", "specification_2", ..., "specification_N"]\n'
+        "}\n\n"
+        "Return only the JSON object with 'PARAMETER' and 'SPECIFICATION' keys, filled with corresponding values. "
+        "Do not include any additional text, explanations, or code."
+    )
+
+    headers = {
+        "Authorization": f"Bearer {get_mistral_api_key()}",
+        "Content-Type": "application/json"
+    }
+
+    data = {
+        "model": model,
+        "messages": [
+            {
+                "role": "user",
+                "content": prompt
+            }
+        ],
+        "max_tokens": 10000,
+    }
+
+    try:
+        response = requests.post("https://api.mistral.ai/v1/chat/completions", headers=headers, json=data)
+        response.raise_for_status()
+
+        result = response.json()
+        generated_data = result["choices"][0]["message"]["content"].strip()
+     
+        st.write(f"The {model} response: {generated_data}")
+
+        if not (generated_data.startswith("{") and generated_data.endswith("}")):
+            generated_data = "{" + generated_data + "}"
+
+        # Attempt to parse the JSON data
+        try:
+            data_dict = json.loads(generated_data)
+        except json.JSONDecodeError as e:
+            st.error(f"An error occurred while parsing the JSON data: {str(e)}")
+            return None, None, None
+
+        # Convert the dictionary into a DataFrame
+        gen_ai_df = pd.DataFrame(data_dict)
+
+        output_volume = len(str(generated_data)) if generated_data is not None else 0
+        prompt_volume = len(str(prompt)) if prompt is not None else 0
+
+        df_correctness_check = check_df_for_null_values(gen_ai_df)
+        return gen_ai_df, prompt_volume, output_volume, df_correctness_check
+
+    except Exception as e:
+        st.error(f"An error occurred: {str(e)}")
+        return None, None, None
 
 def clean_json_output(insights):
     """
@@ -877,7 +1035,98 @@ def fusion_store_experiment(model, time_periods, load_data_trends):
     except Exception as e:
         st.error(f"Error inserting data into the experiment table: {str(e)}")
 
-    st.write(f"System has completed fusion store experiment for {model} number {experiment_number}. Experiment ID {experiment_id}.")
+    st.write(f"System has completed fusion store GENERATE experiment for {model} number {experiment_number}. Experiment ID {experiment_id}.")
+
+def extract_hyperloop_data_experiment(model, time_periods, load_data_trends):
+    fusion_table = "FUSION_STORE.HYPERLOOP_SPECIFICATION_FUSION"
+    staging_table = "STAGING_STORE.HYPERLOOP_SPECIFICATION_STAGING"
+    experiment_table = "ALLIANCE_STORE.EGTL_EXTRACT_DATA_EXPERIMENT"
+    experiment_number = get_record_count_for_model(model, experiment_table) + 1
+    experiment_id = get_largest_record_id(experiment_table) + 1
+    st.write(f"Starting EXTRACT DATA experiment in Fusion Store for {model} number {experiment_number}, ID {experiment_id}")
+
+    start_date = datetime.now(pytz.utc).strftime('%Y-%B-%d %H:%M:%S')
+    
+    # Initialize all variables to default values
+    errors_encountered = False
+    error_type = None
+    error_message = None
+    genai_response_time = 0
+    prompt_volume = 0
+    output_volume = 0
+    total_time = 0
+    save_data_to_snowflake_time = 0
+    df_correctness_check = 0
+
+    try:
+        start_time = time.time()
+
+        if model in ["gpt-3.5-turbo", "gpt-4"]:
+            gen_ai_df, prompt_volume, output_volume, df_correctness_check = extract_hyperloop_specification_with_openai(model, time_periods)
+        elif model == "mistral-small":
+            gen_ai_df, prompt_volume, output_volume, df_correctness_check = extract_hyperloop_specification_with_mistral(model, time_periods)
+        elif model == "gemini-1.5-flash":
+            gen_ai_df, prompt_volume, output_volume, df_correctness_check = extract_hyperloop_specification_with_gemini(model, time_periods)
+        else:
+            st.error("Selected model is not supported.")
+            return None, 0, 0
+        
+        genai_response_time = time.time() - start_time
+        
+        save_start_time = time.time()
+        st.write(gen_ai_df)
+        save_data_to_snowflake(gen_ai_df, fusion_table)
+        save_data_to_snowflake_time = time.time() - save_start_time
+        
+        total_time = time.time() - start_time
+    
+    except Exception as e:
+        errors_encountered = True
+        error_type = type(e).__name__
+        error_message = str(e)
+        st.error(f"An error occurred during the experiment: {error_message}")
+    
+    try:
+        rows_processed = get_table_row_count(fusion_table)
+    except Exception as e:
+        errors_encountered = True
+        error_type = type(e).__name__
+        error_message = str(e)
+        rows_processed = 0
+        st.error(f"Error retrieving row count: {error_message}")
+
+    fusion_transfer_start_time = time.time()
+    try:
+        transfer_data_from_source_to_target(fusion_table, staging_table)
+    except Exception as e:
+        errors_encountered = True
+        error_type = type(e).__name__
+        error_message = str(e)
+        load_to_staging_time = 0
+        st.error(f"Error transferring data from Fusion Store to Staging: {error_message}")
+    load_to_staging_time = time.time() - fusion_transfer_start_time
+    end_date = datetime.now(pytz.utc).strftime('%Y-%B-%d %H:%M:%S')
+
+    try:
+        insert_data_in_data_extract_experiment_table(experiment_id, 
+                                                    model,                                               
+                                                    start_date, 
+                                                    end_date, 
+                                                    genai_response_time, 
+                                                    save_data_to_snowflake_time,                                               
+                                                    total_time,
+                                                    rows_processed,  
+                                                    prompt_volume,    
+                                                    output_volume,
+                                                    load_to_staging_time,
+                                                    df_correctness_check,                                                                                                                                     
+                                                    errors_encountered, 
+                                                    error_type, 
+                                                    error_message)
+    except Exception as e:
+        st.error(f"Error inserting data into the experiment table: {str(e)}")
+
+    st.write(f"System has completed fusion store EXTRACT DATA experiment for {model} number {experiment_number}. Experiment ID {experiment_id}.")
 
 def run_multiple_egtl_qualitative_experiments(model, defined_scenario, number_of_experiments):
     """
@@ -941,6 +1190,44 @@ def normalize_data_for_egtl_experiment(model):
     else:
         st.error("Failed to load data from Snowflake.")
         return None, 0, input_df_size, 0
+    
+def insert_data_in_data_extract_experiment_table(id, 
+                                               model,                                               
+                                               start_date, 
+                                               end_date, 
+                                               genai_response_time, 
+                                               save_data_to_snowflake_time,                                               
+                                               total_time,
+                                               rows_processed,  
+                                               prompt_volume,    
+                                               output_volume,
+                                               load_to_staging_time,
+                                               correctness,                                                                                                                                      
+                                               errors_encountered, 
+                                               error_type, 
+                                               error_message):
+    session = None
+    sanitized_error_message = sanitize_string(error_message)
+    try:
+        session = Session.builder.configs(get_snowflake_connection_params()).create()
+        insert_query = f"""
+            INSERT INTO HPL_SYSTEM_DYNAMICS.ALLIANCE_STORE.EGTL_EXTRACT_DATA_EXPERIMENT 
+            (ID, MODEL, EXPERIMENT_START_DATE, EXPERIMENT_END_DATE, MODEL_WORK_TIME, 
+             SAVE_DATA_TO_SNOWFLAKE_TIME, EXPERIMENT_TIME_TOTAL, ROWS_PROCESSED, 
+             PROMPT_VOLUME, OUTPUT_VOLUME, LOAD_TO_STAGING_TIME, CORRECTNESS, 
+             ERROR_ENCOUNTERED, ERROR_TYPE, ERROR_MESSAGE)
+            VALUES ({id}, '{model}', '{start_date}', '{end_date}', {genai_response_time}, 
+                    {save_data_to_snowflake_time}, {total_time}, {rows_processed}, 
+                    {prompt_volume}, {output_volume}, {load_to_staging_time}, '{correctness}', 
+                    {errors_encountered}, '{error_type}', '{sanitized_error_message}')   
+        """
+        st.write(f"DEBUG: {insert_query}")
+        session.sql(insert_query).collect()
+    except Exception as e:
+        st.error(f"An error occurred while saving insights to Snowflake: {str(e)}")
+    finally:
+        if session:
+            session.close() 
 
 def insert_data_in_fusion_experiment_table(id, 
                                            model,                                               
@@ -1666,13 +1953,18 @@ def populate_hpl_sd_crs():
 
     return combined_df
 
+def view_technical_specification():
+    df = load_data_from_snowflake("ALLIANCE_STORE.HYPERLOOP_SPECIFICATION_ALLIANCE")
+    st.write("Hyperloop technical specification: ")
+    st.write(df)
+
 ##############################################################
 # HOMEPAGE CREATION
 ##############################################################
 
 def render_homepage():
     st.title("HDME")
-    st.subheader("v0.2.1-dev")
+    st.subheader("v0.2.2-dev")
     st.write("""
         Welcome to the Hyperloop Project System Dynamics Dashboard. 
         This application allows you to upload, manage, and visualize data related to various criteria 
@@ -1705,7 +1997,11 @@ def render_homepage():
     )
 
     if st.button("ANALYZE HYPERLOOP PROJECT 🧠"):
-        analyze_hyperloop_project(model, report = "insights")      
+        analyze_hyperloop_project(model, report = "insights")  
+
+    if st.button("VIEW HYPERLOOP TECHNICAL SPECIFICATION ✎"):
+        transfer_data_from_source_to_target("FUSION_STORE.HYPERLOOP_SPECIFICATION_FUSION", "STAGING_STORE.HYPERLOOP_SPECIFICATION_STAGING") 
+        view_technical_specification()            
 
 ##############################################################
 # Data upload and management page
@@ -2359,7 +2655,7 @@ def render_experiment_page():
 
     experiment_name = st.radio(
         "Select experiment:",
-        options=["EGTL_QUANTATIVE_DATA_EXPERIMENT", "EGTL_QUALITATIVE_DATA_EXPERIMENT", "FUSION_STORE_EXPERIMENT"],
+        options=["EGTL_QUANTATIVE_DATA_EXPERIMENT", "EGTL_QUALITATIVE_DATA_EXPERIMENT", "FUSION_STORE_EXPERIMENT", "DATA_EXTRACT_EXPERIMENT"],
         index=0
     )  
 
@@ -2385,7 +2681,9 @@ def render_experiment_page():
         if experiment_name == "EGTL_QUALITATIVE_DATA_EXPERIMENT":
             egtl_qualitative_data_experiment(model, defined_scenario)  
         if experiment_name == "FUSION_STORE_EXPERIMENT":
-            fusion_store_experiment(model, time_periods, load_data_trends)              
+            fusion_store_experiment(model, time_periods, load_data_trends)  
+        if experiment_name == "DATA_EXTRACT_EXPERIMENT":
+            extract_hyperloop_data_experiment(model, time_periods)                         
 
     if st.button("VIEW EGTL EXPERIMENT RESULTS 🔍"):
         if experiment_name == "EGTL_QUANTATIVE_DATA_EXPERIMENT":
@@ -2396,7 +2694,10 @@ def render_experiment_page():
             view_experiment_data(table_name, experiment_name)             
         elif experiment_name == "FUSION_STORE_EXPERIMENT":
             table_name = "ALLIANCE_STORE.EGTL_FUSION_STORE_EXPERIMENT"
-            view_experiment_data(table_name, experiment_name)                    
+            view_experiment_data(table_name, experiment_name) 
+        elif experiment_name == "DATA_EXTRACT_EXPERIMENT":
+            table_name = "ALLIANCE_STORE.EGTL_EXTRACT_DATA_EXPERIMENT"
+            view_experiment_data(table_name, experiment_name)                               
 
     if st.button("APPLY EXPLORATIVE ANALYSIS TO ETL USING GEN AI 🧩"):
         cleaned_df = normalize_cr_scl_data(model)            
