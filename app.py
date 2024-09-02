@@ -1089,7 +1089,7 @@ def extract_hyperloop_data_experiment(model, time_periods, content_type):
     experiment_table = "ALLIANCE_STORE.EGTL_EXTRACT_DATA_EXPERIMENT"
     experiment_number = get_record_count_for_model(model, experiment_table) + 1
     experiment_id = get_largest_record_id(experiment_table) + 1
-    st.write(f"Starting EXTRACT DATA experiment in Fusion Store for {model} number {experiment_number}, ID {experiment_id}, type {content_type}.")
+    st.write(f"Starting EXTRACT DATA experiment in Fusion Store for {model} number {experiment_number}, ID {experiment_id}, type: {content_type}.")
 
     start_date = datetime.now(pytz.utc).strftime('%Y-%B-%d %H:%M:%S')
     
@@ -1508,6 +1508,26 @@ def transfer_data_from_source_to_target(source_table, target_table):
     finally:
         if session:
             session.close()
+
+def transfer_data_from_source_to_target_with_truncate(source_table, target_table):
+    session = Session.builder.configs(get_snowflake_connection_params()).create()
+
+    try:
+        truncate_query = f"""
+            TRUNCATE TABLE IF EXISTS {target_table}
+        """
+        insert_query = f"""
+            INSERT INTO {target_table} SELECT * FROM {source_table}
+        """
+        session.sql(truncate_query).collect()
+        session.sql(insert_query).collect()
+        print(f"Successfully transferred data from {source_table} to {target_table}.")
+
+    except Exception as e:
+        print(f"An error occurred: {str(e)}")
+    finally:
+        if session:
+            session.close()            
 
 def fusion_to_staging_migration(source_table, dest_table):
     
@@ -2057,8 +2077,8 @@ def render_homepage():
         view_advancements()                 
 
     if st.button("VIEW HYPERLOOP TECHNICAL SPECIFICATION ✎"):
-        transfer_data_from_source_to_target("STAGING_STORE.HYPERLOOP_SPECIFICATION_STAGING", "ALLIANCE_STORE.HYPERLOOP_SPECIFICATION_ALLIANCE") 
-        view_technical_specification()    
+        st.session_state['page'] = 'advancements'
+        # view_technical_specification()    
 
 ##############################################################
 # Data upload and management page
@@ -2784,6 +2804,44 @@ def render_experiment_page():
         st.session_state['page'] = 'home' 
 
 #######################################
+# ADVANCEMENTS PAGE
+#######################################
+
+def get_hyperloop_advancements_for_page():
+    session = Session.builder.configs(get_snowflake_connection_params()).create()
+    transfer_data_from_source_to_target_with_truncate("STAGING_STORE.HYPERLOOP_SPECIFICATION_STAGING", "ALLIANCE_STORE.HYPERLOOP_SPECIFICATION_ALLIANCE") 
+    try:
+        query = """
+            SELECT ACTUALITY, RELATED_HYPERLOOP_VENDOR, ADVANCEMENT
+            FROM ALLIANCE_STORE.HYPERLOOP_ADVANCEMENTS_ALLIANCE
+            ORDER BY ACTUALITY DESC
+        """
+        result_df = session.sql(query).collect()
+        return result_df
+    except Exception as e:
+        print(f"An error occurred: {str(e)}")
+    finally:
+        if session:
+            session.close()
+
+def render_hyperloop_advancements():
+    st.title("Hyperloop Technology Advancements ⚛️")
+
+    advancements = get_hyperloop_advancements_for_page()
+    
+    if advancements:
+        for row in advancements:
+            st.write(f"**Date:** {row['ACTUALITY']}")
+            st.write(f"**Vendor:** {row['RELATED_HYPERLOOP_VENDOR']}")
+            st.write(f"**Advancement:** {row['ADVANCEMENT']}")
+            st.markdown("---")
+    else:
+        st.write("No advancements found.")
+
+    if st.button("⬅️ BACK"):
+        st.session_state['page'] = 'home' 
+
+#######################################
 # UTILITY PAGE
 #######################################             
 
@@ -2815,5 +2873,7 @@ elif st.session_state['page'] == 'scenarious':
     render_scenarios_simulation_page()
 elif st.session_state['page'] == 'experiment':
     render_experiment_page()    
+elif st.session_state['page'] == 'advancements':
+    render_hyperloop_advancements()       
 elif st.session_state['page'] == 'utility':
     render_utility_page()    
