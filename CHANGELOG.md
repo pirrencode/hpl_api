@@ -1,5 +1,13 @@
 # Hyperloop decision making ecosystem changelog
 
+## v0.2.2-dev
+
+- Implemented data extraction experiment for technical specification (Fusion).
+- Implemented data extraction experiment for advancements (Fusion).
+- Added data extraction experiments tables' SQL queries.
+- Added page for viewing all advancements.
+- UI update.
+
 ## v0.2.1-dev
 
 - Updated Fusion experiment logic.
