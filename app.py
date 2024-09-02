@@ -1037,7 +1037,7 @@ def fusion_store_experiment(model, time_periods, load_data_trends):
 
     st.write(f"System has completed fusion store GENERATE experiment for {model} number {experiment_number}. Experiment ID {experiment_id}.")
 
-def extract_hyperloop_data_experiment(model, time_periods, load_data_trends):
+def extract_hyperloop_data_experiment(model, time_periods):
     fusion_table = "FUSION_STORE.HYPERLOOP_SPECIFICATION_FUSION"
     staging_table = "STAGING_STORE.HYPERLOOP_SPECIFICATION_STAGING"
     experiment_table = "ALLIANCE_STORE.EGTL_EXTRACT_DATA_EXPERIMENT"
