@@ -971,7 +971,7 @@ def insert_data_in_quantative_experiment_table(id,
              SAVE_DATA_TO_SNOWFLAKE_TIME, EXPERIMENT_TIME_TOTAL, ROWS_PROCESSED, 
              INPUT_DF_VOLUME, PROMPT_VOLUME, OUTPUT_VOLUME, OUTPUT_DF_VOLUME, 
              CORRECTNESS, ERROR_ENCOUNTERED, ERROR_TYPE, ERROR_MESSAGE)
-            VALUES ('{id}', '{model}', '{start_date}', '{end_date}', {genai_response_time}, 
+            VALUES ({id}, '{model}', '{start_date}', '{end_date}', {genai_response_time}, 
                     {save_data_to_snowflake_time}, {total_time}, {rows_processed}, 
                     {input_df_size}, {prompt_volume}, {output_volume}, {normalized_df_volume}, 
                     '{correctness}', {errors_encountered}, '{error_type}', '{error_message}')   
