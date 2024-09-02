@@ -1083,9 +1083,11 @@ def extract_hyperloop_data_experiment(model, time_periods, content_type):
     if content_type == "hyperloop_specifications":
         fusion_table = "FUSION_STORE.HYPERLOOP_SPECIFICATION_FUSION"
         staging_table = "STAGING_STORE.HYPERLOOP_SPECIFICATION_STAGING"
+        alliance_table = "ALLIANCE_STORE.HYPERLOOP_SPECIFICATION_ALLIANCE"
     elif content_type == "advancements":
         fusion_table = "FUSION_STORE.HYPERLOOP_ADVANCEMENTS_FUSION"
         staging_table = "STAGING_STORE.HYPERLOOP_ADVANCEMENTS_STAGING"
+        alliance_table = "ALLIANCE_STORE.HYPERLOOP_ADVANCEMENTS_ALLIANCE"
     experiment_table = "ALLIANCE_STORE.EGTL_EXTRACT_DATA_EXPERIMENT"
     experiment_number = get_record_count_for_model(model, experiment_table) + 1
     experiment_id = get_largest_record_id(experiment_table) + 1
@@ -1143,7 +1145,12 @@ def extract_hyperloop_data_experiment(model, time_periods, content_type):
 
     fusion_transfer_start_time = time.time()
     try:
-        transfer_data_from_source_to_target(fusion_table, staging_table)
+        if content_type == "hyperloop_specifications":
+            transfer_data_from_source_to_target_with_truncate(fusion_table, staging_table)
+            transfer_data_from_source_to_target_with_truncate(staging_table, alliance_table)
+        elif content_type == "advancements":
+            transfer_data_from_source_to_target(fusion_table, staging_table)
+            transfer_data_from_source_to_target(staging_table, alliance_table)                
     except Exception as e:
         errors_encountered = True
         error_type = type(e).__name__
@@ -2073,12 +2080,10 @@ def render_homepage():
         analyze_hyperloop_project(model, report = "insights")  
 
     if st.button("LATEST HYPERLOOP ADVANCEMENTS ✎"):
-        transfer_data_from_source_to_target("STAGING_STORE.HYPERLOOP_ADVANCEMENTS_STAGING", "ALLIANCE_STORE.HYPERLOOP_ADVANCEMENTS_ALLIANCE") 
-        view_advancements()                 
+        st.session_state['page'] = 'advancements'
 
     if st.button("VIEW HYPERLOOP TECHNICAL SPECIFICATION ✎"):
-        st.session_state['page'] = 'advancements'
-        # view_technical_specification()    
+        view_technical_specification()          
 
 ##############################################################
 # Data upload and management page
@@ -2809,7 +2814,6 @@ def render_experiment_page():
 
 def get_hyperloop_advancements_for_page():
     session = Session.builder.configs(get_snowflake_connection_params()).create()
-    transfer_data_from_source_to_target_with_truncate("STAGING_STORE.HYPERLOOP_SPECIFICATION_STAGING", "ALLIANCE_STORE.HYPERLOOP_SPECIFICATION_ALLIANCE") 
     try:
         query = """
             SELECT ACTUALITY, RELATED_HYPERLOOP_VENDOR, ADVANCEMENT
