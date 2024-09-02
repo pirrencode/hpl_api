@@ -621,6 +621,7 @@ def egtl_quantative_data_experiment(model):
         
         try:
             normalized_data, genai_response_time, input_df_size, prompt_volume, output_volume, df_correctness_check, normalized_data_volume = normalize_data_for_egtl_experiment(model)
+            genai_response_time = time.time() - start_time
         except Exception as e:
             errors_encountered = True
             error_type = type(e).__name__
