@@ -279,16 +279,16 @@ def clean_data_with_openai(df, model):
 def generate_data_with_openai(model, time_periods, load_data_trends):
 
     prompt = (
-            "Generate a dataset in JSON format with the following structure:\n\n"
-            "{\n"
-            f'    "TIME": [1, 2, 3, ..., {time_periods}],\n'
-            '    "CR_SCL": [<float>, <float>, <float>, ..., <float>]\n'
-            "}\n\n"
-            "Where:\n"
-            f'- \"TIME\" must be populated as a sequence of integers from 1 to {time_periods}.\n'
-            f'- \"CR_SCL\" must be populated with {time_periods} random floating-point numbers between 0 and 100, following a {load_data_trends} trend (i.e., the values generally increase if load_data_trends == upward else decrease over time).\n'
-            '- The \"TIME\" and \"CR_SCL\" lists must have exactly the same number of elements, and the lengths must be verified before returning the JSON object.\n\n'
-            'Return only the JSON object with both \"TIME\" and \"CR_SCL\" keys and their respective lists of values, ensuring they are of equal length. Do not include any additional text, explanations, or code in the response.'
+        "Generate a dataset in JSON format with the following structure:\n\n"
+        "{\n"
+        f'    "TIME": [1, 2, 3, ..., {time_periods}],\n'
+        '    "CR_SCL": [<float>, <float>, <float>, ..., <float>]\n'
+        "}\n\n"
+        "Where:\n"
+        f'- \"TIME\" must be populated as a sequence of integers from 1 to {time_periods}.\n'
+        f'- \"CR_SCL\" must be populated with random numbers in a range between 0 and 100, showing a {load_data_trends} trend (i.e., the values generally change over time correspondingly).\n'
+        ' - \"TIME\" and \"CR_SCL\ must have equal amount of items.\n\n'
+        'Return only the JSON object with both \"TIME\" and \"CR_SCL\" keys and their respective lists of values, and do not include any additional text, explanations, or code in the response.'
     )
 
     openai.api_key = get_openai_api_key()
@@ -382,9 +382,9 @@ def generate_data_with_gemini(model, time_periods, load_data_trends):
             "}\n\n"
             "Where:\n"
             f'- \"TIME\" must be populated as a sequence of integers from 1 to {time_periods}.\n'
-            f'- \"CR_SCL\" must be populated with {time_periods} random floating-point numbers between 0 and 100, following a {load_data_trends} trend (i.e., the values generally increase if load_data_trends == upward else decrease over time).\n'
-            '- The \"TIME\" and \"CR_SCL\" lists must have exactly the same number of elements, and the lengths must be verified before returning the JSON object.\n\n'
-            'Return only the JSON object with both \"TIME\" and \"CR_SCL\" keys and their respective lists of values, ensuring they are of equal length. Do not include any additional text, explanations, or code in the response.'
+            f'- \"CR_SCL\" must be populated with random numbers in a range between 0 and 100, showing a {load_data_trends} trend (i.e., the values generally change over time correspondingly).\n'
+            ' - \"TIME\" and \"CR_SCL\ must have equal amount of items.\n\n'
+            'Return only the JSON object with both \"TIME\" and \"CR_SCL\" keys and their respective lists of values, and do not include any additional text, explanations, or code in the response.'
         )
 
 
@@ -473,16 +473,16 @@ def clean_data_with_mistral(df, model):
 def generate_data_with_mistral(model, time_periods, load_data_trends):
 
     prompt = (
-            "Generate a dataset in JSON format with the following structure:\n\n"
-            "{\n"
-            f'    "TIME": [1, 2, 3, ..., {time_periods}],\n'
-            '    "CR_SCL": [<float>, <float>, <float>, ..., <float>]\n'
-            "}\n\n"
-            "Where:\n"
-            f'- \"TIME\" must be populated as a sequence of integers from 1 to {time_periods}.\n'
-            f'- \"CR_SCL\" must be populated with {time_periods} random floating-point numbers between 0 and 100, following a {load_data_trends} trend (i.e., the values generally increase if load_data_trends == upward else decrease over time).\n'
-            '- The \"TIME\" and \"CR_SCL\" lists must have exactly the same number of elements, and the lengths must be verified before returning the JSON object.\n\n'
-            'Return only the JSON object with both \"TIME\" and \"CR_SCL\" keys and their respective lists of values, ensuring they are of equal length. Do not include any additional text, explanations, or code in the response.'
+        "Generate a dataset in JSON format with the following structure:\n\n"
+        "{\n"
+        f'    "TIME": [1, 2, 3, ..., {time_periods}],\n'
+        '    "CR_SCL": [<float>, <float>, <float>, ..., <float>]\n'
+        "}\n\n"
+        "Where:\n"
+        f'- \"TIME\" must be populated as a sequence of integers from 1 to {time_periods}.\n'
+        f'- \"CR_SCL\" must be populated with random numbers in a range between 0 and 100, showing a {load_data_trends} trend (i.e., the values generally change over time correspondingly).\n'
+        ' - \"TIME\" and \"CR_SCL\ must have equal amount of items.\n\n'
+        'Return only the JSON object with both \"TIME\" and \"CR_SCL\" keys and their respective lists of values, and do not include any additional text, explanations, or code in the response.'
     )
 
     headers = {
