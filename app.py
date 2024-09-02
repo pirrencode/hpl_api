@@ -2323,8 +2323,6 @@ def render_experiment_page():
             egtl_quantative_data_experiment(model)
         if experiment_name == "EGTL_QUALITATIVE_DATA_EXPERIMENT":
             egtl_qualitative_data_experiment(model, defined_scenario)            
-        else:
-            st.write("No experiment to conduct.") 
 
     if st.button("RUN EGTL EXPERIMENT FOR FUSION STORE ⚛"):
         fusion_store_experiment(model, time_periods, load_data_trends)                   
