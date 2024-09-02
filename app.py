@@ -286,7 +286,7 @@ def generate_data_with_openai(model, time_periods, load_data_trends):
             "}\n\n"
             "Where:\n"
             f'- \"TIME\" must be populated as a sequence of integers from 1 to {time_periods}.\n'
-            f'- \"CR_SCL\" must be populated with {time_periods} random floating-point numbers between 0 and 100, following a {load_data_trends} trend (i.e., the values generally {'increase' if load_data_trends == 'upward' else 'decrease'} over time).\n'
+            f'- \"CR_SCL\" must be populated with {time_periods} random floating-point numbers between 0 and 100, following a {load_data_trends} trend (i.e., the values generally increase if load_data_trends == upward else decrease over time).\n'
             '- The \"TIME\" and \"CR_SCL\" lists must have exactly the same number of elements, and the lengths must be verified before returning the JSON object.\n\n'
             'Return only the JSON object with both \"TIME\" and \"CR_SCL\" keys and their respective lists of values, ensuring they are of equal length. Do not include any additional text, explanations, or code in the response.'
     )
@@ -382,7 +382,7 @@ def generate_data_with_gemini(model, time_periods, load_data_trends):
             "}\n\n"
             "Where:\n"
             f'- \"TIME\" must be populated as a sequence of integers from 1 to {time_periods}.\n'
-            f'- \"CR_SCL\" must be populated with {time_periods} random floating-point numbers between 0 and 100, following a {load_data_trends} trend (i.e., the values generally {'increase' if load_data_trends == 'upward' else 'decrease'} over time).\n'
+            f'- \"CR_SCL\" must be populated with {time_periods} random floating-point numbers between 0 and 100, following a {load_data_trends} trend (i.e., the values generally increase if load_data_trends == upward else decrease over time).\n'
             '- The \"TIME\" and \"CR_SCL\" lists must have exactly the same number of elements, and the lengths must be verified before returning the JSON object.\n\n'
             'Return only the JSON object with both \"TIME\" and \"CR_SCL\" keys and their respective lists of values, ensuring they are of equal length. Do not include any additional text, explanations, or code in the response.'
         )
@@ -480,7 +480,7 @@ def generate_data_with_mistral(model, time_periods, load_data_trends):
             "}\n\n"
             "Where:\n"
             f'- \"TIME\" must be populated as a sequence of integers from 1 to {time_periods}.\n'
-            f'- \"CR_SCL\" must be populated with {time_periods} random floating-point numbers between 0 and 100, following a {load_data_trends} trend (i.e., the values generally {'increase' if load_data_trends == 'upward' else 'decrease'} over time).\n'
+            f'- \"CR_SCL\" must be populated with {time_periods} random floating-point numbers between 0 and 100, following a {load_data_trends} trend (i.e., the values generally increase if load_data_trends == upward else decrease over time).\n'
             '- The \"TIME\" and \"CR_SCL\" lists must have exactly the same number of elements, and the lengths must be verified before returning the JSON object.\n\n'
             'Return only the JSON object with both \"TIME\" and \"CR_SCL\" keys and their respective lists of values, ensuring they are of equal length. Do not include any additional text, explanations, or code in the response.'
     )
