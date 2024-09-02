@@ -791,10 +791,18 @@ def fusion_store_experiment(model, time_periods, load_data_trends):
 
     start_date = datetime.now(pytz.utc).strftime('%Y-%B-%d %H:%M:%S')
     
+    # Initialize all variables to default values
     errors_encountered = False
     error_type = None
     error_message = None
-    df_correctness_check = 0  # Initialize df_correctness_check
+    df_correctness_check = 0  
+    genai_response_time = 0
+    prompt_volume = 0
+    output_volume = 0
+    total_time = 0
+    normalized_data_volume = 0
+    save_data_to_snowflake_time = 0
+    load_to_staging_time = 0
 
     try:
         start_time = time.time()
@@ -809,6 +817,8 @@ def fusion_store_experiment(model, time_periods, load_data_trends):
             st.error("Selected model is not supported.")
             return None, 0, 0
         
+        genai_response_time = time.time() - start_time
+        
         save_start_time = time.time()
         st.write(gen_ai_df)
         save_data_to_snowflake(gen_ai_df, fusion_table)
@@ -820,12 +830,6 @@ def fusion_store_experiment(model, time_periods, load_data_trends):
         errors_encountered = True
         error_type = type(e).__name__
         error_message = str(e)
-        genai_response_time = 0
-        prompt_volume = 0
-        output_volume = 0
-        total_time = 0
-        normalized_data_volume = 0
-        save_data_to_snowflake_time = 0
         st.error(f"An error occurred during the experiment: {error_message}")
     
     end_date = datetime.now(pytz.utc).strftime('%Y-%B-%d %H:%M:%S')
@@ -937,9 +941,8 @@ def insert_data_in_fusion_experiment_table(id,
             VALUES ({id}, '{model}', '{start_date}', '{end_date}', {genai_response_time}, 
                     {save_data_to_snowflake_time}, {total_time}, {rows_processed}, 
                     {prompt_volume}, {output_volume}, {normalized_df_volume}, {load_to_staging_time}, 
-                    '{correctness}', {errors_encountered}, '{error_type}', '{sanitized_error_message}')   
+                    '{correctness}', {errors_encountered}, '{error_type}', '{sanitized_error_message}')
         """
-        # st.write(f"DEBUG: {insert_query}")
         session.sql(insert_query).collect()
     except Exception as e:
         st.error(f"An error occurred while saving insights to Snowflake: {str(e)}")
