@@ -613,6 +613,8 @@ def egtl_quantative_data_experiment(model):
     normalized_data_volume = 0
     save_data_to_snowflake_time = 0
     correctness = 0
+    normalized_data = None
+    input_df_size = 0    
 
     try:
         start_time = time.time()
@@ -2336,9 +2338,7 @@ def render_experiment_page():
             view_experiment_data(table_name, experiment_name)             
         elif experiment_name == "FUSION_STORE_EXPERIMENT":
             table_name = "ALLIANCE_STORE.EGTL_FUSION_STORE_EXPERIMENT"
-            view_experiment_data(table_name, experiment_name)             
-        else:
-            st.write("No experiment is selected to view.")          
+            view_experiment_data(table_name, experiment_name)                      
 
     if st.button("APPLY EXPLORATIVE ANALYSIS TO ETL USING GEN AI 🧩"):
         cleaned_df = normalize_cr_scl_data(model)            
