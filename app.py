@@ -1207,7 +1207,21 @@ def run_multiple_fusion_store_experiments(model, time_periods, load_data_trends,
     """
     for i in range(number_of_experiments):
         fusion_store_experiment(model, time_periods, load_data_trends)
-        st.write(f"Streamline has processed task N {i+1} of {number_of_experiments}.")      
+        st.write(f"Streamline has processed task N {i+1} of {number_of_experiments}.") 
+
+def run_multiple_data_extract_experiments(model, time_periods, content_type, number_of_experiments):
+    """
+    Executes the fusion_store_experiment function 'number_of_experiments' times in a row.
+    
+    Parameters:
+    model (str): The model to be used in the experiment.
+    time_periods (list): List of time periods for the experiment.
+    content_type (str): Content scenario.
+    number_of_experiments (int): The number of times to run the experiment.
+    """
+    for i in range(number_of_experiments):
+        extract_hyperloop_data_experiment(model, time_periods, content_type)
+        st.write(f"Streamline has processed task N {i+1} of {number_of_experiments}.")              
 
 def normalize_data_for_egtl_experiment(model):
     df = load_data_from_snowflake("STAGING_STORE.CALC_CR_SCL_STAGING")
@@ -2785,7 +2799,10 @@ def render_experiment_page():
             view_experiment_data(table_name, experiment_name) 
         elif experiment_name == "DATA_EXTRACT_EXPERIMENT_FOR_SPECIFICATIONS":
             table_name = "ALLIANCE_STORE.EGTL_EXTRACT_DATA_EXPERIMENT"
-            view_experiment_data(table_name, experiment_name)                               
+            view_experiment_data(table_name, experiment_name)   
+        elif experiment_name == "DATA_EXTRACT_EXPERIMENT_FOR_ADVANCEMENTS":
+            table_name = "ALLIANCE_STORE.EGTL_EXTRACT_DATA_EXPERIMENT"
+            view_experiment_data(table_name, experiment_name)                                          
 
     if st.button("APPLY EXPLORATIVE ANALYSIS TO ETL USING GEN AI 🧩"):
         cleaned_df = normalize_cr_scl_data(model)            
@@ -2803,7 +2820,13 @@ def render_experiment_page():
         if experiment_name == "EGTL_QUALITATIVE_DATA_EXPERIMENT":
             run_multiple_egtl_qualitative_experiments(model, defined_scenario, number_of_experiments)           
         elif experiment_name == "FUSION_STORE_EXPERIMENT":
-            run_multiple_fusion_store_experiments(model, time_periods, load_data_trends, number_of_experiments)                                                                  
+            run_multiple_fusion_store_experiments(model, time_periods, load_data_trends, number_of_experiments) 
+        elif experiment_name == "DATA_EXTRACT_EXPERIMENT_FOR_SPECIFICATIONS":
+            content_type="hyperloop_specifications"
+            run_multiple_data_extract_experiments(model, time_periods, content_type, number_of_experiments)
+        elif experiment_name == "DATA_EXTRACT_EXPERIMENT_FOR_ADVANCEMENTS":
+            content_type="advancements"
+            run_multiple_data_extract_experiments(model, time_periods, content_type, number_of_experiments)                                                                                         
 
     if st.button("⬅️ BACK"):
         st.session_state['page'] = 'home' 
