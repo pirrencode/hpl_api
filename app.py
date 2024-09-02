@@ -2309,24 +2309,14 @@ def render_experiment_page():
     )   
 
     defined_scenario = st.radio(
-        "Select scenario that was simulated:",
+        "Select scenario data loaded in database on which QUALITATIVE DATA experiment will be running:",
         options=["PROJECT RAPID DECLINE", "PROJECT DECLINE OVER TIME", "PROJECT SUSTAINABLE GROWTH", "PROJECT RAPID GROWTH"],
         index=0
-    )             
+    )          
  
     if st.button("GENERATE DIRTY DATA FOR SCALABILITY 🧪"):
         raw_df = populate_calc_cr_scl_staging(time_periods)              
         save_data_to_snowflake(raw_df, "STAGING_STORE.CALC_CR_SCL_STAGING")
-
-    if st.button("APPLY EXPLORATIVE ANALYSIS TO ETL USING GEN AI 🧩"):
-        cleaned_df = normalize_cr_scl_data(model)            
-        save_data_to_snowflake(cleaned_df, "STAGING_STORE.CALC_CR_SCL_STAGING")
-
-    if st.button("REPORT HYPERLOOP PROJECT STATUS 🧑‍🔬"):
-        cleaned_df = analyze_hyperloop_project(model, report="status")      
-
-    if st.button("SHOW HYPERLOOP PROJECT STATUS 🔍"):
-        cleaned_df = view_hyperloop_project_status()   
 
     if st.button("RUN EGTL EXPERIMENT 🥽"):
         if experiment_name == "EGTL_QUANTATIVE_DATA_EXPERIMENT":
@@ -2350,7 +2340,17 @@ def render_experiment_page():
             table_name = "ALLIANCE_STORE.EGTL_FUSION_STORE_EXPERIMENT"
             view_experiment_data(table_name, experiment_name)             
         else:
-            st.write("No experiment is selected to view.")                                                       
+            st.write("No experiment is selected to view.")          
+
+    if st.button("APPLY EXPLORATIVE ANALYSIS TO ETL USING GEN AI 🧩"):
+        cleaned_df = normalize_cr_scl_data(model)            
+        save_data_to_snowflake(cleaned_df, "STAGING_STORE.CALC_CR_SCL_STAGING")
+
+    if st.button("REPORT HYPERLOOP PROJECT STATUS 🧑‍🔬"):
+        cleaned_df = analyze_hyperloop_project(model, report="status")      
+
+    if st.button("SHOW HYPERLOOP PROJECT STATUS 🔍"):
+        cleaned_df = view_hyperloop_project_status()                                                        
 
     if st.button("⬅️ BACK"):
         st.session_state['page'] = 'home' 
