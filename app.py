@@ -286,7 +286,8 @@ def generate_data_with_openai(model, time_periods, load_data_trends):
         "}\n\n"
         "Where:\n"
         f'- \"TIME\" must be populated as a sequence of integers from 1 to {time_periods}.\n'
-        f'- \"CR_SCL\" must be populated with random numbers in a range between 0 and 100, showing a {load_data_trends} trend (i.e., the values generally increase over time).\n\n'
+        f'- \"CR_SCL\" must be populated with random numbers in a range between 0 and 100, showing a {load_data_trends} trend (i.e., the values generally increase over time).\n'
+        ' - \"TIME\" and \"CR_SCL\ must have equal amount of items.\n\n'
         'Return only the JSON object with both \"TIME\" and \"CR_SCL\" keys and their respective lists of values, and do not include any additional text, explanations, or code in the response.'
     )
 
@@ -381,7 +382,8 @@ def generate_data_with_gemini(model, time_periods, load_data_trends):
             "}\n\n"
             "Where:\n"
             f'- \"TIME\" must be populated as a sequence of integers from 1 to {time_periods}.\n'
-            f'- \"CR_SCL\" must be populated with random numbers in a range between 0 and 100, showing a {load_data_trends} trend (i.e., the values generally increase over time).\n\n'
+            f'- \"CR_SCL\" must be populated with random numbers in a range between 0 and 100, showing a {load_data_trends} trend (i.e., the values generally increase over time).\n'
+            ' - \"TIME\" and \"CR_SCL\ must have equal amount of items.\n\n'
             'Return only the JSON object with both \"TIME\" and \"CR_SCL\" keys and their respective lists of values, and do not include any additional text, explanations, or code in the response.'
         )
 
@@ -478,7 +480,8 @@ def generate_data_with_mistral(model, time_periods, load_data_trends):
         "}\n\n"
         "Where:\n"
         f'- \"TIME\" must be populated as a sequence of integers from 1 to {time_periods}.\n'
-        f'- \"CR_SCL\" must be populated with random numbers in a range between 0 and 100, showing a {load_data_trends} trend (i.e., the values generally increase over time).\n\n'
+        f'- \"CR_SCL\" must be populated with random numbers in a range between 0 and 100, showing a {load_data_trends} trend (i.e., the values generally increase over time).\n'
+        ' - \"TIME\" and \"CR_SCL\ must have equal amount of items.\n\n'
         'Return only the JSON object with both \"TIME\" and \"CR_SCL\" keys and their respective lists of values, and do not include any additional text, explanations, or code in the response.'
     )
 
@@ -833,8 +836,6 @@ def fusion_store_experiment(model, time_periods, load_data_trends):
         error_message = str(e)
         st.error(f"An error occurred during the experiment: {error_message}")
     
-    end_date = datetime.now(pytz.utc).strftime('%Y-%B-%d %H:%M:%S')
-    
     try:
         rows_processed = get_table_row_count(fusion_table)
     except Exception as e:
@@ -847,13 +848,14 @@ def fusion_store_experiment(model, time_periods, load_data_trends):
     fusion_transfer_start_time = time.time()
     try:
         transfer_data_from_source_to_target(fusion_table, staging_table)
-        load_to_staging_time = time.time() - fusion_transfer_start_time
     except Exception as e:
         errors_encountered = True
         error_type = type(e).__name__
         error_message = str(e)
         load_to_staging_time = 0
         st.error(f"Error transferring data from Fusion Store to Staging: {error_message}")
+    load_to_staging_time = time.time() - fusion_transfer_start_time
+    end_date = datetime.now(pytz.utc).strftime('%Y-%B-%d %H:%M:%S')
 
     try:
         insert_data_in_fusion_experiment_table(experiment_id, 
@@ -888,7 +890,7 @@ def run_multiple_egtl_qualitative_experiments(model, defined_scenario, number_of
     """
     for i in range(number_of_experiments):
         egtl_qualitative_data_experiment(model, defined_scenario)
-        st.write(f"Batch processed experiment N {i+1} of {number_of_experiments}.")   
+        st.write(f"Streamline has processed task N {i+1} of {number_of_experiments}.")   
 
 def run_multiple_fusion_store_experiments(model, time_periods, load_data_trends, number_of_experiments):
     """
@@ -902,7 +904,7 @@ def run_multiple_fusion_store_experiments(model, time_periods, load_data_trends,
     """
     for i in range(number_of_experiments):
         fusion_store_experiment(model, time_periods, load_data_trends)
-        st.write(f"Batch processed experiment N {i+1} of {number_of_experiments}.")      
+        st.write(f"Streamline has processed task N {i+1} of {number_of_experiments}.")      
 
 def normalize_data_for_egtl_experiment(model):
     df = load_data_from_snowflake("STAGING_STORE.CALC_CR_SCL_STAGING")
@@ -2346,7 +2348,7 @@ def render_experiment_page():
     time_period_raw = st.text_input('Time period:', value='100')
     time_periods = int(time_period_raw)   
 
-    number_of_experiments_raw = st.text_input('Number of experiments for batch processing:', value='1')
+    number_of_experiments_raw = st.text_input('Number of experiments for stream processing:', value='1')
     number_of_experiments = int(number_of_experiments_raw)       
 
     model = st.radio(
@@ -2407,9 +2409,9 @@ def render_experiment_page():
     if st.button("SHOW HYPERLOOP PROJECT STATUS 🔍"):
         cleaned_df = view_hyperloop_project_status()       
 
-    if st.button("BATCH PROCESS CHOSEN EXPERIMENT"):
+    if st.button("STREAM TASK PROCESSING FOR CHOSEN EXPERIMENT"):
         if experiment_name == "EGTL_QUANTATIVE_DATA_EXPERIMENT":
-            st.write("Feature disabled for quantative experiment") 
+            st.write("Feature disabled for quantative experiment.") 
         if experiment_name == "EGTL_QUALITATIVE_DATA_EXPERIMENT":
             run_multiple_egtl_qualitative_experiments(model, defined_scenario, number_of_experiments)           
         elif experiment_name == "FUSION_STORE_EXPERIMENT":
