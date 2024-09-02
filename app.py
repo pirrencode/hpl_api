@@ -1209,7 +1209,6 @@ def backup_table_script(source_table, backup_table):
             session.close()
 
 def backup_fusion_store():
-    # List of tables in the FUSION_STORE schema
     tables = [
         "CR_ECV_SOURCE",
         "CR_ENV_SOURCE",
@@ -1221,7 +1220,8 @@ def backup_fusion_store():
         "CR_SCL_SOURCE",
         "CR_SFY_SOURCE",
         "CR_TFE_SOURCE",
-        "CR_USB_SOURCE"
+        "CR_USB_SOURCE",
+        "CALC_CR_SCL_FUSION"
     ]
     
     progress_bar = st.progress(0)
@@ -1238,7 +1238,6 @@ def backup_fusion_store():
     st.write(f"Backup for Fusion store is completed")        
 
 def backup_staging_store():
-    
     tables = [
         "CALC_CR_ECV_STAGING",
         "CALC_CR_ENV_STAGING",
@@ -1278,10 +1277,12 @@ def backup_staging_store():
     st.write(f"Backup for Staging store is completed")                 
 
 def backup_alliance_store():
-    
     tables = [
         "HPL_SD_CRS_ALLIANCE",
-        "PROJECT_STATUS"
+        "PROJECT_STATUS",
+        "EGTL_QUANTATIVE_DATA_EXPERIMENT",
+        "EGTL_QUALITATIVE_DATA_EXPERIMENT",
+        "EGTL_FUSION_STORE_EXPERIMENT"
     ]
 
     progress_bar = st.progress(0)
@@ -1613,7 +1614,7 @@ def populate_hpl_sd_crs():
 
 def render_homepage():
     st.title("HDME")
-    st.subheader("v0.2.0-dev")
+    st.subheader("v0.2.1-dev")
     st.write("""
         Welcome to the Hyperloop Project System Dynamics Dashboard. 
         This application allows you to upload, manage, and visualize data related to various criteria 
