@@ -621,6 +621,7 @@ def egtl_quantative_data_experiment(model):
         
         try:
             normalized_data, genai_response_time, input_df_size, prompt_volume, output_volume, df_correctness_check, normalized_data_volume = normalize_data_for_egtl_experiment(model)
+            genai_response_time = time.time() - start_time
         except Exception as e:
             errors_encountered = True
             error_type = type(e).__name__
@@ -706,7 +707,7 @@ def egtl_qualitative_data_experiment(model, defined_scenario):
     insights = None
 
     try:
-        start_time = time.time()
+        start_total_time = time.time()
         
         try:
             if model in ["gpt-3.5-turbo", "gpt-4"]:
@@ -715,9 +716,9 @@ def egtl_qualitative_data_experiment(model, defined_scenario):
                 insights, prompt_volume, output_volume = get_insights_using_mistral(df_summary, model, report)
             elif model == "gemini-1.5-flash":
                 insights, prompt_volume, output_volume = get_insights_using_gemini(df_summary, model, report)
-            else:
-                st.error("Selected model is not supported.")
-                return None, 0, 0
+            
+            genai_response_time = time.time() - start_total_time
+            
         except Exception as e:
             errors_encountered = True
             error_type = type(e).__name__
@@ -735,7 +736,7 @@ def egtl_qualitative_data_experiment(model, defined_scenario):
             error_message = str(e)
             st.error(f"Error saving data to Snowflake: {error_message}")
 
-        total_time = time.time() - start_time
+        total_time = time.time() - start_total_time
     
     except Exception as e:
         errors_encountered = True
