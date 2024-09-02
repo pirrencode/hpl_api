@@ -287,7 +287,7 @@ def generate_data_with_openai(model, time_periods, load_data_trends):
         "Where:\n"
         f'- \"TIME\" must be populated as a sequence of integers from 1 to {time_periods}.\n'
         f'- \"CR_SCL\" must be populated with random numbers in a range between 0 and 100, showing a {load_data_trends} trend (i.e., the values generally increase over time).\n'
-        ' - \"TIME\" and \"CR_SCL\ must have equal amount of items.\n\n'
+        ' - \"TIME\" and \"CR_SCL\ must be of the same length.\n\n'
         'Return only the JSON object with both \"TIME\" and \"CR_SCL\" keys and their respective lists of values, and do not include any additional text, explanations, or code in the response.'
     )
 
@@ -383,7 +383,7 @@ def generate_data_with_gemini(model, time_periods, load_data_trends):
             "Where:\n"
             f'- \"TIME\" must be populated as a sequence of integers from 1 to {time_periods}.\n'
             f'- \"CR_SCL\" must be populated with random numbers in a range between 0 and 100, showing a {load_data_trends} trend (i.e., the values generally increase over time).\n'
-            ' - \"TIME\" and \"CR_SCL\ must have equal amount of items.\n\n'
+            ' - \"TIME\" and \"CR_SCL\ lists of values must be the same length.\n\n'
             'Return only the JSON object with both \"TIME\" and \"CR_SCL\" keys and their respective lists of values, and do not include any additional text, explanations, or code in the response.'
         )
 
@@ -481,7 +481,7 @@ def generate_data_with_mistral(model, time_periods, load_data_trends):
         "Where:\n"
         f'- \"TIME\" must be populated as a sequence of integers from 1 to {time_periods}.\n'
         f'- \"CR_SCL\" must be populated with random numbers in a range between 0 and 100, showing a {load_data_trends} trend (i.e., the values generally increase over time).\n'
-        ' - \"TIME\" and \"CR_SCL\ must have equal amount of items.\n\n'
+        ' - \"TIME\" and \"CR_SCL\ must be of the same length.\n\n'
         'Return only the JSON object with both \"TIME\" and \"CR_SCL\" keys and their respective lists of values, and do not include any additional text, explanations, or code in the response.'
     )
 
@@ -2383,10 +2383,9 @@ def render_experiment_page():
         if experiment_name == "EGTL_QUANTATIVE_DATA_EXPERIMENT":
             egtl_quantative_data_experiment(model)
         if experiment_name == "EGTL_QUALITATIVE_DATA_EXPERIMENT":
-            egtl_qualitative_data_experiment(model, defined_scenario)            
-
-    if st.button("RUN EGTL EXPERIMENT FOR FUSION STORE ⚛"):
-        fusion_store_experiment(model, time_periods, load_data_trends)                   
+            egtl_qualitative_data_experiment(model, defined_scenario)  
+        if experiment_name == "FUSION_STORE_EXPERIMENT":
+            fusion_store_experiment(model, time_periods, load_data_trends)              
 
     if st.button("VIEW EGTL EXPERIMENT RESULTS 🔍"):
         if experiment_name == "EGTL_QUANTATIVE_DATA_EXPERIMENT":
@@ -2409,7 +2408,7 @@ def render_experiment_page():
     if st.button("SHOW HYPERLOOP PROJECT STATUS 🔍"):
         cleaned_df = view_hyperloop_project_status()       
 
-    if st.button("STREAM TASK PROCESSING FOR CHOSEN EXPERIMENT"):
+    if st.button("STREAM TASK PROCESSING FOR CHOSEN EXPERIMENT ⚛"):
         if experiment_name == "EGTL_QUANTATIVE_DATA_EXPERIMENT":
             st.write("Feature disabled for quantative experiment.") 
         if experiment_name == "EGTL_QUALITATIVE_DATA_EXPERIMENT":
