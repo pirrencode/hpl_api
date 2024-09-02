@@ -924,8 +924,10 @@ def insert_data_in_fusion_experiment_table(id,
                                            errors_encountered, 
                                            error_type, 
                                            error_message):
-    session = Session.builder.configs(get_snowflake_connection_params()).create()
+    session = None
+    sanitized_error_message = sanitize_string(error_message)
     try:
+        session = Session.builder.configs(get_snowflake_connection_params()).create()
         insert_query = f"""
             INSERT INTO HPL_SYSTEM_DYNAMICS.ALLIANCE_STORE.EGTL_FUSION_STORE_EXPERIMENT 
             (ID, MODEL, EXPERIMENT_START_DATE, EXPERIMENT_END_DATE, MODEL_WORK_TIME, 
@@ -935,7 +937,7 @@ def insert_data_in_fusion_experiment_table(id,
             VALUES ({id}, '{model}', '{start_date}', '{end_date}', {genai_response_time}, 
                     {save_data_to_snowflake_time}, {total_time}, {rows_processed}, 
                     {prompt_volume}, {output_volume}, {normalized_df_volume}, {load_to_staging_time}, 
-                    '{correctness}', {errors_encountered}, '{error_type}', '{error_message}')   
+                    '{correctness}', {errors_encountered}, '{error_type}', '{sanitized_error_message}')   
         """
         # st.write(f"DEBUG: {insert_query}")
         session.sql(insert_query).collect()
@@ -965,6 +967,7 @@ def insert_data_in_quantative_experiment_table(id,
     session = None
     try:
         session = Session.builder.configs(get_snowflake_connection_params()).create()
+        sanitized_error_message = sanitize_string(error_message)
         insert_query = f"""
             INSERT INTO ALLIANCE_STORE.EGTL_QUANTATIVE_DATA_EXPERIMENT 
             (ID, MODEL, EXPERIMENT_START_DATE, EXPERIMENT_END_DATE, MODEL_WORK_TIME, 
@@ -974,7 +977,7 @@ def insert_data_in_quantative_experiment_table(id,
             VALUES ({id}, '{model}', '{start_date}', '{end_date}', {genai_response_time}, 
                     {save_data_to_snowflake_time}, {total_time}, {rows_processed}, 
                     {input_df_size}, {prompt_volume}, {output_volume}, {normalized_df_volume}, 
-                    '{correctness}', {errors_encountered}, '{error_type}', '{error_message}')   
+                    '{correctness}', {errors_encountered}, '{error_type}', '{sanitized_error_message}')   
         """
         st.write(f"DEBUG: {insert_query}")
         session.sql(insert_query).collect()
@@ -1017,8 +1020,10 @@ def insert_data_in_qualitative_experiment_table(id,
                                                errors_encountered, 
                                                error_type, 
                                                error_message):
-    session = Session.builder.configs(get_snowflake_connection_params()).create()
+    session = None
+    sanitized_error_message = sanitize_string(error_message)
     try:
+        session = Session.builder.configs(get_snowflake_connection_params()).create()
         insert_query = f"""
             INSERT INTO HPL_SYSTEM_DYNAMICS.ALLIANCE_STORE.EGTL_QUALITATIVE_DATA_EXPERIMENT 
             (ID, MODEL, EXPERIMENT_START_DATE, EXPERIMENT_END_DATE, MODEL_WORK_TIME, 
@@ -1028,7 +1033,7 @@ def insert_data_in_qualitative_experiment_table(id,
             VALUES ({id}, '{model}', '{start_date}', '{end_date}', {genai_response_time}, 
                     {save_data_to_snowflake_time}, {total_time}, {rows_processed}, 
                     {input_df_size}, {prompt_volume}, {output_volume}, '{loaded_scenario}', 
-                    '{status_result}', {errors_encountered}, '{error_type}', '{error_message}')   
+                    '{status_result}', {errors_encountered}, '{error_type}', '{sanitized_error_message}')   
         """
         # st.write(f"DEBUG: {insert_query}")
         session.sql(insert_query).collect()
@@ -1115,6 +1120,21 @@ def check_df_for_null_values(df):
     correct_percentage = str(correct_count) + "%"
     
     return correct_percentage
+
+import re
+
+def sanitize_string(input_string):
+    """Sanitize the input string to escape or remove problematic characters for SQL."""
+    if input_string is None:
+        return ''
+
+    sanitized = input_string.replace("'", "''")
+    sanitized = sanitized.replace("\\", "\\\\")
+    sanitized = sanitized.replace('"', '\\"')
+    sanitized = re.sub(r'[\x00-\x1f\x7f]', '', sanitized)
+    sanitized = sanitized.replace(";", "")
+
+    return sanitized
 
 #############################################
 # MIGRATION SCRIPTS
