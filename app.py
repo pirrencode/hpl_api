@@ -935,7 +935,7 @@ def insert_data_in_fusion_experiment_table(id,
                     {prompt_volume}, {output_volume}, {normalized_df_volume}, {load_to_staging_time}, 
                     '{correctness}', {errors_encountered}, '{error_type}', '{error_message}')   
         """
-        st.write(f"DEBUG: {insert_query}")
+        # st.write(f"DEBUG: {insert_query}")
         session.sql(insert_query).collect()
     except Exception as e:
         st.error(f"An error occurred while saving insights to Snowflake: {str(e)}")
@@ -973,7 +973,7 @@ def insert_data_in_quantative_experiment_table(id,
                     {input_df_size}, {prompt_volume}, {output_volume}, {normalized_df_volume}, 
                     '{correctness}', {errors_encountered}, '{error_type}', '{error_message}')   
         """
-        st.write(f"DEBUG: {insert_query}")
+        # st.write(f"DEBUG: {insert_query}")
         session.sql(insert_query).collect()
     except Exception as e:
         st.error(f"An error occurred while saving insights to Snowflake: {str(e)}")
@@ -1010,7 +1010,7 @@ def insert_data_in_qualitative_experiment_table(id,
                     {input_df_size}, {prompt_volume}, {output_volume}, '{loaded_scenario}', 
                     '{status_result}', {errors_encountered}, '{error_type}', '{error_message}')   
         """
-        st.write(f"DEBUG: {insert_query}")
+        # st.write(f"DEBUG: {insert_query}")
         session.sql(insert_query).collect()
     except Exception as e:
         st.error(f"An error occurred while saving insights to Snowflake: {str(e)}")
