@@ -549,7 +549,7 @@ def extract_hyperloop_specification_with_openai(model, time_periods):
     openai.api_key = get_openai_api_key()
 
     try:
-        response = openai.ChatCompletion.create(
+        response = openai.chat.completions.create(
             model=model,
             messages=[
                 {"role": "system", "content": "You are a helpful assistant."},
@@ -557,7 +557,7 @@ def extract_hyperloop_specification_with_openai(model, time_periods):
             ]
         )
 
-        generated_data = response.choices[0].message.content.strip("{}").strip()
+        generated_data = response.choices[0].message.content.strip()
 
         st.write(f"The {model} response: {generated_data}")
 
@@ -2000,7 +2000,7 @@ def render_homepage():
         analyze_hyperloop_project(model, report = "insights")  
 
     if st.button("VIEW HYPERLOOP TECHNICAL SPECIFICATION ✎"):
-        transfer_data_from_source_to_target("FUSION_STORE.HYPERLOOP_SPECIFICATION_FUSION", "STAGING_STORE.HYPERLOOP_SPECIFICATION_STAGING") 
+        transfer_data_from_source_to_target("STAGING_STORE.HYPERLOOP_SPECIFICATION_STAGING", "ALLIANCE_STORE.HYPERLOOP_SPECIFICATION_ALLIANCE") 
         view_technical_specification()            
 
 ##############################################################
