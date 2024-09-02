@@ -532,19 +532,33 @@ def generate_data_with_mistral(model, time_periods, load_data_trends):
         st.error(f"An error occurred: {str(e)}")
         return None, None, None      
 
-def extract_hyperloop_specification_with_openai(model, time_periods):
+def extract_hyperloop_specification_with_openai(model, time_periods, content_type):
 
-    prompt = (
-        f"Generate a JSON dataset for Hyperloop technology with {time_periods} parameters. "
-        "Each parameter should describe a key aspect of Hyperloop technology, such as speed, price, or capacity. "
-        "The structure should be as follows:\n\n"
-        "{\n"
-        '    "PARAMETER": ["parameter_1", "parameter_2", ..., "parameter_N"],\n'
-        '    "SPECIFICATION": ["specification_1", "specification_2", ..., "specification_N"]\n'
-        "}\n\n"
-        "Return only the JSON object with 'PARAMETER' and 'SPECIFICATION' keys, filled with corresponding values. "
-        "Do not include any additional text, explanations, or code."
-    )
+    if content_type == "hyperloop_specifications":
+        prompt = (
+            f"Generate a JSON dataset for Hyperloop technology with {time_periods} parameters. "
+            "Each parameter should describe a key aspect of Hyperloop technology, such as speed, price, or capacity. "
+            "The structure should be as follows:\n\n"
+            "{\n"
+            '    "PARAMETER": ["parameter_1", "parameter_2", ..., "parameter_N"],\n'
+            '    "SPECIFICATION": ["specification_1", "specification_2", ..., "specification_N"]\n'
+            "}\n\n"
+            "Return only the JSON object with 'PARAMETER' and 'SPECIFICATION' keys, filled with corresponding values. "
+            "Do not include any additional text, explanations, or code."
+        )
+    elif content_type == "advancements":
+        prompt = (
+            f"Generate a JSON dataset for the latest Hyperloop technology advancements, with {time_periods} entries. "
+            "Each entry should describe a recent development or news related to Hyperloop technology. "
+            "The structure should be as follows:\n\n"
+            "{\n"
+            '    "ACTUALITY": ["MMMM-YYYY", "MMMM-YYYY", ..., "MMMM-YYYY"],\n'
+            '    "RELATED_HYPERLOOP_VENDOR": ["vendor_1", "vendor_2", ..., "vendor_N"],\n'
+            '    "ADVANCEMENT": ["advancement_1", "advancement_2", ..., "advancement_N"]\n'
+            "}\n\n"
+            "Return only the JSON object with 'ACTUALITY', 'RELATED_HYPERLOOP_VENDOR', and 'ADVANCEMENT' keys, filled with corresponding values. "
+            "Do not include any additional text, explanations, or code."
+        )       
 
     openai.api_key = get_openai_api_key()
 
@@ -582,24 +596,38 @@ def extract_hyperloop_specification_with_openai(model, time_periods):
         st.error(f"An error occurred: {str(e)}")
         return None, None, None
 
-def extract_hyperloop_specification_with_gemini(model, time_periods):
+def extract_hyperloop_specification_with_gemini(model, time_periods, content_type):
 
     gemini.configure(api_key=get_google_api_key())
 
     gemini_model = gemini.GenerativeModel(model_name=model)
     try:
 
-        prompt = (
-            f"Generate a JSON dataset for Hyperloop technology with {time_periods} parameters. "
-            "Each parameter should describe a key aspect of Hyperloop technology, such as speed, price, or capacity. "
-            "The structure should be as follows:\n\n"
-            "{\n"
-            '    "PARAMETER": ["parameter_1", "parameter_2", ..., "parameter_N"],\n'
-            '    "SPECIFICATION": ["specification_1", "specification_2", ..., "specification_N"]\n'
-            "}\n\n"
-            "Return only the JSON object with 'PARAMETER' and 'SPECIFICATION' keys, filled with corresponding values. "
-            "Do not include any additional text, explanations, or code."
-        )
+        if content_type == "hyperloop_specifications":
+            prompt = (
+                f"Generate a JSON dataset for Hyperloop technology with {time_periods} parameters. "
+                "Each parameter should describe a key aspect of Hyperloop technology, such as speed, price, or capacity. "
+                "The structure should be as follows:\n\n"
+                "{\n"
+                '    "PARAMETER": ["parameter_1", "parameter_2", ..., "parameter_N"],\n'
+                '    "SPECIFICATION": ["specification_1", "specification_2", ..., "specification_N"]\n'
+                "}\n\n"
+                "Return only the JSON object with 'PARAMETER' and 'SPECIFICATION' keys, filled with corresponding values. "
+                "Do not include any additional text, explanations, or code."
+            )
+        elif content_type == "advancements":
+            prompt = (
+                f"Generate a JSON dataset for the latest Hyperloop technology advancements, with {time_periods} entries. "
+                "Each entry should describe a recent development or news related to Hyperloop technology. "
+                "The structure should be as follows:\n\n"
+                "{\n"
+                '    "ACTUALITY": ["MMMM-YYYY", "MMMM-YYYY", ..., "MMMM-YYYY"],\n'
+                '    "RELATED_HYPERLOOP_VENDOR": ["vendor_1", "vendor_2", ..., "vendor_N"],\n'
+                '    "ADVANCEMENT": ["advancement_1", "advancement_2", ..., "advancement_N"]\n'
+                "}\n\n"
+                "Return only the JSON object with 'ACTUALITY', 'RELATED_HYPERLOOP_VENDOR', and 'ADVANCEMENT' keys, filled with corresponding values. "
+                "Do not include any additional text, explanations, or code."
+            )   
 
         response = gemini_model.generate_content([prompt])
 
@@ -629,19 +657,33 @@ def extract_hyperloop_specification_with_gemini(model, time_periods):
         st.error(f"An error occurred: {str(e)}")
         return None, None, None 
 
-def extract_hyperloop_specification_with_mistral(model, time_periods):
+def extract_hyperloop_specification_with_mistral(model, time_periods, content_type):
 
-    prompt = (
-        f"Generate a JSON dataset for Hyperloop technology with {time_periods} parameters. "
-        "Each parameter should describe a key aspect of Hyperloop technology, such as speed, price, or capacity. "
-        "The structure should be as follows:\n\n"
-        "{\n"
-        '    "PARAMETER": ["parameter_1", "parameter_2", ..., "parameter_N"],\n'
-        '    "SPECIFICATION": ["specification_1", "specification_2", ..., "specification_N"]\n'
-        "}\n\n"
-        "Return only the JSON object with 'PARAMETER' and 'SPECIFICATION' keys, filled with corresponding values. "
-        "Do not include any additional text, explanations, or code."
-    )
+    if content_type == "hyperloop_specifications":
+        prompt = (
+            f"Generate a JSON dataset for Hyperloop technology with {time_periods} parameters. "
+            "Each parameter should describe a key aspect of Hyperloop technology, such as speed, price, or capacity. "
+            "The structure should be as follows:\n\n"
+            "{\n"
+            '    "PARAMETER": ["parameter_1", "parameter_2", ..., "parameter_N"],\n'
+            '    "SPECIFICATION": ["specification_1", "specification_2", ..., "specification_N"]\n'
+            "}\n\n"
+            "Return only the JSON object with 'PARAMETER' and 'SPECIFICATION' keys, filled with corresponding values. "
+            "Do not include any additional text, explanations, or code."
+        )
+    elif content_type == "advancements":
+        prompt = (
+            f"Generate a JSON dataset for the latest Hyperloop technology advancements, with {time_periods} entries. "
+            "Each entry should describe a recent development or news related to Hyperloop technology. "
+            "The structure should be as follows:\n\n"
+            "{\n"
+            '    "ACTUALITY": ["MMMM-YYYY", "MMMM-YYYY", ..., "MMMM-YYYY"],\n'
+            '    "RELATED_HYPERLOOP_VENDOR": ["vendor_1", "vendor_2", ..., "vendor_N"],\n'
+            '    "ADVANCEMENT": ["advancement_1", "advancement_2", ..., "advancement_N"]\n'
+            "}\n\n"
+            "Return only the JSON object with 'ACTUALITY', 'RELATED_HYPERLOOP_VENDOR', and 'ADVANCEMENT' keys, filled with corresponding values. "
+            "Do not include any additional text, explanations, or code."
+        ) 
 
     headers = {
         "Authorization": f"Bearer {get_mistral_api_key()}",
@@ -1037,13 +1079,17 @@ def fusion_store_experiment(model, time_periods, load_data_trends):
 
     st.write(f"System has completed fusion store GENERATE experiment for {model} number {experiment_number}. Experiment ID {experiment_id}.")
 
-def extract_hyperloop_data_experiment(model, time_periods):
-    fusion_table = "FUSION_STORE.HYPERLOOP_SPECIFICATION_FUSION"
-    staging_table = "STAGING_STORE.HYPERLOOP_SPECIFICATION_STAGING"
+def extract_hyperloop_data_experiment(model, time_periods, content_type):
+    if content_type == "hyperloop_specifications":
+        fusion_table = "FUSION_STORE.HYPERLOOP_SPECIFICATION_FUSION"
+        staging_table = "STAGING_STORE.HYPERLOOP_SPECIFICATION_STAGING"
+    elif content_type == "advancements":
+        fusion_table = "FUSION_STORE.HYPERLOOP_ADVANCEMENTS_FUSION"
+        staging_table = "STAGING_STORE.HYPERLOOP_ADVANCEMENTS_STAGING"
     experiment_table = "ALLIANCE_STORE.EGTL_EXTRACT_DATA_EXPERIMENT"
     experiment_number = get_record_count_for_model(model, experiment_table) + 1
     experiment_id = get_largest_record_id(experiment_table) + 1
-    st.write(f"Starting EXTRACT DATA experiment in Fusion Store for {model} number {experiment_number}, ID {experiment_id}")
+    st.write(f"Starting EXTRACT DATA experiment in Fusion Store for {model} number {experiment_number}, ID {experiment_id}, type {content_type}.")
 
     start_date = datetime.now(pytz.utc).strftime('%Y-%B-%d %H:%M:%S')
     
@@ -1062,11 +1108,11 @@ def extract_hyperloop_data_experiment(model, time_periods):
         start_time = time.time()
 
         if model in ["gpt-3.5-turbo", "gpt-4"]:
-            gen_ai_df, prompt_volume, output_volume, df_correctness_check = extract_hyperloop_specification_with_openai(model, time_periods)
+            gen_ai_df, prompt_volume, output_volume, df_correctness_check = extract_hyperloop_specification_with_openai(model, time_periods, content_type)
         elif model == "mistral-small":
-            gen_ai_df, prompt_volume, output_volume, df_correctness_check = extract_hyperloop_specification_with_mistral(model, time_periods)
+            gen_ai_df, prompt_volume, output_volume, df_correctness_check = extract_hyperloop_specification_with_mistral(model, time_periods, content_type)
         elif model == "gemini-1.5-flash":
-            gen_ai_df, prompt_volume, output_volume, df_correctness_check = extract_hyperloop_specification_with_gemini(model, time_periods)
+            gen_ai_df, prompt_volume, output_volume, df_correctness_check = extract_hyperloop_specification_with_gemini(model, time_periods, content_type)
         else:
             st.error("Selected model is not supported.")
             return None, 0, 0
@@ -1109,7 +1155,8 @@ def extract_hyperloop_data_experiment(model, time_periods):
 
     try:
         insert_data_in_data_extract_experiment_table(experiment_id, 
-                                                    model,                                               
+                                                    model,    
+                                                    content_type,                                           
                                                     start_date, 
                                                     end_date, 
                                                     genai_response_time, 
@@ -1192,7 +1239,8 @@ def normalize_data_for_egtl_experiment(model):
         return None, 0, input_df_size, 0
     
 def insert_data_in_data_extract_experiment_table(id, 
-                                               model,                                               
+                                               model,    
+                                               content_type,  # Adjusted parameter name to match EXPERIMENT_TYPE                                           
                                                start_date, 
                                                end_date, 
                                                genai_response_time, 
@@ -1212,11 +1260,11 @@ def insert_data_in_data_extract_experiment_table(id,
         session = Session.builder.configs(get_snowflake_connection_params()).create()
         insert_query = f"""
             INSERT INTO HPL_SYSTEM_DYNAMICS.ALLIANCE_STORE.EGTL_EXTRACT_DATA_EXPERIMENT 
-            (ID, MODEL, EXPERIMENT_START_DATE, EXPERIMENT_END_DATE, MODEL_WORK_TIME, 
+            (ID, MODEL, EXPERIMENT_TYPE, EXPERIMENT_START_DATE, EXPERIMENT_END_DATE, MODEL_WORK_TIME, 
              SAVE_DATA_TO_SNOWFLAKE_TIME, EXPERIMENT_TIME_TOTAL, ROWS_PROCESSED, 
              PROMPT_VOLUME, OUTPUT_VOLUME, LOAD_TO_STAGING_TIME, CORRECTNESS, 
              ERROR_ENCOUNTERED, ERROR_TYPE, ERROR_MESSAGE)
-            VALUES ({id}, '{model}', '{start_date}', '{end_date}', {genai_response_time}, 
+            VALUES ({id}, '{model}', '{content_type}', '{start_date}', '{end_date}', {genai_response_time}, 
                     {save_data_to_snowflake_time}, {total_time}, {rows_processed}, 
                     {prompt_volume}, {output_volume}, {load_to_staging_time}, '{correctness}', 
                     {errors_encountered}, '{error_type}', '{sanitized_error_message}')   
@@ -1227,7 +1275,7 @@ def insert_data_in_data_extract_experiment_table(id,
         st.error(f"An error occurred while saving insights to Snowflake: {str(e)}")
     finally:
         if session:
-            session.close() 
+            session.close()  
 
 def insert_data_in_fusion_experiment_table(id, 
                                            model,                                               
@@ -1958,6 +2006,11 @@ def view_technical_specification():
     st.write("Hyperloop technical specification: ")
     st.write(df)
 
+def view_advancements():
+    df = load_data_from_snowflake("ALLIANCE_STORE.HYPERLOOP_ADVANCEMENTS_ALLIANCE")
+    st.write("Latest Hyperloop advancements: ")
+    st.write(df)    
+
 ##############################################################
 # HOMEPAGE CREATION
 ##############################################################
@@ -1999,9 +2052,13 @@ def render_homepage():
     if st.button("ANALYZE HYPERLOOP PROJECT 🧠"):
         analyze_hyperloop_project(model, report = "insights")  
 
+    if st.button("LATEST HYPERLOOP ADVANCEMENTS ✎"):
+        transfer_data_from_source_to_target("STAGING_STORE.HYPERLOOP_ADVANCEMENTS_STAGING", "ALLIANCE_STORE.HYPERLOOP_ADVANCEMENTS_ALLIANCE") 
+        view_advancements()                 
+
     if st.button("VIEW HYPERLOOP TECHNICAL SPECIFICATION ✎"):
         transfer_data_from_source_to_target("STAGING_STORE.HYPERLOOP_SPECIFICATION_STAGING", "ALLIANCE_STORE.HYPERLOOP_SPECIFICATION_ALLIANCE") 
-        view_technical_specification()            
+        view_technical_specification()    
 
 ##############################################################
 # Data upload and management page
@@ -2655,7 +2712,11 @@ def render_experiment_page():
 
     experiment_name = st.radio(
         "Select experiment:",
-        options=["EGTL_QUANTATIVE_DATA_EXPERIMENT", "EGTL_QUALITATIVE_DATA_EXPERIMENT", "FUSION_STORE_EXPERIMENT", "DATA_EXTRACT_EXPERIMENT"],
+        options=["EGTL_QUANTATIVE_DATA_EXPERIMENT", 
+                 "EGTL_QUALITATIVE_DATA_EXPERIMENT", 
+                 "FUSION_STORE_EXPERIMENT", 
+                 "DATA_EXTRACT_EXPERIMENT_FOR_SPECIFICATIONS",
+                 "DATA_EXTRACT_EXPERIMENT_FOR_ADVANCEMENTS"],
         index=0
     )  
 
@@ -2682,8 +2743,10 @@ def render_experiment_page():
             egtl_qualitative_data_experiment(model, defined_scenario)  
         if experiment_name == "FUSION_STORE_EXPERIMENT":
             fusion_store_experiment(model, time_periods, load_data_trends)  
-        if experiment_name == "DATA_EXTRACT_EXPERIMENT":
-            extract_hyperloop_data_experiment(model, time_periods)                         
+        if experiment_name == "DATA_EXTRACT_EXPERIMENT_FOR_SPECIFICATIONS":
+            extract_hyperloop_data_experiment(model, time_periods,content_type="hyperloop_specifications")      
+        if experiment_name == "DATA_EXTRACT_EXPERIMENT_FOR_ADVANCEMENTS":
+            extract_hyperloop_data_experiment(model, time_periods,content_type="advancements")                                  
 
     if st.button("VIEW EGTL EXPERIMENT RESULTS 🔍"):
         if experiment_name == "EGTL_QUANTATIVE_DATA_EXPERIMENT":
@@ -2695,7 +2758,7 @@ def render_experiment_page():
         elif experiment_name == "FUSION_STORE_EXPERIMENT":
             table_name = "ALLIANCE_STORE.EGTL_FUSION_STORE_EXPERIMENT"
             view_experiment_data(table_name, experiment_name) 
-        elif experiment_name == "DATA_EXTRACT_EXPERIMENT":
+        elif experiment_name == "DATA_EXTRACT_EXPERIMENT_FOR_SPECIFICATIONS":
             table_name = "ALLIANCE_STORE.EGTL_EXTRACT_DATA_EXPERIMENT"
             view_experiment_data(table_name, experiment_name)                               
 
