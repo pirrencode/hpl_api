@@ -1655,7 +1655,9 @@ def backup_fusion_store():
         "CR_SFY_SOURCE",
         "CR_TFE_SOURCE",
         "CR_USB_SOURCE",
-        "CALC_CR_SCL_FUSION"
+        "CALC_CR_SCL_FUSION",
+        "HYPERLOOP_SPECIFICATION_FUSION",
+        "HYPERLOOP_ADVANCEMENTS_FUSION"
     ]
     
     progress_bar = st.progress(0)
@@ -1694,7 +1696,9 @@ def backup_staging_store():
         "CR_SCL_STAGING",
         "CR_SFY_STAGING",
         "CR_TFE_STAGING",
-        "CR_USB_STAGING"
+        "CR_USB_STAGING",
+        "HYPERLOOP_SPECIFICATION_STAGING",
+        "HYPERLOOP_ADVANCEMENTS_STAGING",
     ]
 
     progress_bar = st.progress(0)
@@ -1716,7 +1720,10 @@ def backup_alliance_store():
         "PROJECT_STATUS",
         "EGTL_QUANTATIVE_DATA_EXPERIMENT",
         "EGTL_QUALITATIVE_DATA_EXPERIMENT",
-        "EGTL_FUSION_STORE_EXPERIMENT"
+        "EGTL_FUSION_STORE_EXPERIMENT",
+        "EGTL_EXTRACT_DATA_EXPERIMENT",
+        "HYPERLOOP_SPECIFICATION_ALLIANCE",
+        "HYPERLOOP_ADVANCEMENTS_ALLIANCE",
     ]
 
     progress_bar = st.progress(0)
