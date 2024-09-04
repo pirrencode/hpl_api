@@ -1915,16 +1915,20 @@ def execute_sql_statement(sql_statement):
 
 def execute_sql_batch(sql_string):
     sql_statements = sql_string.strip().split(';')
-    st.write(sql_statements)   
-    
+    st.write(sql_statements)
+
     for sql_statement in sql_statements:
         sql_statement = sql_statement.strip()
-        st.write(sql_statement) 
+        st.write(sql_statement)
 
         if sql_statement:
             sql_statement_sanitized = cleanup_query_string(sql_statement)
             st.write(f"Sanitized: {sql_statement_sanitized}")
-            execute_sql_statement(sql_statement_sanitized)
+            
+            if sql_statement_sanitized:
+                execute_sql_statement(sql_statement_sanitized)
+            else:
+                st.write("Sanitized query is empty, skipping execution.")
 
 def check_list_first_element(df_check):
     if isinstance(df_check, list) and len(df_check) > 0:
