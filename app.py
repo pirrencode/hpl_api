@@ -1384,9 +1384,9 @@ def generate_code_experiment(model, time_periods, content_type):
     end_date = datetime.now(pytz.utc).strftime('%Y-%B-%d %H:%M:%S')
 
     try:
-        check_query = f"SELECT * FROM {fusion_table}"
+        check_query = f"SELECT count(1) FROM {fusion_table}"
         df_check = execute_sql_statement(check_query)
-        df_correctness_check = check_df_empty(df_check)       
+        df_correctness_check = check_list_first_element(df_check)      
     except Exception as e:
         st.error(f"Error during correctness check: {str(e)}")
 
@@ -1918,6 +1918,16 @@ def execute_sql_batch(sql_string):
         if sql_statement:
             execute_sql_statement(sql_statement)
             st.write(sql_statement)          
+
+def check_list_first_element(df_check):
+    if isinstance(df_check, list) and len(df_check) > 0:
+        first_element = df_check[0][0]  
+        if first_element > 0:
+            return "100%"
+        else:
+            return "0%"
+    else:
+        return "Invalid data or empty list"
 
 def load_data_from_snowflake(table_name):
     session = Session.builder.configs(get_snowflake_connection_params()).create()
