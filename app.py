@@ -1556,6 +1556,7 @@ def insert_data_in_generate_code_experiment_table(id,
     try:
         session = Session.builder.configs(get_snowflake_connection_params()).create()
         
+        # Ensure that the dates and content_type are properly quoted
         insert_query = f"""
             INSERT INTO HPL_SYSTEM_DYNAMICS.ALLIANCE_STORE.EGTL_GENERATE_CODE_EXPERIMENT 
             (ID, MODEL, EXPERIMENT_START_DATE, EXPERIMENT_END_DATE, MODEL_WORK_TIME, 
@@ -1567,7 +1568,7 @@ def insert_data_in_generate_code_experiment_table(id,
                     {prompt_volume}, {output_volume}, {normalized_df_volume}, {load_to_staging_time}, 
                     '{correctness}', {errors_encountered}, '{error_type}', '{sanitized_error_message}')
         """
-        st.write(f"DEBUG: {insert_query} ")
+        st.write(f"DEBUG: {insert_query}")
         session.sql(insert_query).collect()
         
     except Exception as e:
