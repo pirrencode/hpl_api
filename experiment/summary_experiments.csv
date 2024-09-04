@@ -1,6 +1,0 @@
-Model,Total experiments,Succeeded experiments (%),Avg. model work time (ms),Avg. output correctness (%),Avg. prompt size (symbols),Avg. model output size (symbols)
-Extract,120,87.92,5.41,100,533.53,942.22
-Generate,120,85.95,5.04,100,566.03,130.42
-Transform,120,88.56,3.16,98.67,698.94,178.36
-Load,160,100,5.2,100,1445.98,34.65
-Total,520,90.6075,4.7025,99.6675,811.12,321.4125

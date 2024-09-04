@@ -1,5 +1,13 @@
 # Hyperloop decision making ecosystem changelog
 
+##v0.0.3-alpha
+
+- Alpha version of application released.
+- Implemented data extraction experiment to handle code generation (Fusion).
+- Added experiment for creating and populating Hyperloop subsystem by GenAI.
+- Added experiment for removing unused tables by GenAI.
+- Added experiment to handle backups in Fusion by GenAI.
+
 ## v0.2.2-dev
 
 - Implemented data extraction experiment for technical specification (Fusion).
