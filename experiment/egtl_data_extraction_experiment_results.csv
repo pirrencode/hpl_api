@@ -1,0 +1,170 @@
+﻿ID,MODEL,EXPERIMENT_TYPE,EXPERIMENT_START_DATE,EXPERIMENT_END_DATE,MODEL_WORK_TIME,SAVE_DATA_TO_SNOWFLAKE_TIME,EXPERIMENT_TIME_TOTAL,ROWS_PROCESSED,PROMPT_VOLUME,OUTPUT_VOLUME,LOAD_TO_STAGING_TIME,CORRECTNESS,ERROR_ENCOUNTERED,ERROR_TYPE,ERROR_MESSAGE
+42,mistral-small,advancements,2024-September-02 18:13:58,2024-September-02 18:14:08,3.087082863,2.988587379,6.075671673,20,626,895,2.67718482,100.0%,false,None,
+1,gpt-3.5-turbo,hyperloop_specifications,2024-September-02 18:02:08,2024-September-02 18:02:16,1.082751274,3.075085402,4.157837391,5,530,229,3.357378483,100.0%,false,None,
+2,gpt-3.5-turbo,hyperloop_specifications,2024-September-02 18:02:19,2024-September-02 18:02:27,1.390145302,3.004716635,4.394862652,5,530,311,3.10002327,100.0%,false,None,
+3,gpt-3.5-turbo,hyperloop_specifications,2024-September-02 18:02:30,2024-September-02 18:02:38,1.236360788,2.890019178,4.12638092,5,530,299,3.019543886,100.0%,false,None,
+4,gpt-3.5-turbo,hyperloop_specifications,2024-September-02 18:02:41,2024-September-02 18:02:49,1.23442626,3.014904499,4.249331951,5,530,287,2.830571413,100.0%,false,None,
+5,gpt-3.5-turbo,hyperloop_specifications,2024-September-02 18:02:52,2024-September-02 18:03:00,1.166522026,3.092658281,4.259182215,5,530,238,3.039988518,100.0%,false,None,
+6,gpt-3.5-turbo,advancements,2024-September-02 18:05:01,2024-September-02 18:05:10,2.402423859,2.955780745,5.358205557,5,625,693,2.347793341,100.0%,false,None,
+7,gpt-3.5-turbo,advancements,2024-September-02 18:05:13,2024-September-02 18:05:22,2.248350382,3.133600473,5.381952286,5,625,610,2.501483917,100.0%,false,None,
+8,gpt-3.5-turbo,advancements,2024-September-02 18:05:24,2024-September-02 18:05:33,2.525502682,3.04131341,5.566817045,5,625,776,2.534981251,100.0%,false,None,
+9,gpt-3.5-turbo,advancements,2024-September-02 18:05:36,2024-September-02 18:05:45,2.429197788,2.869452238,5.298650742,5,625,823,2.523923635,100.0%,false,None,
+10,gpt-3.5-turbo,advancements,2024-September-02 18:05:48,2024-September-02 18:05:56,1.702288151,3.106672764,4.808961868,5,625,527,2.345908642,100.0%,false,None,
+11,gpt-4,hyperloop_specifications,2024-September-02 18:06:24,2024-September-02 18:06:35,3.369731188,3.048574686,6.418307066,5,530,237,2.994248629,100.0%,false,None,
+12,gpt-4,hyperloop_specifications,2024-September-02 18:06:38,2024-September-02 18:06:48,3.38910675,2.775973558,6.165081739,5,530,264,3.252656221,100.0%,false,None,
+13,gpt-4,hyperloop_specifications,2024-September-02 18:06:51,2024-September-02 18:07:00,3.174365044,2.896180391,6.070546389,5,530,322,2.808228731,100.0%,false,None,
+14,mistral-small,hyperloop_specifications,2024-September-02 18:07:03,2024-September-02 18:07:10,1.135239363,2.723161697,3.858402014,5,530,281,2.69895792,100.0%,false,None,
+14,gpt-4,hyperloop_specifications,2024-September-02 18:07:03,2024-September-02 18:07:13,3.619706869,2.797921658,6.417629242,5,530,311,2.784428596,100.0%,false,None,
+15,mistral-small,hyperloop_specifications,2024-September-02 18:07:13,2024-September-02 18:07:21,0.9917607307,2.807833672,3.799595594,5,530,218,3.068186522,100.0%,false,None,
+15,gpt-4,hyperloop_specifications,2024-September-02 18:07:16,2024-September-02 18:07:26,3.785399675,2.966520309,6.751921177,5,530,231,2.893443584,100.0%,false,None,
+16,mistral-small,hyperloop_specifications,2024-September-02 18:07:23,2024-September-02 18:07:31,1.097828388,2.966729403,4.064558506,5,530,275,2.795606136,100.0%,false,None,
+17,mistral-small,hyperloop_specifications,2024-September-02 18:07:34,2024-September-02 18:07:42,1.765958786,2.902000666,4.667960882,5,530,318,2.849387646,100.0%,false,None,
+18,mistral-small,hyperloop_specifications,2024-September-02 18:07:45,2024-September-02 18:07:53,1.502322674,2.811658621,4.313982487,5,530,251,2.676488876,100.0%,false,None,
+17,gpt-4,advancements,2024-September-02 18:07:43,2024-September-02 18:08:00,11.168267012,2.945317268,14.113584995,5,625,877,2.766726255,100.0%,false,None,
+19,gpt-4,advancements,2024-September-02 18:08:03,2024-September-02 18:08:18,8.440315247,2.8271451,11.267461777,5,625,727,2.369064808,100.0%,false,None,
+19,mistral-small,advancements,2024-September-02 18:08:14,2024-September-02 18:08:22,2.101674318,2.802769661,4.904445171,5,625,546,2.127417803,100.0%,false,None,
+20,mistral-small,advancements,2024-September-02 18:08:24,2024-September-02 18:08:33,2.319417,2.927010536,5.24642849,5,625,696,2.253893375,100.0%,false,None,
+21,mistral-small,advancements,2024-September-02 18:08:35,2024-September-02 18:08:39,0,0,0,0,0,0,2.289398193,0,true,ValueError,"not enough values to unpack (expected 4, got 3)"
+20,gpt-4,advancements,2024-September-02 18:08:21,2024-September-02 18:08:40,13.454847813,2.951957226,16.406806469,5,625,924,2.241665363,100.0%,false,None,
+22,mistral-small,advancements,2024-September-02 18:08:42,2024-September-02 18:08:50,1.883840322,2.744103432,4.627944708,5,625,498,2.391305923,100.0%,false,None,
+22,gpt-4,advancements,2024-September-02 18:08:43,2024-September-02 18:08:56,7.37422657,2.722132444,10.096360207,5,625,529,2.469167709,100.0%,false,None,
+23,mistral-small,advancements,2024-September-02 18:08:52,2024-September-02 18:09:01,2.055446863,2.784515858,4.839963436,5,625,582,2.513766766,100.0%,false,None,
+23,gpt-4,advancements,2024-September-02 18:08:59,2024-September-02 18:09:10,5.293109417,3.002845287,8.295955896,5,625,486,2.233314276,100.0%,false,None,
+24,gemini-1.5-flash,hyperloop_specifications,2024-September-02 18:09:58,2024-September-02 18:10:05,1.009295464,3.065576792,4.074873209,5,530,299,2.895742655,100.0%,false,None,
+25,gemini-1.5-flash,hyperloop_specifications,2024-September-02 18:10:08,2024-September-02 18:10:16,1.045552969,2.743003368,3.788557053,5,530,375,2.884331226,100.0%,false,None,
+26,gemini-1.5-flash,hyperloop_specifications,2024-September-02 18:10:19,2024-September-02 18:10:27,0.99548316,2.83250165,3.82798624,5,530,380,2.923287153,100.0%,false,None,
+27,gemini-1.5-flash,hyperloop_specifications,2024-September-02 18:10:29,2024-September-02 18:10:37,1.081025124,2.794312239,3.87533927,5,530,295,2.867600679,100.0%,false,None,
+28,gemini-1.5-flash,hyperloop_specifications,2024-September-02 18:10:40,2024-September-02 18:10:47,1.02177906,2.70011735,3.721897125,5,530,362,2.927784443,100.0%,false,None,
+29,gemini-1.5-flash,advancements,2024-September-02 18:11:12,2024-September-02 18:11:20,1.982628822,2.839323044,4.82195282,5,625,991,2.290873051,100.0%,false,None,
+30,gemini-1.5-flash,advancements,2024-September-02 18:11:23,2024-September-02 18:11:31,1.983680487,2.695089817,4.678771257,5,625,1009,2.334340096,100.0%,false,None,
+31,gemini-1.5-flash,advancements,2024-September-02 18:11:34,2024-September-02 18:11:41,1.439305067,2.725483894,4.164789915,5,625,760,2.289141178,100.0%,false,None,
+32,gemini-1.5-flash,advancements,2024-September-02 18:11:44,2024-September-02 18:11:51,1.496084929,2.649320364,4.145406485,5,625,656,2.315642118,100.0%,false,None,
+33,gemini-1.5-flash,advancements,2024-September-02 18:11:54,2024-September-02 18:12:02,1.818707943,2.810668707,4.629377842,5,625,870,2.430140018,100.0%,false,None,
+34,gpt-3.5-turbo,hyperloop_specifications,2024-September-02 18:12:15,2024-September-02 18:12:24,1.895800114,2.850841999,4.746643543,10,531,584,2.946198225,100.0%,false,None,
+35,gpt-3.5-turbo,hyperloop_specifications,2024-September-02 18:12:27,2024-September-02 18:12:35,1.712703943,2.864048481,4.576753616,10,531,516,3.126820564,100.0%,false,None,
+36,gpt-3.5-turbo,hyperloop_specifications,2024-September-02 18:12:38,2024-September-02 18:12:46,1.756864786,2.656797409,4.413662672,0,531,535,2.861483335,100.0%,false,None,
+36,mistral-small,hyperloop_specifications,2024-September-02 18:12:38,2024-September-02 18:12:47,1.75807786,2.921559811,4.679639816,10,531,468,2.689431906,100.0%,false,None,
+37,gpt-3.5-turbo,hyperloop_specifications,2024-September-02 18:12:48,2024-September-02 18:12:57,1.988883257,2.906532764,4.895416737,20,531,501,2.700809717,100.0%,false,None,
+37,mistral-small,hyperloop_specifications,2024-September-02 18:12:49,2024-September-02 18:12:58,2.082466841,2.746305466,4.828773499,20,531,570,2.727577209,100.0%,false,None,
+38,gpt-3.5-turbo,hyperloop_specifications,2024-September-02 18:12:59,2024-September-02 18:13:07,1.803392649,2.75668788,4.560081959,0,531,453,2.719128847,100.0%,false,None,
+38,mistral-small,hyperloop_specifications,2024-September-02 18:13:00,2024-September-02 18:13:09,2.129034758,2.678132772,4.807168484,10,531,556,3.087951422,100.0%,false,None,
+39,mistral-small,hyperloop_specifications,2024-September-02 18:13:12,2024-September-02 18:13:22,1.980500221,2.864667177,4.845168352,10,531,501,3.135992765,100.0%,false,None,
+40,mistral-small,hyperloop_specifications,2024-September-02 18:13:25,2024-September-02 18:13:33,2.060148239,2.85180378,4.911953211,10,531,622,3.075516701,100.0%,false,None,
+40,gpt-3.5-turbo,advancements,2024-September-02 18:13:31,2024-September-02 18:13:42,3.767565727,3.104388714,6.871955395,10,626,1265,3.306494713,100.0%,false,None,
+41,gpt-3.5-turbo,advancements,2024-September-02 18:13:45,2024-September-02 18:13:55,3.193559408,3.167892933,6.361453772,10,626,989,2.42561388,100.0%,false,None,
+42,gpt-3.5-turbo,advancements,2024-September-02 18:13:58,2024-September-02 18:14:07,3.885481358,2.726378679,6.611860991,20,626,1174,2.268421888,100.0%,false,None,
+43,mistral-small,advancements,2024-September-02 18:14:10,2024-September-02 18:14:20,3.191180944,2.856239796,6.047421932,10,626,937,2.56311202,100.0%,false,None,
+44,mistral-small,advancements,2024-September-02 18:14:22,2024-September-02 18:14:32,3.992139816,2.77678442,6.768925428,10,626,967,2.180379391,100.0%,false,None,
+43,gpt-3.5-turbo,advancements,2024-September-02 18:14:10,2024-September-02 18:14:40,23.315803766,2.823212385,26.139017582,10,626,975,2.512764931,100.0%,false,None,
+45,mistral-small,advancements,2024-September-02 18:14:35,2024-September-02 18:14:46,4.642378092,2.862313271,7.504692554,10,626,1592,2.318979025,100.0%,false,None,
+45,gpt-3.5-turbo,advancements,2024-September-02 18:14:42,2024-September-02 18:14:53,4.904040813,2.882183313,7.786225319,10,626,1595,2.411987305,100.0%,false,None,
+46,mistral-small,advancements,2024-September-02 18:14:48,2024-September-02 18:14:59,4.284832716,2.690164566,6.974998713,10,626,1080,2.349782467,100.0%,false,None,
+47,gpt-4,hyperloop_specifications,2024-September-02 18:15:19,2024-September-02 18:15:33,6.519310713,3.014553547,9.533865213,10,531,440,3.717978954,100.0%,false,None,
+48,gpt-4,hyperloop_specifications,2024-September-02 18:15:35,2024-September-02 18:15:48,5.334510326,3.183812618,8.518323898,10,531,462,3.044950962,100.0%,false,None,
+49,gemini-1.5-flash,hyperloop_specifications,2024-September-02 18:15:51,2024-September-02 18:15:59,1.200168133,2.651253462,3.851422548,10,531,665,3.136080503,100.0%,false,None,
+49,gpt-4,hyperloop_specifications,2024-September-02 18:15:51,2024-September-02 18:16:03,4.99925375,3.003007889,8.002262354,10,531,455,2.955031633,100.0%,false,None,
+50,gemini-1.5-flash,hyperloop_specifications,2024-September-02 18:16:01,2024-September-02 18:16:10,1.522109032,2.794270277,4.316380739,10,531,699,2.982032299,100.0%,false,None,
+50,gpt-4,hyperloop_specifications,2024-September-02 18:16:06,2024-September-02 18:16:22,5.629467487,6.772980452,12.402449369,0,531,550,3.008670568,100.0%,false,None,
+51,gemini-1.5-flash,hyperloop_specifications,2024-September-02 18:16:12,2024-September-02 18:16:24,4.512999058,2.954735756,7.467735767,10,531,656,3.116584063,100.0%,false,None,
+52,gemini-1.5-flash,hyperloop_specifications,2024-September-02 18:16:26,2024-September-02 18:16:34,1.510173082,2.851097107,4.361270905,10,531,871,2.776832819,100.0%,false,None,
+51,gpt-4,hyperloop_specifications,2024-September-02 18:16:25,2024-September-02 18:16:37,6.199192047,2.753465891,8.952658892,10,531,544,2.845247269,100.0%,false,None,
+53,gemini-1.5-flash,hyperloop_specifications,2024-September-02 18:16:37,2024-September-02 18:16:45,1.815184593,2.721776485,4.536962271,10,531,612,2.816732883,100.0%,false,None,
+54,gemini-1.5-flash,advancements,2024-September-02 18:17:29,2024-September-02 18:17:38,3.10086894,2.95455122,6.055421114,10,626,1819,2.278174639,100.0%,false,None,
+55,gemini-1.5-flash,advancements,2024-September-02 18:17:41,2024-September-02 18:17:50,2.152877569,2.979803085,5.132681608,10,626,1178,2.685575724,100.0%,false,None,
+56,gemini-1.5-flash,advancements,2024-September-02 18:17:53,2024-September-02 18:18:01,2.351319075,2.820387363,5.171707153,20,626,1329,2.257705927,100.0%,false,None,
+56,gemini-1.5-flash,advancements,2024-September-02 18:17:53,2024-September-02 18:18:02,2.536139011,2.727975845,5.264116287,20,626,1296,2.199697256,100.0%,false,None,
+57,gemini-1.5-flash,advancements,2024-September-02 18:18:04,2024-September-02 18:18:12,2.426778316,2.796072483,5.222851515,20,626,1366,2.430519819,100.0%,false,None,
+58,gemini-1.5-flash,advancements,2024-September-02 18:18:15,2024-September-02 18:18:24,2.384358406,2.840655088,5.225015163,10,626,1099,2.332840681,100.0%,false,None,
+59,gpt-4,advancements,2024-September-02 18:19:55,2024-September-02 18:20:14,12.609102726,3.035607576,15.644711494,10,626,1036,2.334796906,100.0%,false,None,
+60,gpt-4,advancements,2024-September-02 18:20:17,2024-September-02 18:20:34,10.742015123,2.794637442,13.536653757,10,626,893,2.47466135,100.0%,false,None,
+61,gpt-4,advancements,2024-September-02 18:20:36,2024-September-02 18:20:56,13.405228853,2.876291037,16.281520844,10,626,1341,2.592229843,100.0%,false,None,
+79,gpt-4,hyperloop_specifications,2024-September-02 18:26:23,2024-September-02 18:26:41,11.258159161,2.899165154,14.157325745,40,531,1317,2.958715439,100.0%,false,None,
+81,gpt-4,hyperloop_specifications,2024-September-02 18:26:43,2024-September-02 18:27:00,10.445053816,2.779759645,13.224814892,20,531,875,3.024232626,100.0%,false,None,
+62,gpt-4,advancements,2024-September-02 18:20:59,2024-September-02 18:21:20,14.263753414,3.086090088,17.349843979,10,626,1132,2.41479516,100.0%,false,None,
+63,gpt-4,advancements,2024-September-02 18:21:23,2024-September-02 18:21:39,10.391393423,2.809706926,13.201101542,10,626,854,2.538193464,100.0%,false,None,
+64,mistral-small,hyperloop_specifications,2024-September-02 18:22:04,2024-September-02 18:22:16,4.451088428,3.057995796,7.50908494,20,531,1525,3.127281904,100.0%,false,None,
+64,gpt-3.5-turbo,hyperloop_specifications,2024-September-02 18:22:16,2024-September-02 18:22:26,3.492298365,2.825786114,6.318085432,20,531,1146,2.530369997,100.0%,false,None,
+65,mistral-small,hyperloop_specifications,2024-September-02 18:22:19,2024-September-02 18:22:29,4.207490921,2.71055007,6.918042421,20,531,1315,2.874763489,100.0%,false,None,
+65,gpt-3.5-turbo,hyperloop_specifications,2024-September-02 18:22:29,2024-September-02 18:22:39,3.339466333,2.770634651,6.110101938,20,531,918,3.356349945,100.0%,false,None,
+66,mistral-small,hyperloop_specifications,2024-September-02 18:22:32,2024-September-02 18:22:44,5.179503679,2.741213799,7.920718193,20,531,1928,2.836612225,100.0%,false,None,
+66,gpt-3.5-turbo,hyperloop_specifications,2024-September-02 18:22:42,2024-September-02 18:22:53,4.055934191,2.856832981,6.912768602,20,531,1064,3.025903463,100.0%,false,None,
+67,mistral-small,hyperloop_specifications,2024-September-02 18:22:46,2024-September-02 18:22:58,4.351826191,2.819648027,7.171475172,20,531,1572,3.400673628,100.0%,false,None,
+67,gpt-3.5-turbo,hyperloop_specifications,2024-September-02 18:22:56,2024-September-02 18:23:03,0,0,0,20,0,0,3.160045385,0,true,ValueError,"not enough values to unpack (expected 4, got 3)"
+68,mistral-small,hyperloop_specifications,2024-September-02 18:23:01,2024-September-02 18:23:12,4.927245378,2.991537333,7.918784142,20,531,1691,2.998250484,100.0%,false,None,
+68,gpt-3.5-turbo,hyperloop_specifications,2024-September-02 18:23:06,2024-September-02 18:23:16,3.435990334,2.562536955,5.998528719,20,531,1024,3.010599136,100.0%,false,None,
+69,gpt-3.5-turbo,advancements,2024-September-02 18:23:40,2024-September-02 18:23:54,7.953086615,3.006510258,10.959597588,20,626,2316,2.304608107,100.0%,false,None,
+70,gpt-3.5-turbo,advancements,2024-September-02 18:23:57,2024-September-02 18:24:10,6.594300032,2.994364738,9.588665724,20,626,1868,2.644928932,100.0%,false,None,
+70,mistral-small,advancements,2024-September-02 18:24:02,2024-September-02 18:24:12,0,0,0,20,0,0,2.442816496,0,true,ValueError,"not enough values to unpack (expected 4, got 3)"
+71,gpt-3.5-turbo,advancements,2024-September-02 18:24:13,2024-September-02 18:24:24,0,0,0,20,0,0,2.430223227,0,true,ValueError,"not enough values to unpack (expected 4, got 3)"
+71,mistral-small,advancements,2024-September-02 18:24:14,2024-September-02 18:24:27,5.836637497,2.992029428,8.828667879,20,626,1740,2.731654406,100.0%,false,None,
+72,gpt-3.5-turbo,advancements,2024-September-02 18:24:26,2024-September-02 18:24:39,5.812470675,2.934853554,8.747324944,20,626,1842,2.624881506,100.0%,false,None,
+72,mistral-small,advancements,2024-September-02 18:24:29,2024-September-02 18:24:41,5.807087898,2.789838552,8.596927643,20,626,1767,2.287817478,100.0%,false,None,
+73,mistral-small,advancements,2024-September-02 18:24:44,2024-September-02 18:24:53,0,0,0,20,0,0,2.384688139,0,true,ValueError,"not enough values to unpack (expected 4, got 3)"
+73,gpt-3.5-turbo,advancements,2024-September-02 18:24:41,2024-September-02 18:24:54,5.930648088,3.247219086,9.177868128,20,626,2095,2.516151905,100.0%,false,None,
+74,mistral-small,advancements,2024-September-02 18:24:56,2024-September-02 18:25:09,6.882419348,3.13760376,10.020023823,20,626,1766,2.320195436,100.0%,false,None,
+75,gpt-4,hyperloop_specifications,2024-September-02 18:25:15,2024-September-02 18:25:36,13.476612091,3.223699331,16.700312376,20,531,1425,3.062329769,100.0%,false,None,
+76,gemini-1.5-flash,hyperloop_specifications,2024-September-02 18:25:44,2024-September-02 18:25:53,2.237076759,3.055130959,5.292208672,20,531,1118,3.151503563,100.0%,false,None,
+76,gpt-4,hyperloop_specifications,2024-September-02 18:25:39,2024-September-02 18:25:56,10.860302687,2.755477905,13.615781546,20,531,980,2.838462353,100.0%,false,None,
+77,gemini-1.5-flash,hyperloop_specifications,2024-September-02 18:25:56,2024-September-02 18:26:05,2.10729146,3.007173777,5.11446619,20,531,939,2.875367641,100.0%,false,None,
+78,gemini-1.5-flash,hyperloop_specifications,2024-September-02 18:26:07,2024-September-02 18:26:17,2.114553452,3.558841705,5.673396111,20,531,1102,2.929610252,100.0%,false,None,
+77,gpt-4,hyperloop_specifications,2024-September-02 18:25:59,2024-September-02 18:26:20,13.295629025,3.744773865,17.040403843,20,531,1344,2.971404314,100.0%,false,None,
+79,gemini-1.5-flash,hyperloop_specifications,2024-September-02 18:26:20,2024-September-02 18:26:29,2.613699436,2.860110283,5.473810911,20,531,1413,2.823594332,100.0%,false,None,
+80,gemini-1.5-flash,hyperloop_specifications,2024-September-02 18:26:32,2024-September-02 18:26:40,1.949090242,2.842934132,4.792025328,40,531,1055,2.941702366,100.0%,false,None,
+82,gemini-1.5-flash,advancements,2024-September-02 18:27:15,2024-September-02 18:27:25,4.782894373,2.757503986,7.54039979,20,626,2726,2.444846392,100.0%,false,None,
+83,gemini-1.5-flash,advancements,2024-September-02 18:27:28,2024-September-02 18:27:39,4.647676945,2.760040522,7.407718897,20,626,2672,2.338193417,100.0%,false,None,
+84,gemini-1.5-flash,advancements,2024-September-02 18:27:42,2024-September-02 18:27:52,4.573341608,2.921970129,7.495312691,20,626,2595,2.490288496,100.0%,false,None,
+85,gemini-1.5-flash,advancements,2024-September-02 18:27:55,2024-September-02 18:28:03,0,0,0,20,0,0,2.150730848,0,true,ValueError,"not enough values to unpack (expected 4, got 3)"
+83,gpt-4,advancements,2024-September-02 18:27:38,2024-September-02 18:28:05,21.208325863,2.912032127,24.120358944,20,626,2137,2.740742445,100.0%,false,None,
+86,gemini-1.5-flash,advancements,2024-September-02 18:28:06,2024-September-02 18:28:16,3.646952391,3.110025406,6.756978989,20,626,2349,2.797858,100.0%,false,None,
+86,gpt-4,advancements,2024-September-02 18:28:08,2024-September-02 18:28:31,15.791457415,3.719562769,19.511021137,20,626,1550,2.554950476,100.0%,false,None,
+87,gpt-4,advancements,2024-September-02 18:28:34,2024-September-02 18:28:55,14.034403801,2.960156202,16.994561195,20,626,1373,2.372291088,100.0%,false,None,
+88,gpt-4,advancements,2024-September-02 18:28:58,2024-September-02 18:29:21,16.314297915,3.025021553,19.339320183,20,626,1400,2.524485111,100.0%,false,None,
+89,gpt-4,advancements,2024-September-02 18:29:24,2024-September-02 18:29:48,18.677473545,2.887646675,21.565121651,20,626,1563,2.458618164,100.0%,false,None,
+90,mistral-small,hyperloop_specifications,2024-September-02 18:30:45,2024-September-02 18:30:58,0,0,0,20,0,0,3.285056353,0,true,ValueError,"not enough values to unpack (expected 4, got 3)"
+91,mistral-small,hyperloop_specifications,2024-September-02 18:31:01,2024-September-02 18:31:13,0,0,0,47,0,0,3.118920088,0,true,ValueError,"not enough values to unpack (expected 4, got 3)"
+90,gpt-3.5-turbo,hyperloop_specifications,2024-September-02 18:30:58,2024-September-02 18:31:14,8.728755951,3.056803226,11.785559893,47,531,2592,3.096372843,100.0%,false,None,
+92,mistral-small,hyperloop_specifications,2024-September-02 18:31:16,2024-September-02 18:31:29,0,0,0,47,0,0,2.878781796,0,true,ValueError,"not enough values to unpack (expected 4, got 3)"
+92,gpt-3.5-turbo,hyperloop_specifications,2024-September-02 18:31:17,2024-September-02 18:31:32,8.706352234,2.786233187,11.492586851,48,531,3137,2.850768805,100.0%,false,None,
+93,mistral-small,hyperloop_specifications,2024-September-02 18:31:31,2024-September-02 18:31:46,0,0,0,48,0,0,3.011511087,0,true,ValueError,"not enough values to unpack (expected 4, got 3)"
+93,gpt-3.5-turbo,hyperloop_specifications,2024-September-02 18:31:35,2024-September-02 18:31:49,0,0,0,48,0,0,3.101615191,0,true,ValueError,"not enough values to unpack (expected 4, got 3)"
+94,mistral-small,hyperloop_specifications,2024-September-02 18:31:49,2024-September-02 18:32:04,0,0,0,0,0,0,2.904580832,0,true,ValueError,"not enough values to unpack (expected 4, got 3)"
+94,gpt-3.5-turbo,hyperloop_specifications,2024-September-02 18:31:51,2024-September-02 18:32:06,7.690903902,2.973734856,10.664639711,48,531,2450,3.010364294,100.0%,false,None,
+95,gpt-3.5-turbo,hyperloop_specifications,2024-September-02 18:32:09,2024-September-02 18:32:25,10.022134542,2.817950487,12.840086222,49,531,4564,2.994214773,100.0%,false,None,
+96,mistral-small,advancements,2024-September-02 18:32:27,2024-September-02 18:32:41,0,0,0,20,0,0,2.811862707,0,true,ValueError,"not enough values to unpack (expected 4, got 3)"
+97,mistral-small,advancements,2024-September-02 18:32:44,2024-September-02 18:32:48,0,0,0,20,0,0,2.385552406,0,true,ValueError,"not enough values to unpack (expected 4, got 3)"
+97,gpt-3.5-turbo,advancements,2024-September-02 18:32:46,2024-September-02 18:33:01,0,0,0,20,0,0,2.465412855,0,true,ValueError,"not enough values to unpack (expected 4, got 3)"
+98,mistral-small,advancements,2024-September-02 18:32:50,2024-September-02 18:33:02,0,0,0,20,0,0,2.403362989,0,true,ValueError,"not enough values to unpack (expected 4, got 3)"
+99,mistral-small,advancements,2024-September-02 18:33:05,2024-September-02 18:33:15,0,0,0,20,0,0,2.682160139,0,true,ValueError,"not enough values to unpack (expected 4, got 3)"
+99,gpt-3.5-turbo,advancements,2024-September-02 18:33:03,2024-September-02 18:33:22,0,0,0,20,0,0,2.370497227,0,true,ValueError,"not enough values to unpack (expected 4, got 3)"
+100,mistral-small,advancements,2024-September-02 18:33:18,2024-September-02 18:33:31,0,0,0,20,0,0,2.585899115,0,true,ValueError,"not enough values to unpack (expected 4, got 3)"
+100,gpt-3.5-turbo,advancements,2024-September-02 18:33:25,2024-September-02 18:33:42,0,0,0,20,0,0,2.430037737,0,true,ValueError,"not enough values to unpack (expected 4, got 3)"
+101,gpt-3.5-turbo,advancements,2024-September-02 18:33:45,2024-September-02 18:33:58,0,0,0,20,0,0,2.408323288,0,true,ValueError,"not enough values to unpack (expected 4, got 3)"
+101,gemini-1.5-flash,hyperloop_specifications,2024-September-02 18:33:52,2024-September-02 18:34:04,4.946673393,2.835911512,7.782586098,51,531,2769,3.133603573,100.0%,false,None,
+102,gemini-1.5-flash,hyperloop_specifications,2024-September-02 18:34:07,2024-September-02 18:34:16,0,0,0,51,0,0,3.178179502,0,true,ValueError,"not enough values to unpack (expected 4, got 3)"
+102,gpt-3.5-turbo,advancements,2024-September-02 18:34:01,2024-September-02 18:34:21,0,0,0,20,0,0,2.336378336,0,true,ValueError,"not enough values to unpack (expected 4, got 3)"
+103,gemini-1.5-flash,hyperloop_specifications,2024-September-02 18:34:19,2024-September-02 18:34:32,5.431558132,2.916883707,8.348442793,50,531,3203,3.076634884,100.0%,false,None,
+104,gemini-1.5-flash,hyperloop_specifications,2024-September-02 18:34:34,2024-September-02 18:34:42,0,0,0,50,0,0,2.769623756,0,true,ValueError,"not enough values to unpack (expected 4, got 3)"
+105,gemini-1.5-flash,hyperloop_specifications,2024-September-02 18:34:45,2024-September-02 18:34:54,0,0,0,50,0,0,2.773784876,0,true,ValueError,"not enough values to unpack (expected 4, got 3)"
+104,gpt-4,hyperloop_specifications,2024-September-02 18:34:40,2024-September-02 18:35:14,27.058103323,3.141210079,30.199314356,50,531,2417,3.15127492,100.0%,false,None,
+106,gemini-1.5-flash,advancements,2024-September-02 18:35:17,2024-September-02 18:35:36,11.854098082,2.941129684,14.79522872,49,626,5919,2.45478344,100.0%,false,None,
+106,gpt-4,hyperloop_specifications,2024-September-02 18:35:17,2024-September-02 18:35:44,21.045053959,2.867726564,23.912781477,50,531,1768,2.823073864,100.0%,false,None,
+107,gemini-1.5-flash,advancements,2024-September-02 18:35:39,2024-September-02 18:35:50,0,0,0,49,0,0,2.351414204,0,true,ValueError,"not enough values to unpack (expected 4, got 3)"
+108,gemini-1.5-flash,advancements,2024-September-02 18:35:53,2024-September-02 18:36:06,0,0,0,49,0,0,2.488665342,0,true,ValueError,"not enough values to unpack (expected 4, got 3)"
+109,gemini-1.5-flash,advancements,2024-September-02 18:36:09,2024-September-02 18:36:21,0,0,0,49,0,0,2.60187149,0,true,ValueError,"not enough values to unpack (expected 4, got 3)"
+107,gpt-4,hyperloop_specifications,2024-September-02 18:35:47,2024-September-02 18:36:23,29.770576239,2.740592003,32.511169434,52,531,2899,3.078405142,100.0%,false,None,
+110,gemini-1.5-flash,advancements,2024-September-02 18:36:23,2024-September-02 18:36:38,0,0,0,49,0,0,2.439393282,0,true,ValueError,"not enough values to unpack (expected 4, got 3)"
+110,gpt-4,hyperloop_specifications,2024-September-02 18:36:26,2024-September-02 18:36:59,25.943236828,2.71275568,28.655993938,50,531,2275,3.023576975,100.0%,false,None,
+111,gpt-4,hyperloop_specifications,2024-September-02 18:37:01,2024-September-02 18:37:39,30.819716454,3.024365664,33.844082832,50,531,3796,3.208286285,100.0%,false,None,
+112,gpt-4,advancements,2024-September-02 18:37:58,2024-September-02 18:38:50,0,0,0,49,0,0,2.590343475,0,true,ValueError,"not enough values to unpack (expected 4, got 3)"
+113,gpt-4,advancements,2024-September-02 18:38:52,2024-September-02 18:39:40,0,0,0,49,0,0,2.701245546,0,true,ValueError,"not enough values to unpack (expected 4, got 3)"
+114,gpt-4,advancements,2024-September-02 18:39:43,2024-September-02 18:39:52,0,0,0,49,0,0,2.594668627,0,true,ValueError,"not enough values to unpack (expected 4, got 3)"
+115,gpt-4,advancements,2024-September-02 18:39:55,2024-September-02 18:40:02,0,0,0,49,0,0,2.498907804,0,true,ValueError,"not enough values to unpack (expected 4, got 3)"
+116,gpt-4,advancements,2024-September-02 18:40:04,2024-September-02 18:40:09,0,0,0,49,0,0,2.564217091,0,true,ValueError,"not enough values to unpack (expected 4, got 3)"
+117,gpt-3.5-turbo,hyperloop_specifications,2024-September-02 18:41:02,2024-September-02 18:41:19,0,0,0,50,0,0,3.059983969,0,true,ValueError,"not enough values to unpack (expected 4, got 3)"
+118,gpt-4,hyperloop_specifications,2024-September-02 18:41:50,2024-September-02 18:42:57,59.723201036,2.864748478,62.58795023,115,532,4774,3.024755955,100.0%,false,None,
+119,mistral-small,hyperloop_specifications,2024-September-02 18:46:05,2024-September-02 18:46:20,0,0,0,115,0,0,3.26240778,0,true,ValueError,"not enough values to unpack (expected 4, got 3)"
+120,gemini-1.5-flash,hyperloop_specifications,2024-September-02 18:46:40,2024-September-02 18:46:51,0,0,0,115,0,0,2.815708876,0,true,ValueError,"not enough values to unpack (expected 4, got 3)"
+121,gpt-3.5-turbo,advancements,2024-September-02 18:47:11,2024-September-02 18:47:43,0,0,0,49,0,0,2.622199297,0,true,ValueError,"not enough values to unpack (expected 4, got 3)"
+122,gpt-4,advancements,2024-September-02 18:48:14,2024-September-02 18:48:26,0,0,0,49,0,0,2.470549583,0,true,ValueError,"not enough values to unpack (expected 4, got 3)"
+123,mistral-small,advancements,2024-September-02 18:49:02,2024-September-02 18:49:18,0,0,0,49,0,0,2.781753063,0,true,ValueError,"not enough values to unpack (expected 4, got 3)"
+124,gemini-1.5-flash,advancements,2024-September-02 18:49:27,2024-September-02 18:49:48,0,0,0,49,0,0,2.715015411,0,true,ValueError,"not enough values to unpack (expected 4, got 3)"
