@@ -1821,8 +1821,8 @@ def sanitize_string(input_string):
     return sanitized
 
 def cleanup_query_string(query):
-    # Remove 'sql' at the beginning of the string
-    query = re.sub(r'^\s*sql\s+', '', query, flags=re.IGNORECASE)
+    # Remove '```' and 'sql' at the beginning of the string
+    query = re.sub(r'^\s*(```|sql\s+)', '', query, flags=re.IGNORECASE)
 
     # Remove 'sql' if it appears right before CREATE or INSERT
     query = re.sub(r'\bsql\s+(?=(CREATE|INSERT))', '', query, flags=re.IGNORECASE)
