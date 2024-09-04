@@ -1909,13 +1909,15 @@ def execute_sql_statement(sql_statement):
 
 def execute_sql_batch(sql_string):
     sql_statements = sql_string.strip().split(';')
+    st.write(sql_statements)   
     
     for sql_statement in sql_statements:
         sql_statement = sql_statement.strip()
+        st.write(sql_statement) 
 
         if sql_statement:
             execute_sql_statement(sql_statement)
-            print(f"Executed: {sql_statement}")           
+            st.write(sql_statement)          
 
 def load_data_from_snowflake(table_name):
     session = Session.builder.configs(get_snowflake_connection_params()).create()
