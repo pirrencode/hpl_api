@@ -1326,8 +1326,12 @@ def extract_hyperloop_data_experiment(model, time_periods, content_type):
 def generate_code_experiment(model, time_periods, content_type):
     query = "show tables in schema FUSION_STORE"
     df_temp = execute_sql_statement(query)
-    st.write(df_temp)
-    hpl_table_name = get_next_hyperloop_table(df_temp)
+    if content_type == "add_hyperloop_subsystem_sql":
+        hpl_table_name = get_next_hyperloop_table(df_temp)
+    elif content_type == "backup_sql":
+        hpl_table_name = get_next_hyperloop_table(df_temp)     
+    elif content_type == "remove_hyperloop_specifications_sql":
+        hpl_table_name = get_previous_hyperloop_table(df_temp)             
     fusion_table = f"FUSION_STORE.{hpl_table_name}"
     experiment_table = "ALLIANCE_STORE.EGTL_GENERATE_CODE_EXPERIMENT"
     experiment_number = get_record_count_for_model(model, experiment_table) + 1
@@ -1401,9 +1405,9 @@ def generate_code_experiment(model, time_periods, content_type):
         elif content_type == "remove_hyperloop_specifications_sql":
             is_removed = check_table_removed('FUSION_STORE', fusion_table)
             if is_removed == True:
-                df_correctness_check = "0%"
+                df_correctness_check = "100%"
             elif is_removed == False:
-                df_correctness_check = "100%"       
+                df_correctness_check = "0%"       
         elif content_type == "backup_sql":
             check_query = f"SELECT count(1) FROM {fusion_table}_BCK"
             df_check = execute_sql_statement(check_query)
@@ -1451,6 +1455,25 @@ def get_next_hyperloop_table(result):
 
     next_table_name = f'HYPERLOOP_SUBSYSTEM_{max_number + 1}'
     return next_table_name
+
+def get_previous_hyperloop_table(result):
+    if result is None:
+        raise ValueError("Invalid result set from SQL query")
+
+    result_str = "\n".join([str(row) for row in result])
+
+    pattern = r'HYPERLOOP_SUBSYSTEM_(\d+)'
+    max_number = 0
+
+    matches = re.findall(pattern, result_str)
+    
+    for match in matches:
+        number = int(match)
+        max_number = max(max_number, number)
+
+    next_table_name = f'HYPERLOOP_SUBSYSTEM_{max_number - 1}'
+    return next_table_name
+
 
 def convert_result_to_df(result):
     try:
