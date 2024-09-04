@@ -1387,7 +1387,8 @@ def generate_code_experiment(model, time_periods, content_type):
     try:
         check_query = f"SELECT count(1) FROM {fusion_table}"
         df_check = execute_sql_statement(check_query)
-        df_correctness_check = check_list_first_element(df_check)      
+        df_correctness_check = check_list_first_element(df_check)
+        st.write("Correctness check is coompleted.")      
     except Exception as e:
         st.error(f"Error during correctness check: {str(e)}")
 
@@ -1554,7 +1555,7 @@ def insert_data_in_generate_code_experiment_table(id,
     try:
         session = Session.builder.configs(get_snowflake_connection_params()).create()
         insert_query = f"""
-            INSERT INTO HPL_SYSTEM_DYNAMICS.ALLIANCE_STORE.EGTL_FUSION_STORE_EXPERIMENT 
+            INSERT INTO HPL_SYSTEM_DYNAMICS.ALLIANCE_STORE.EGTL_GENERATE_CODE_EXPERIMENT 
             (ID, MODEL, EXPERIMENT_START_DATE, EXPERIMENT_END_DATE, MODEL_WORK_TIME, 
              SAVE_DATA_TO_SNOWFLAKE_TIME, EXPERIMENT_TIME_TOTAL, ROWS_PROCESSED, 
              PROMPT_VOLUME, OUTPUT_VOLUME, OUTPUT_DF_VOLUME, LOAD_TO_STAGING_TIME, 
@@ -1566,7 +1567,7 @@ def insert_data_in_generate_code_experiment_table(id,
         """
         session.sql(insert_query).collect()
     except Exception as e:
-        st.error(f"An error occurred while saving data to Snowflake: {str(e)}")
+        st.error(f"An error occurred while saving data to Snowflake Experiments Table: {str(e)}")
     finally:
         if session:
             session.close()  
@@ -1929,6 +1930,7 @@ def execute_sql_batch(sql_string):
                 execute_sql_statement(sql_statement_sanitized)
             else:
                 st.write("Sanitized query is empty, skipping execution.")
+    st.write("Query processing is completed.")            
 
 def check_list_first_element(df_check):
     if isinstance(df_check, list) and len(df_check) > 0:
