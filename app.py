@@ -3256,7 +3256,7 @@ def render_experiment_page():
         elif experiment_name == "DATA_EXTRACT_EXPERIMENT_FOR_ADVANCEMENTS":
             table_name = "ALLIANCE_STORE.EGTL_EXTRACT_DATA_EXPERIMENT"
             view_experiment_data(table_name, experiment_name)     
-        elif experiment_name == "DATA_EXTRACT_EXPERIMENT_FOR_ADVANCEMENTS":
+        elif experiment_name == "EGTL_GENERATE_CODE_EXPERIMENT":
             table_name = "ALLIANCE_STORE.EGTL_GENERATE_CODE_EXPERIMENT"
             view_experiment_data(table_name, experiment_name)                                                      
         elif experiment_name == "EGTL_REMOVE_SYSTEM_STRUCTURE_EXPERIMENT":
