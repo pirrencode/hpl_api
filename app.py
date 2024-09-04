@@ -1886,11 +1886,10 @@ def execute_sql_statement(sql_statement):
     session = Session.builder.configs(get_snowflake_connection_params()).create()
 
     try:
-        # Execute the query and collect the result
         query = session.sql(f"{sql_statement} ;")
-        result = query.collect()  # Collect the query result
+        result = query.collect()
         print(f"Successfully executed SQL query {sql_statement}.")
-        return result  # Return the collected result
+        return result
 
     except Exception as e:
         print(f"An error occurred: {str(e)}")
@@ -1899,6 +1898,16 @@ def execute_sql_statement(sql_statement):
     finally:
         if session:
             session.close()
+
+def execute_sql_batch(sql_string):
+    sql_statements = sql_string.strip().split(';')
+    
+    for sql_statement in sql_statements:
+        sql_statement = sql_statement.strip()
+
+        if sql_statement:
+            execute_sql_statement(sql_statement)
+            print(f"Executed: {sql_statement}")           
 
 def load_data_from_snowflake(table_name):
     session = Session.builder.configs(get_snowflake_connection_params()).create()
