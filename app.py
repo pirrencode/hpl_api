@@ -1405,20 +1405,25 @@ def generate_code_experiment(model, time_periods, content_type):
 
 import re
 
-def get_next_hyperloop_table(df):
-    if df is None or 'name' not in df.columns:
-        raise ValueError("Invalid DataFrame or 'name' column not found")
+def get_next_hyperloop_table(result):
+    if result is None:
+        raise ValueError("Invalid result set from SQL query")
+
+    # Convert result to a single string for easier pattern searching
+    result_str = "\n".join([str(row) for row in result])
 
     pattern = r'HYPERLOOP_SUBSYSTEM_(\d+)'
     max_number = 0
 
-    for table_name in df['name']:
-        match = re.match(pattern, table_name)
-        if match:
-            number = int(match.group(1))
-            max_number = max(max_number, number)
+    # Find all matches in the result string
+    matches = re.findall(pattern, result_str)
+    
+    # Iterate through the matches and find the largest number
+    for match in matches:
+        number = int(match)
+        max_number = max(max_number, number)
 
-    # Generate next table name
+    # Generate the next table name
     next_table_name = f'HYPERLOOP_SUBSYSTEM_{max_number + 1}'
     return next_table_name
 
