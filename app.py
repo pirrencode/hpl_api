@@ -13,6 +13,7 @@ import requests
 import json
 import google.generativeai as gemini
 import os
+import re
 
 # LOG LEVEL SETUP
 logging.basicConfig(level=logging.INFO)
@@ -1412,8 +1413,6 @@ def generate_code_experiment(model, time_periods, content_type):
 
     st.write(f"System has completed fusion store GENERATE CODE experiment for {model} number {experiment_number}. Experiment ID {experiment_id}.")
 
-import re
-
 def get_next_hyperloop_table(result):
     if result is None:
         raise ValueError("Invalid result set from SQL query")
@@ -1808,8 +1807,6 @@ def check_df_for_null_values(df):
     
     return correct_percentage
 
-import re
-
 def sanitize_string(input_string):
     """Sanitize the input string to escape or remove problematic characters for SQL."""
     if input_string is None:
@@ -1822,6 +1819,15 @@ def sanitize_string(input_string):
     sanitized = sanitized.replace(";", "")
 
     return sanitized
+
+def cleanup_query_string(query):
+    # Remove 'sql' at the beginning of the string
+    query = re.sub(r'^\s*sql\s+', '', query, flags=re.IGNORECASE)
+
+    # Remove 'sql' if it appears right before CREATE or INSERT
+    query = re.sub(r'\bsql\s+(?=(CREATE|INSERT))', '', query, flags=re.IGNORECASE)
+
+    return query
 
 #############################################
 # MIGRATION SCRIPTS
@@ -1916,8 +1922,9 @@ def execute_sql_batch(sql_string):
         st.write(sql_statement) 
 
         if sql_statement:
-            execute_sql_statement(sql_statement)
-            st.write(sql_statement)          
+            sql_statement_sanitized = cleanup_query_string(sql_statement)
+            st.write(f"Sanitized: {sql_statement_sanitized}")
+            execute_sql_statement(sql_statement_sanitized)
 
 def check_list_first_element(df_check):
     if isinstance(df_check, list) and len(df_check) > 0:
