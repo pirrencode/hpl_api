@@ -1312,7 +1312,7 @@ def extract_hyperloop_data_experiment(model, time_periods, content_type):
 
 def generate_code_experiment(model, time_periods, content_type):
     if content_type == "add_hyperloop_subsystem_sql":
-        query = "show tables"
+        query = "show tables in schema FUSION_STORE"
         df_temp = execute_sql_statement(query)
         st.write(df_temp)
         hpl_table_name = get_next_hyperloop_table(df_temp)
@@ -1886,9 +1886,11 @@ def execute_sql_statement(sql_statement):
     session = Session.builder.configs(get_snowflake_connection_params()).create()
 
     try:
-        st.write(f"Query: {sql_statement}")
-        session.sql(sql_statement).collect()
-        print(f"Successfully executed SQL query {sql_statement}.")
+        query = session.sql(f"""
+            {sql_statement} ;
+        """)
+        # session.sql(query).collect()
+        print(f"Successfully executed SQL query {query}.")
 
     except Exception as e:
         print(f"An error occurred: {str(e)}")
