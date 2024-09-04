@@ -1,0 +1,17 @@
+Model,Task difficulty,Total experiments,Succeeded experiments (%),Avg. model work time (ms),Avg. output correctness (%),Avg. prompt size (symbols),Avg. model output size (symbols)
+gemini-1.5-flash,1,10,100.0,1.39,100,577.5,599.7
+gemini-1.5-flash,2,10,100.0,2.27,100,566.62,949.88
+gemini-1.5-flash,3,10,90.0,3.38,100,541.31,1663.33
+gpt-3.5-turbo,1,10,100.0,1.74,100,577.5,479.3
+gpt-3.5-turbo,2,10,100.0,6.46,100,594.33,987.33
+gpt-3.5-turbo,3,10,60.0,8.0,100,360.37,1244.67
+gpt-4,1,10,100.0,6.31,100,577.5,490.8
+gpt-4,2,10,100.0,9.01,100,578.5,770.7
+gpt-4,3,10,100.0,14.54,100,578.5,1396.4
+mistral-small,1,10,100.0,1.65,100,572.22,407.22
+mistral-small,2,10,100.0,3.0,100,578.5,840.38
+mistral-small,3,10,5.0,7.15,100,299.47,1476.9
+TOTAL_PER_DATA_INTENSITY_5,1,40,100.0,2.77,100,576.18,494.26
+TOTAL_PER_DATA_INTENSITY_10,2,40,100.0,5.18,100,579.49,887.07
+TOTAL_PER_DATA_INTENSITY_20,3,40,63.75,8.27,100,444.91,1445.32
+TOTAL,2,120,87.92,5.41,100,533.53,942.22

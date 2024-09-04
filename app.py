@@ -245,7 +245,8 @@ def clean_data_with_openai(df, model):
     data_json = df.to_json(orient='split')
 
     prompt = (
-        "You are given a dataset in JSON format. Check if the 'CR_SCL' column contains any value larger than 1. "
+        "You are given a dataset in JSON format. Check if the 'CR_SCL' column contains any value larger than 1."
+        "Also change Null or NaN values. If you see numbers in string format replace them with numerical values. Negative values should be changed to 0."
         "If so, normalize those values so they fall within the range 0..1. Decimal precision should be 2. Other values should stay as they are. "
         "Return the cleaned dataset in JSON format "
         "without any additional text or explanation.\n\n"
@@ -309,14 +310,12 @@ def generate_data_with_openai(model, time_periods, load_data_trends):
         if not (generated_data.startswith("{") and generated_data.endswith("}")):
             generated_data = "{" + generated_data + "}"
 
-        # Attempt to parse the JSON data
         try:
             data_dict = json.loads(generated_data)
         except json.JSONDecodeError as e:
             st.error(f"An error occurred while parsing the JSON data: {str(e)}")
             return None, None, None
 
-        # Convert the dictionary into a DataFrame
         gen_ai_df = pd.DataFrame(data_dict)
 
         output_volume = len(str(generated_data)) if generated_data is not None else 0
@@ -343,6 +342,7 @@ def clean_data_with_gemini(df, model):
         "If so, normalize those values so they fall within the range 0 to 1 using the following formula: "
         "For each value x greater than 1, compute the normalized value as x / max(x) where max(x) is the maximum value in the 'CR_SCL' column. Decimal precision should be 2."
         "Other values should stay as they are."
+        "Also change Null or NaN values. If you see numbers in string format replace them with numerical values. Negative values should be changed to 0."
         "Return only the 'data' array from the JSON in the format of a list of lists, without any additional text, columns, or index fields."
         "Do not include any code, text, column names or index fields in the output. Your answer to me must contain only dataset - numerical digits, in dict format."
         "\n\n"
@@ -395,14 +395,12 @@ def generate_data_with_gemini(model, time_periods, load_data_trends):
         if not (generated_data.startswith("{") and generated_data.endswith("}")):
             generated_data = "{" + generated_data + "}"
 
-        # Attempt to parse the JSON data
         try:
             data_dict = json.loads(generated_data)
         except json.JSONDecodeError as e:
             st.error(f"An error occurred while parsing the JSON data: {str(e)}")
             return None, None, None
 
-        # Convert the dictionary into a DataFrame
         gen_ai_df = pd.DataFrame(data_dict)
 
         output_volume = len(str(generated_data)) if generated_data is not None else 0
@@ -637,14 +635,12 @@ def extract_hyperloop_specification_with_gemini(model, time_periods, content_typ
         if not (generated_data.startswith("{") and generated_data.endswith("}")):
             generated_data = "{" + generated_data + "}"
 
-        # Attempt to parse the JSON data
         try:
             data_dict = json.loads(generated_data)
         except json.JSONDecodeError as e:
             st.error(f"An error occurred while parsing the JSON data: {str(e)}")
             return None, None, None
 
-        # Convert the dictionary into a DataFrame
         gen_ai_df = pd.DataFrame(data_dict)
 
         output_volume = len(str(generated_data)) if generated_data is not None else 0
@@ -713,14 +709,12 @@ def extract_hyperloop_specification_with_mistral(model, time_periods, content_ty
         if not (generated_data.startswith("{") and generated_data.endswith("}")):
             generated_data = "{" + generated_data + "}"
 
-        # Attempt to parse the JSON data
         try:
             data_dict = json.loads(generated_data)
         except json.JSONDecodeError as e:
             st.error(f"An error occurred while parsing the JSON data: {str(e)}")
             return None, None, None
 
-        # Convert the dictionary into a DataFrame
         gen_ai_df = pd.DataFrame(data_dict)
 
         output_volume = len(str(generated_data)) if generated_data is not None else 0
@@ -732,6 +726,118 @@ def extract_hyperloop_specification_with_mistral(model, time_periods, content_ty
     except Exception as e:
         st.error(f"An error occurred: {str(e)}")
         return None, None, None
+
+
+def generate_code_with_openai(model, time_periods, fusion_table, content_type):
+
+    if content_type == "add_hyperloop_subsystem_sql":
+        prompt = (
+            f"Generate a SQL query for Snowflake that creates the table {fusion_table} and inserts data based on Hyperloop technology subsystem with {time_periods} parameters. Return only the SQL query as an output, without any additional text or explanations."
+        )
+    elif content_type == "remove_hyperloop_specifications_sql":
+        prompt = (
+            f"PLACEHOLDER. "
+        )       
+
+    openai.api_key = get_openai_api_key()
+
+    try:
+        response = openai.chat.completions.create(
+            model=model,
+            messages=[
+                {"role": "system", "content": "You are a helpful assistant."},
+                {"role": "user", "content": prompt}
+            ]
+        )
+
+        generated_data = response.choices[0].message.content.strip()
+
+        st.write(f"The {model} response: {generated_data}")
+
+        output_volume = len(str(generated_data)) if generated_data is not None else 0
+        prompt_volume = len(str(prompt)) if prompt is not None else 0
+
+        return generated_data, prompt_volume, output_volume
+
+    except Exception as e:
+        st.error(f"An error occurred: {str(e)}")
+        return None, None, None
+    
+def generate_code_with_mistral(model, time_periods, fusion_table, content_type):
+
+    if content_type == "add_hyperloop_subsystem_sql":
+        prompt = (
+            f"Generate a SQL query for Snowflake that creates the table {fusion_table} and inserts data based on Hyperloop technology subsystem with {time_periods} parameters. Return only the SQL query as an output, without any additional text or explanations."
+        )
+    elif content_type == "remove_hyperloop_specifications_sql":
+        prompt = (
+            f"PLACEHOLDER. "
+        )       
+
+    headers = {
+        "Authorization": f"Bearer {get_mistral_api_key()}",
+        "Content-Type": "application/json"
+    }
+
+    data = {
+        "model": model,
+        "messages": [
+            {
+                "role": "user",
+                "content": prompt
+            }
+        ],
+        "max_tokens": 10000,
+    }
+
+    try:
+        response = requests.post("https://api.mistral.ai/v1/chat/completions", headers=headers, json=data)
+        response.raise_for_status()
+
+        result = response.json()
+        generated_data = result["choices"][0]["message"]["content"].strip()
+
+        st.write(f"The {model} response: {generated_data}")
+
+        output_volume = len(str(generated_data)) if generated_data is not None else 0
+        prompt_volume = len(str(prompt)) if prompt is not None else 0
+
+        return generated_data, prompt_volume, output_volume
+
+    except Exception as e:
+        st.error(f"An error occurred: {str(e)}")
+        return None, None, None    
+    
+def generate_code_with_gemini(model, time_periods, fusion_table, content_type):
+
+    if content_type == "add_hyperloop_subsystem_sql":
+        prompt = (
+            f"Generate a SQL query for Snowflake that creates the table {fusion_table} and inserts data based on Hyperloop technology subsystem with {time_periods} parameters. Return only the SQL query as an output, without any additional text or explanations."
+        )
+    elif content_type == "remove_hyperloop_specifications_sql":
+        prompt = (
+            f"PLACEHOLDER. "
+        )       
+
+    gemini.configure(api_key=get_google_api_key())
+
+    gemini_model = gemini.GenerativeModel(model_name=model)
+
+    try:
+        response = gemini_model.generate_content([prompt])
+
+        generated_data = response.text
+
+        st.write(f"The {model} response: {generated_data}")
+
+        output_volume = len(str(generated_data)) if generated_data is not None else 0
+        prompt_volume = len(str(prompt)) if prompt is not None else 0
+
+        return generated_data, prompt_volume, output_volume
+
+    except Exception as e:
+        st.error(f"An error occurred: {str(e)}")
+        return None, None, None        
 
 def clean_json_output(insights):
     """
@@ -794,7 +900,15 @@ def populate_calc_cr_scl_staging(time_periods):
     return df
 
 #############################################
+#############################################
+#############################################
 # EGTL EXPERIMENT
+#############################################
+#############################################
+#############################################
+
+#############################################
+# STAGING_STORE TRANSFORMATION EXPERIMENT
 #############################################
 
 def egtl_quantative_data_experiment(model):
@@ -884,6 +998,10 @@ def egtl_quantative_data_experiment(model):
         st.error(f"Error inserting data into the experiment table: {str(e)}")
 
     st.write(f"System has completed quantative experiment for {model} number {experiment_number}. Experiment ID {experiment_id}.")
+
+#############################################
+# ALLIANCE_STORE ANALYSIS EXPERIMENT
+#############################################
 
 def egtl_qualitative_data_experiment(model, defined_scenario):
     summary_table = "ALLIANCE_STORE.HPL_SD_CRS_ALLIANCE"
@@ -985,6 +1103,10 @@ def egtl_qualitative_data_experiment(model, defined_scenario):
 
     st.write(f"System has completed qualitative experiment for {model} number {experiment_number}. Experiment ID {experiment_id}.")
 
+#############################################
+# FUSION_STORE GENERATE DATA EXPERIMENT
+#############################################
+
 def fusion_store_experiment(model, time_periods, load_data_trends):
     fusion_table = "FUSION_STORE.CALC_CR_SCL_FUSION"
     staging_table = "STAGING_STORE.CALC_CR_SCL_STAGING"
@@ -995,7 +1117,6 @@ def fusion_store_experiment(model, time_periods, load_data_trends):
 
     start_date = datetime.now(pytz.utc).strftime('%Y-%B-%d %H:%M:%S')
     
-    # Initialize all variables to default values
     errors_encountered = False
     error_type = None
     error_message = None
@@ -1079,6 +1200,10 @@ def fusion_store_experiment(model, time_periods, load_data_trends):
 
     st.write(f"System has completed fusion store GENERATE experiment for {model} number {experiment_number}. Experiment ID {experiment_id}.")
 
+#############################################
+# FUSION_STORE EXTRACT DATA EXPERIMENT
+#############################################
+
 def extract_hyperloop_data_experiment(model, time_periods, content_type):
     if content_type == "hyperloop_specifications":
         fusion_table = "FUSION_STORE.HYPERLOOP_SPECIFICATION_FUSION"
@@ -1095,7 +1220,6 @@ def extract_hyperloop_data_experiment(model, time_periods, content_type):
 
     start_date = datetime.now(pytz.utc).strftime('%Y-%B-%d %H:%M:%S')
     
-    # Initialize all variables to default values
     errors_encountered = False
     error_type = None
     error_message = None
@@ -1182,6 +1306,118 @@ def extract_hyperloop_data_experiment(model, time_periods, content_type):
 
     st.write(f"System has completed fusion store EXTRACT DATA experiment for {model} number {experiment_number}. Experiment ID {experiment_id}.")
 
+########################################
+# GENERATE CODE EXPERIMENT
+########################################
+
+def generate_code_experiment(model, time_periods, content_type):
+    if content_type == "add_hyperloop_subsystem_sql":
+        query = "show tables in schema FUSION_STORE"
+        df_temp = execute_sql_statement(query)
+        hpl_table_name = get_next_hyperloop_table(df_temp)
+        fusion_table = f"FUSION_STORE.{hpl_table_name}"
+    elif content_type == "remove_hyperloop_subsystem_sql":
+        fusion_table = "PLACEHOLDER"
+    experiment_table = "ALLIANCE_STORE.EGTL_EXTRACT_DATA_EXPERIMENT"
+    experiment_number = get_record_count_for_model(model, experiment_table) + 1
+    experiment_id = get_largest_record_id(experiment_table) + 1
+    st.write(f"Starting GENERATE CODE experiment to add Hyperloop subsystem specification in Fusion Store for {model} number {experiment_number}, ID {experiment_id}, type: {content_type}.")
+
+    start_date = datetime.now(pytz.utc).strftime('%Y-%B-%d %H:%M:%S')
+    
+    errors_encountered = False
+    error_type = None
+    error_message = None
+    genai_response_time = 0
+    prompt_volume = 0
+    output_volume = 0
+    total_time = 0
+    save_data_to_snowflake_time = 0
+    df_correctness_check = 0
+
+    try:
+        start_time = time.time()
+
+        if model in ["gpt-3.5-turbo", "gpt-4"]:
+            gen_ai_df, prompt_volume, output_volume, df_correctness_check = generate_code_with_openai(model, time_periods, fusion_table, content_type)
+        elif model == "mistral-small":
+            gen_ai_df, prompt_volume, output_volume, df_correctness_check = generate_code_with_mistral(model, time_periods, fusion_table, content_type)
+        elif model == "gemini-1.5-flash":
+            gen_ai_df, prompt_volume, output_volume, df_correctness_check = generate_code_with_gemini(model, time_periods, fusion_table, content_type)
+        else:
+            st.error("Selected model is not supported.")
+            return None, 0, 0
+        
+        genai_response_time = time.time() - start_time
+        
+        save_start_time = time.time()
+        st.write(gen_ai_df)
+        save_data_to_snowflake(gen_ai_df, fusion_table)
+        save_data_to_snowflake_time = time.time() - save_start_time
+        
+        total_time = time.time() - start_time
+
+    except Exception as e:
+        errors_encountered = True
+        error_type = type(e).__name__
+        error_message = str(e)
+        st.error(f"An error occurred during the experiment: {error_message}")
+    
+    try:
+        rows_processed = get_table_row_count(fusion_table)
+    except Exception as e:
+        errors_encountered = True
+        error_type = type(e).__name__
+        error_message = str(e)
+        rows_processed = 0
+        st.error(f"Error retrieving row count: {error_message}")
+
+    end_date = datetime.now(pytz.utc).strftime('%Y-%B-%d %H:%M:%S')
+
+    try:
+        check_query = f"SELECT * FROM {fusion_table}"
+        df_check = execute_sql_statement(check_query)
+        df_correctness_check = check_df_empty(df_check)       
+    except Exception as e:
+        st.error(f"Error during correctness check: {str(e)}")
+
+    try:
+        insert_data_in_generate_code_experiment_table(experiment_id, 
+                                                    model,    
+                                                    content_type,                                           
+                                                    start_date, 
+                                                    end_date, 
+                                                    genai_response_time, 
+                                                    save_data_to_snowflake_time,                                               
+                                                    total_time,
+                                                    rows_processed,  
+                                                    prompt_volume,    
+                                                    output_volume,
+                                                    content_type,
+                                                    df_correctness_check,                                                                                                                                     
+                                                    errors_encountered, 
+                                                    error_type, 
+                                                    error_message)
+    except Exception as e:
+        st.error(f"Error inserting data into the experiment table: {str(e)}")
+
+    st.write(f"System has completed fusion store GENERATE CODE experiment for {model} number {experiment_number}. Experiment ID {experiment_id}.")
+
+import re
+
+def get_next_hyperloop_table(df):
+    pattern = r'HYPERLOOP_SUBSYSTEM_(\d+)'
+    max_number = 0
+
+    for table_name in df['name']:
+        match = re.match(pattern, table_name)
+        if match:
+            number = int(match.group(1))
+            max_number = max(max_number, number)
+
+    next_table_name = f'HYPERLOOP_SUBSYSTEM_{max_number + 1}'
+    return next_table_name
+
 def run_multiple_egtl_qualitative_experiments(model, defined_scenario, number_of_experiments):
     """
     Executes the egtl_qualitative_data_experiment function 'number_of_experiments' times in a row.
@@ -1194,6 +1430,19 @@ def run_multiple_egtl_qualitative_experiments(model, defined_scenario, number_of
     for i in range(number_of_experiments):
         egtl_qualitative_data_experiment(model, defined_scenario)
         st.write(f"Streamline has processed task N {i+1} of {number_of_experiments}.")   
+
+def run_multiple_egtl_generate_code_experiments(model, time_periods, content_type, number_of_experiments):
+    """
+    Executes the generate cxode function 'number_of_experiments' times in a row.
+    
+    Parameters:
+    model (str): The model to be used in the experiment.
+    defined_scenario (str): The scenario to be loaded for the experiment.
+    number_of_experiments (int): The number of times to run the experiment.
+    """
+    for i in range(number_of_experiments):
+        generate_code_experiment(model, time_periods, content_type)
+        st.write(f"Streamline has processed task N {i+1} of {number_of_experiments}.")         
 
 def run_multiple_fusion_store_experiments(model, time_periods, load_data_trends, number_of_experiments):
     """
@@ -1258,10 +1507,48 @@ def normalize_data_for_egtl_experiment(model):
     else:
         st.error("Failed to load data from Snowflake.")
         return None, 0, input_df_size, 0
-    
+
+def insert_data_in_generate_code_experiment_table(id, 
+                                           model,                                               
+                                           start_date, 
+                                           end_date, 
+                                           genai_response_time, 
+                                           save_data_to_snowflake_time,                                               
+                                           total_time,
+                                           rows_processed,  
+                                           prompt_volume,    
+                                           output_volume,
+                                           normalized_df_volume,
+                                           load_to_staging_time,                                                                                                                                   
+                                           correctness,
+                                           errors_encountered, 
+                                           error_type, 
+                                           error_message):
+    session = None
+    sanitized_error_message = sanitize_string(error_message)
+    try:
+        session = Session.builder.configs(get_snowflake_connection_params()).create()
+        insert_query = f"""
+            INSERT INTO HPL_SYSTEM_DYNAMICS.ALLIANCE_STORE.EGTL_FUSION_STORE_EXPERIMENT 
+            (ID, MODEL, EXPERIMENT_START_DATE, EXPERIMENT_END_DATE, MODEL_WORK_TIME, 
+             SAVE_DATA_TO_SNOWFLAKE_TIME, EXPERIMENT_TIME_TOTAL, ROWS_PROCESSED, 
+             PROMPT_VOLUME, OUTPUT_VOLUME, OUTPUT_DF_VOLUME, LOAD_TO_STAGING_TIME, 
+             CORRECTNESS, ERROR_ENCOUNTERED, ERROR_TYPE, ERROR_MESSAGE)
+            VALUES ({id}, '{model}', '{start_date}', '{end_date}', {genai_response_time}, 
+                    {save_data_to_snowflake_time}, {total_time}, {rows_processed}, 
+                    {prompt_volume}, {output_volume}, {normalized_df_volume}, {load_to_staging_time}, 
+                    '{correctness}', {errors_encountered}, '{error_type}', '{sanitized_error_message}')
+        """
+        session.sql(insert_query).collect()
+    except Exception as e:
+        st.error(f"An error occurred while saving data to Snowflake: {str(e)}")
+    finally:
+        if session:
+            session.close()  
+
 def insert_data_in_data_extract_experiment_table(id, 
                                                model,    
-                                               content_type,  # Adjusted parameter name to match EXPERIMENT_TYPE                                           
+                                               content_type,                                         
                                                start_date, 
                                                end_date, 
                                                genai_response_time, 
@@ -1567,6 +1854,28 @@ def fusion_to_staging_migration(source_table, dest_table):
         logging.error(f"Error saving data to Snowflake: {e}")
         st.error(f"An error occurred while saving data to Snowflake: {str(e)}")
         
+    finally:
+        if session:
+            session.close()
+
+def check_df_empty(df):
+    if df.empty:
+        return "0%"
+    else:
+        return "100%"   
+
+def execute_sql_statement(sql_statement):
+    session = Session.builder.configs(get_snowflake_connection_params()).create()
+
+    try:
+        query = f"""
+            {sql_statement}
+        """
+        session.sql(query).collect()
+        print(f"Successfully executed SQL query {query}.")
+
+    except Exception as e:
+        print(f"An error occurred: {str(e)}")
     finally:
         if session:
             session.close()
@@ -2065,7 +2374,7 @@ def view_advancements():
 
 def render_homepage():
     st.title("HDME")
-    st.subheader("v0.2.2-dev")
+    st.subheader("v0.2.3-dev")
     st.write("""
         Welcome to the Hyperloop Project System Dynamics Dashboard. 
         This application allows you to upload, manage, and visualize data related to various criteria 
@@ -2104,7 +2413,10 @@ def render_homepage():
         st.session_state['page'] = 'advancements'
 
     if st.button("VIEW HYPERLOOP TECHNICAL SPECIFICATION ✎"):
-        view_technical_specification()          
+        view_technical_specification()        
+
+    if st.button("SUBSYSTEMS REPORT 🛠️"):
+        st.session_state['page'] = 'subsystems'          
 
 ##############################################################
 # Data upload and management page
@@ -2762,7 +3074,8 @@ def render_experiment_page():
                  "EGTL_QUALITATIVE_DATA_EXPERIMENT", 
                  "FUSION_STORE_EXPERIMENT", 
                  "DATA_EXTRACT_EXPERIMENT_FOR_SPECIFICATIONS",
-                 "DATA_EXTRACT_EXPERIMENT_FOR_ADVANCEMENTS"],
+                 "DATA_EXTRACT_EXPERIMENT_FOR_ADVANCEMENTS",
+                 "EGTL_GENERATE_CODE_EXPERIMENT"],
         index=0
     )  
 
@@ -2792,7 +3105,9 @@ def render_experiment_page():
         if experiment_name == "DATA_EXTRACT_EXPERIMENT_FOR_SPECIFICATIONS":
             extract_hyperloop_data_experiment(model, time_periods,content_type="hyperloop_specifications")      
         if experiment_name == "DATA_EXTRACT_EXPERIMENT_FOR_ADVANCEMENTS":
-            extract_hyperloop_data_experiment(model, time_periods,content_type="advancements")                                  
+            extract_hyperloop_data_experiment(model, time_periods,content_type="advancements")    
+        if experiment_name == "EGTL_GENERATE_CODE_EXPERIMENT":
+            generate_code_experiment(model, time_periods,content_type="add_hyperloop_subsystem_sql")                                            
 
     if st.button("VIEW EGTL EXPERIMENT RESULTS 🔍"):
         if experiment_name == "EGTL_QUANTATIVE_DATA_EXPERIMENT":
@@ -2833,7 +3148,10 @@ def render_experiment_page():
             run_multiple_data_extract_experiments(model, time_periods, content_type, number_of_experiments)
         elif experiment_name == "DATA_EXTRACT_EXPERIMENT_FOR_ADVANCEMENTS":
             content_type="advancements"
-            run_multiple_data_extract_experiments(model, time_periods, content_type, number_of_experiments)                                                                                         
+            run_multiple_data_extract_experiments(model, time_periods, content_type, number_of_experiments) 
+        elif experiment_name == "EGTL_GENERATE_CODE_EXPERIMENT":
+            content_type="add_hyperloop_subsystem_sql"
+            run_multiple_egtl_generate_code_experiments(model, time_periods, content_type, number_of_experiments)                                                                                                      
 
     if st.button("⬅️ BACK"):
         st.session_state['page'] = 'home' 
@@ -2875,6 +3193,45 @@ def render_hyperloop_advancements():
     if st.button("⬅️ BACK"):
         st.session_state['page'] = 'home' 
 
+##########################################
+# HYPERLOOP SUBSYSTEMS REPORT PAGE
+##########################################
+
+def get_hyperloop_tables():
+    sql_statement = "SHOW TABLES IN SCHEMA FUSION_STORE"
+    tables = execute_sql_statement(sql_statement)
+
+    # Assuming tables are returned as a list of dictionaries and 'name' is one of the keys
+    df = pd.DataFrame(tables)
+    pattern = r'HYPERLOOP_SUBSYSTEM_(\d+)'
+
+    # Filter tables that match the pattern
+    hyperloop_tables = df[df['name'].str.match(pattern)]
+    return hyperloop_tables['name'].tolist()
+
+def render_subsystems_report_page():
+    st.title("HYPERLOOP SUBSYSTEMS REPORT")
+
+    hyperloop_tables = get_hyperloop_tables()
+    if not hyperloop_tables:
+        st.warning("No matching Hyperloop subsystem tables found.")
+    else:
+        for table_name in hyperloop_tables:
+            st.write(f"### {table_name}")
+            
+            fusion_table_name = f"FUSION_STORE{table_name}"
+            sql_query = f"SELECT * FROM {fusion_table_name};"
+            table_data = execute_sql_statement(sql_query)
+
+            if table_data:
+                df = pd.DataFrame(table_data)
+                st.dataframe(df)
+            else:
+                st.write(f"No data found in {table_name}.")    
+
+    if st.button("⬅️ BACK"):
+        st.session_state['page'] = 'home'  
+
 #######################################
 # UTILITY PAGE
 #######################################             
@@ -2908,6 +3265,8 @@ elif st.session_state['page'] == 'scenarious':
 elif st.session_state['page'] == 'experiment':
     render_experiment_page()    
 elif st.session_state['page'] == 'advancements':
-    render_hyperloop_advancements()       
+    render_hyperloop_advancements()   
+elif st.session_state['page'] == 'subsystems':
+    render_hyperloop_advancements()           
 elif st.session_state['page'] == 'utility':
     render_utility_page()    
