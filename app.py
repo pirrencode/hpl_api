@@ -1409,7 +1409,6 @@ def generate_code_experiment(model, time_periods, content_type):
             df_check = execute_sql_statement(check_query)
             df_correctness_check = check_list_first_element(df_check)
 
-        df_correctness_check = check_list_first_element(df_check)
         st.write(f"Correctness check is completed: {df_correctness_check}")      
     except Exception as e:
         st.error(f"Error during correctness check: {str(e)}")
