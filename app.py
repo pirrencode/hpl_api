@@ -1401,9 +1401,9 @@ def generate_code_experiment(model, time_periods, content_type):
         elif content_type == "remove_hyperloop_specifications_sql":
             is_removed = check_table_removed('FUSION_STORE', fusion_table)
             if is_removed == True:
-                df_correctness_check = "100%"
+                df_correctness_check = "0%"
             elif is_removed == False:
-                df_correctness_check = "0%"       
+                df_correctness_check = "100%"       
         elif content_type == "backup_sql":
             check_query = f"SELECT count(1) FROM {fusion_table}_BCK"
             df_check = execute_sql_statement(check_query)
