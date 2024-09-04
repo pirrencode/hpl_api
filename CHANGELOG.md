@@ -1,6 +1,10 @@
 # Hyperloop decision making ecosystem changelog
 
-##v0.0.3-alpha
+##v0.3.1-alpha
+
+- Added EGTL experiments results
+
+##v0.3.0-alpha
 
 - Alpha version of application released.
 - Implemented data extraction experiment to handle code generation (Fusion).
