@@ -1886,14 +1886,16 @@ def execute_sql_statement(sql_statement):
     session = Session.builder.configs(get_snowflake_connection_params()).create()
 
     try:
-        query = session.sql(f"""
-            {sql_statement} ;
-        """)
-        # session.sql(query).collect()
-        print(f"Successfully executed SQL query {query}.")
+        # Execute the query and collect the result
+        query = session.sql(f"{sql_statement} ;")
+        result = query.collect()  # Collect the query result
+        print(f"Successfully executed SQL query {sql_statement}.")
+        return result  # Return the collected result
 
     except Exception as e:
         print(f"An error occurred: {str(e)}")
+        return None
+
     finally:
         if session:
             session.close()
