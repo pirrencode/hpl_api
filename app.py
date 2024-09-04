@@ -1324,14 +1324,11 @@ def extract_hyperloop_data_experiment(model, time_periods, content_type):
 ########################################
 
 def generate_code_experiment(model, time_periods, content_type):
-    if content_type == "add_hyperloop_subsystem_sql":
-        query = "show tables in schema FUSION_STORE"
-        df_temp = execute_sql_statement(query)
-        st.write(df_temp)
-        hpl_table_name = get_next_hyperloop_table(df_temp)
-        fusion_table = f"FUSION_STORE.{hpl_table_name}"
-    elif content_type == "remove_hyperloop_subsystem_sql":
-        fusion_table = "PLACEHOLDER"
+    query = "show tables in schema FUSION_STORE"
+    df_temp = execute_sql_statement(query)
+    st.write(df_temp)
+    hpl_table_name = get_next_hyperloop_table(df_temp)
+    fusion_table = f"FUSION_STORE.{hpl_table_name}"
     experiment_table = "ALLIANCE_STORE.EGTL_GENERATE_CODE_EXPERIMENT"
     experiment_number = get_record_count_for_model(model, experiment_table) + 1
     experiment_id = get_largest_record_id(experiment_table) + 1
