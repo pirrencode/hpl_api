@@ -3181,7 +3181,10 @@ def render_experiment_page():
                  "FUSION_STORE_EXPERIMENT", 
                  "DATA_EXTRACT_EXPERIMENT_FOR_SPECIFICATIONS",
                  "DATA_EXTRACT_EXPERIMENT_FOR_ADVANCEMENTS",
-                 "EGTL_GENERATE_CODE_EXPERIMENT"],
+                 "EGTL_GENERATE_CODE_EXPERIMENT",
+                 "EGTL_REMOVE_SYSTEM_STRUCTURE_EXPERIMENT",
+                 "EGTL_CREATE_BACKUP_STRUCTURES_EXPERIMENT",
+                 ],
         index=0
     )  
 
@@ -3214,6 +3217,10 @@ def render_experiment_page():
             extract_hyperloop_data_experiment(model, time_periods,content_type="advancements")    
         if experiment_name == "EGTL_GENERATE_CODE_EXPERIMENT":
             generate_code_experiment(model, time_periods,content_type="add_hyperloop_subsystem_sql")                                            
+        if experiment_name == "EGTL_REMOVE_SYSTEM_STRUCTURE_EXPERIMENT":
+            generate_code_experiment(model, time_periods,content_type="remove_hyperloop_specifications_sql") 
+        if experiment_name == "EGTL_CREATE_BACKUP_STRUCTURES_EXPERIMENT":
+            generate_code_experiment(model, time_periods,content_type="backup_sql") 
 
     if st.button("VIEW EGTL EXPERIMENT RESULTS 🔍"):
         if experiment_name == "EGTL_QUANTATIVE_DATA_EXPERIMENT":
@@ -3230,7 +3237,16 @@ def render_experiment_page():
             view_experiment_data(table_name, experiment_name)   
         elif experiment_name == "DATA_EXTRACT_EXPERIMENT_FOR_ADVANCEMENTS":
             table_name = "ALLIANCE_STORE.EGTL_EXTRACT_DATA_EXPERIMENT"
-            view_experiment_data(table_name, experiment_name)                                          
+            view_experiment_data(table_name, experiment_name)     
+        elif experiment_name == "DATA_EXTRACT_EXPERIMENT_FOR_ADVANCEMENTS":
+            table_name = "ALLIANCE_STORE.EGTL_GENERATE_CODE_EXPERIMENT"
+            view_experiment_data(table_name, experiment_name)                                                      
+        elif experiment_name == "EGTL_REMOVE_SYSTEM_STRUCTURE_EXPERIMENT":
+            table_name = "ALLIANCE_STORE.EGTL_GENERATE_CODE_EXPERIMENT"
+            view_experiment_data(table_name, experiment_name)  
+        elif experiment_name == "EGTL_CREATE_BACKUP_STRUCTURES_EXPERIMENT":
+            table_name = "ALLIANCE_STORE.EGTL_GENERATE_CODE_EXPERIMENT"
+            view_experiment_data(table_name, experiment_name)              
 
     if st.button("APPLY EXPLORATIVE ANALYSIS TO ETL USING GEN AI 🧩"):
         cleaned_df = normalize_cr_scl_data(model)            
@@ -3257,7 +3273,13 @@ def render_experiment_page():
             run_multiple_data_extract_experiments(model, time_periods, content_type, number_of_experiments) 
         elif experiment_name == "EGTL_GENERATE_CODE_EXPERIMENT":
             content_type="add_hyperloop_subsystem_sql"
-            run_multiple_egtl_generate_code_experiments(model, time_periods, content_type, number_of_experiments)                                                                                                      
+            run_multiple_egtl_generate_code_experiments(model, time_periods, content_type, number_of_experiments) 
+        elif experiment_name == "EGTL_CREATE_BACKUP_STRUCTURES_EXPERIMENT":
+            content_type="backup_sql"
+            run_multiple_egtl_generate_code_experiments(model, time_periods, content_type, number_of_experiments)                                                                                                                
+        elif experiment_name == "EGTL_REMOVE_SYSTEM_STRUCTURE_EXPERIMENT":
+            content_type="remove_hyperloop_specifications_sql"
+            run_multiple_egtl_generate_code_experiments(model, time_periods, content_type, number_of_experiments)
 
     if st.button("⬅️ BACK"):
         st.session_state['page'] = 'home' 
