@@ -1394,8 +1394,7 @@ def generate_code_experiment(model, time_periods, content_type):
 
     try:
         insert_data_in_generate_code_experiment_table(experiment_id, 
-                                                    model,    
-                                                    content_type,                                           
+                                                    model,                                           
                                                     start_date, 
                                                     end_date, 
                                                     genai_response_time, 
@@ -1544,8 +1543,7 @@ def insert_data_in_generate_code_experiment_table(id,
                                            rows_processed,  
                                            prompt_volume,    
                                            output_volume,
-                                           normalized_df_volume,
-                                           load_to_staging_time,                                                                                                                                   
+                                           content_type,                                                                                                                                  
                                            correctness,
                                            errors_encountered, 
                                            error_type, 
@@ -1556,7 +1554,6 @@ def insert_data_in_generate_code_experiment_table(id,
     try:
         session = Session.builder.configs(get_snowflake_connection_params()).create()
         
-        # Ensure that the dates and content_type are properly quoted
         insert_query = f"""
             INSERT INTO HPL_SYSTEM_DYNAMICS.ALLIANCE_STORE.EGTL_GENERATE_CODE_EXPERIMENT 
             (ID, MODEL, EXPERIMENT_START_DATE, EXPERIMENT_END_DATE, MODEL_WORK_TIME, 
@@ -1565,8 +1562,8 @@ def insert_data_in_generate_code_experiment_table(id,
              CORRECTNESS, ERROR_ENCOUNTERED, ERROR_TYPE, ERROR_MESSAGE)
             VALUES ({id}, '{model}', '{start_date}', '{end_date}', {genai_response_time}, 
                     {save_data_to_snowflake_time}, {total_time}, {rows_processed}, 
-                    {prompt_volume}, {output_volume}, {normalized_df_volume}, {load_to_staging_time}, 
-                    '{correctness}', {errors_encountered}, '{error_type}', '{sanitized_error_message}')
+                    {prompt_volume}, {output_volume}, {content_type}, '{correctness}', 
+                    {errors_encountered}, '{error_type}', '{sanitized_error_message}')
         """
         st.write(f"DEBUG: {insert_query}")
         session.sql(insert_query).collect()
