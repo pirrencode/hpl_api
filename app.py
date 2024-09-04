@@ -1314,6 +1314,7 @@ def generate_code_experiment(model, time_periods, content_type):
     if content_type == "add_hyperloop_subsystem_sql":
         query = "show tables in schema FUSION_STORE"
         df_temp = execute_sql_statement(query)
+        st.write(df_temp)
         hpl_table_name = get_next_hyperloop_table(df_temp)
         fusion_table = f"FUSION_STORE.{hpl_table_name}"
     elif content_type == "remove_hyperloop_subsystem_sql":
