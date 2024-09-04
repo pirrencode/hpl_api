@@ -1489,7 +1489,7 @@ def get_current_hyperloop_backup_table(result):
         number = int(match)
         max_number = max(max_number, number)
 
-    next_table_name = f'HYPERLOOP_SUBSYSTEM_{max_number}'
+    next_table_name = f'HYPERLOOP_SUBSYSTEM_{max_number + 1}_BCK'
     return next_table_name
 
 
