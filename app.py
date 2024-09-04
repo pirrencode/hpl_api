@@ -1331,7 +1331,7 @@ def generate_code_experiment(model, time_periods, content_type):
     elif content_type == "backup_sql":
         hpl_table_name = get_next_hyperloop_table(df_temp)     
     elif content_type == "remove_hyperloop_specifications_sql":
-        hpl_table_name = get_previous_hyperloop_table(df_temp)             
+        hpl_table_name = get_current_hyperloop_table(df_temp)             
     fusion_table = f"FUSION_STORE.{hpl_table_name}"
     experiment_table = "ALLIANCE_STORE.EGTL_GENERATE_CODE_EXPERIMENT"
     experiment_number = get_record_count_for_model(model, experiment_table) + 1
@@ -1456,7 +1456,7 @@ def get_next_hyperloop_table(result):
     next_table_name = f'HYPERLOOP_SUBSYSTEM_{max_number + 1}'
     return next_table_name
 
-def get_previous_hyperloop_table(result):
+def get_current_hyperloop_table(result):
     if result is None:
         raise ValueError("Invalid result set from SQL query")
 
@@ -1471,7 +1471,7 @@ def get_previous_hyperloop_table(result):
         number = int(match)
         max_number = max(max_number, number)
 
-    next_table_name = f'HYPERLOOP_SUBSYSTEM_{max_number - 1}'
+    next_table_name = f'HYPERLOOP_SUBSYSTEM_{max_number}'
     return next_table_name
 
 
