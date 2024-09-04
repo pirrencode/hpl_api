@@ -1567,6 +1567,7 @@ def insert_data_in_generate_code_experiment_table(id,
                     {prompt_volume}, {output_volume}, {normalized_df_volume}, {load_to_staging_time}, 
                     '{correctness}', {errors_encountered}, '{error_type}', '{sanitized_error_message}')
         """
+        st.write(f"DEBUG: {insert_query} ")
         session.sql(insert_query).collect()
         
     except Exception as e:
