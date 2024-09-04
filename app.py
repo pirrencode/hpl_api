@@ -1405,14 +1405,7 @@ def generate_code_experiment(model, time_periods, content_type):
 
 import re
 
-def get_next_hyperloop_table():
-    # Query for fetching the tables
-    query = "SHOW TABLES IN SCHEMA FUSION_STORE"
-    result = execute_sql_statement(query)
-    st.write(result)
-    
-    df = convert_result_to_df(result)
-
+def get_next_hyperloop_table(df):
     if df is None or 'name' not in df.columns:
         raise ValueError("Invalid DataFrame or 'name' column not found")
 
@@ -1425,6 +1418,7 @@ def get_next_hyperloop_table():
             number = int(match.group(1))
             max_number = max(max_number, number)
 
+    # Generate next table name
     next_table_name = f'HYPERLOOP_SUBSYSTEM_{max_number + 1}'
     return next_table_name
 
