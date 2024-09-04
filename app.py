@@ -1405,7 +1405,17 @@ def generate_code_experiment(model, time_periods, content_type):
 
 import re
 
-def get_next_hyperloop_table(df):
+def get_next_hyperloop_table():
+    # Query for fetching the tables
+    query = "SHOW TABLES IN SCHEMA FUSION_STORE"
+    result = execute_sql_statement(query)
+    st.write(result)
+    
+    df = convert_result_to_df(result)
+
+    if df is None or 'name' not in df.columns:
+        raise ValueError("Invalid DataFrame or 'name' column not found")
+
     pattern = r'HYPERLOOP_SUBSYSTEM_(\d+)'
     max_number = 0
 
@@ -1417,6 +1427,14 @@ def get_next_hyperloop_table(df):
 
     next_table_name = f'HYPERLOOP_SUBSYSTEM_{max_number + 1}'
     return next_table_name
+
+def convert_result_to_df(result):
+    try:
+        df = pd.DataFrame(result)
+        return df
+    except Exception as e:
+        print(f"Error converting result to DataFrame: {str(e)}")
+        return None
 
 def run_multiple_egtl_qualitative_experiments(model, defined_scenario, number_of_experiments):
     """
