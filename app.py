@@ -1388,7 +1388,7 @@ def generate_code_experiment(model, time_periods, content_type):
         check_query = f"SELECT count(1) FROM {fusion_table}"
         df_check = execute_sql_statement(check_query)
         df_correctness_check = check_list_first_element(df_check)
-        st.write("Correctness check is coompleted.")      
+        st.write(f"Correctness check is completed: {df_correctness_check}")      
     except Exception as e:
         st.error(f"Error during correctness check: {str(e)}")
 
@@ -1552,8 +1552,10 @@ def insert_data_in_generate_code_experiment_table(id,
                                            error_message):
     session = None
     sanitized_error_message = sanitize_string(error_message)
+    
     try:
         session = Session.builder.configs(get_snowflake_connection_params()).create()
+        
         insert_query = f"""
             INSERT INTO HPL_SYSTEM_DYNAMICS.ALLIANCE_STORE.EGTL_GENERATE_CODE_EXPERIMENT 
             (ID, MODEL, EXPERIMENT_START_DATE, EXPERIMENT_END_DATE, MODEL_WORK_TIME, 
@@ -1566,8 +1568,10 @@ def insert_data_in_generate_code_experiment_table(id,
                     '{correctness}', {errors_encountered}, '{error_type}', '{sanitized_error_message}')
         """
         session.sql(insert_query).collect()
+        
     except Exception as e:
         st.error(f"An error occurred while saving data to Snowflake Experiments Table: {str(e)}")
+        
     finally:
         if session:
             session.close()  
@@ -1916,31 +1920,28 @@ def execute_sql_statement(sql_statement):
 
 def execute_sql_batch(sql_string):
     sql_statements = sql_string.strip().split(';')
-    st.write(sql_statements)
-
     for sql_statement in sql_statements:
         sql_statement = sql_statement.strip()
-        st.write(sql_statement)
 
         if sql_statement:
             sql_statement_sanitized = cleanup_query_string(sql_statement)
-            st.write(f"Sanitized: {sql_statement_sanitized}")
-            
             if sql_statement_sanitized:
-                execute_sql_statement(sql_statement_sanitized)
+                try:
+                    execute_sql_statement(sql_statement_sanitized)
+                except Exception as e:
+                    st.error(f"Error executing statement: {sql_statement_sanitized}. Error: {str(e)}")
             else:
                 st.write("Sanitized query is empty, skipping execution.")
     st.write("Query processing is completed.")            
 
 def check_list_first_element(df_check):
-    if isinstance(df_check, list) and len(df_check) > 0:
-        first_element = df_check[0][0]  
-        if first_element > 0:
+    if isinstance(df_check, list) and len(df_check) > 0 and isinstance(df_check[0], list) and len(df_check[0]) > 0:
+        first_element = df_check[0][0]  # Access the first element
+        if isinstance(first_element, int) and first_element > 0:
             return "100%"
         else:
             return "0%"
-    else:
-        return "Invalid data or empty list"
+    return "Invalid data or empty list"
 
 def load_data_from_snowflake(table_name):
     session = Session.builder.configs(get_snowflake_connection_params()).create()
