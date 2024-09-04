@@ -1329,7 +1329,7 @@ def generate_code_experiment(model, time_periods, content_type):
     if content_type == "add_hyperloop_subsystem_sql":
         hpl_table_name = get_next_hyperloop_table(df_temp)
     elif content_type == "backup_sql":
-        hpl_table_name = get_next_hyperloop_table(df_temp)     
+        hpl_table_name = get_current_hyperloop_backup_table(df_temp)     
     elif content_type == "remove_hyperloop_specifications_sql":
         hpl_table_name = get_current_hyperloop_table(df_temp)             
     fusion_table = f"FUSION_STORE.{hpl_table_name}"
@@ -1463,6 +1463,24 @@ def get_current_hyperloop_table(result):
     result_str = "\n".join([str(row) for row in result])
 
     pattern = r'HYPERLOOP_SUBSYSTEM_(\d+)'
+    max_number = 0
+
+    matches = re.findall(pattern, result_str)
+    
+    for match in matches:
+        number = int(match)
+        max_number = max(max_number, number)
+
+    next_table_name = f'HYPERLOOP_SUBSYSTEM_{max_number}'
+    return next_table_name
+
+def get_current_hyperloop_backup_table(result):
+    if result is None:
+        raise ValueError("Invalid result set from SQL query")
+
+    result_str = "\n".join([str(row) for row in result])
+
+    pattern = r'HYPERLOOP_SUBSYSTEM_(\d+)_BCK'
     max_number = 0
 
     matches = re.findall(pattern, result_str)
