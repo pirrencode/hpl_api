@@ -737,8 +737,12 @@ def generate_code_with_openai(model, time_periods, fusion_table, content_type):
         )
     elif content_type == "remove_hyperloop_specifications_sql":
         prompt = (
-            f"PLACEHOLDER. "
+            f"Generate a SQL query for Snowflake that drops the table {fusion_table}. Return only the SQL query as an output, without any additional text or explanations."
         )       
+    elif content_type == "backup_sql":
+        prompt = (
+            f"Generate a SQL query for Snowflake that creates or replaces a backup table of {fusion_table}. For backup table name use source table name with _BCK postfix. Return only the SQL query as an output, without any additional text or explanations."
+        )              
 
     openai.api_key = get_openai_api_key()
 
@@ -772,8 +776,12 @@ def generate_code_with_mistral(model, time_periods, fusion_table, content_type):
         )
     elif content_type == "remove_hyperloop_specifications_sql":
         prompt = (
-            f"PLACEHOLDER. "
+            f"Generate a SQL query for Snowflake that drops the table {fusion_table}. Return only the SQL query as an output, without any additional text or explanations."
         )       
+    elif content_type == "backup_sql":
+        prompt = (
+            f"Generate a SQL query for Snowflake that creates or replaces a backup table of {fusion_table}. For backup table name use source table name with _BCK postfix. Return only the SQL query as an output, without any additional text or explanations."
+        )      
 
     headers = {
         "Authorization": f"Bearer {get_mistral_api_key()}",
@@ -817,8 +825,12 @@ def generate_code_with_gemini(model, time_periods, fusion_table, content_type):
         )
     elif content_type == "remove_hyperloop_specifications_sql":
         prompt = (
-            f"PLACEHOLDER. "
+            f"Generate a SQL query for Snowflake that drops the table {fusion_table}. Return only the SQL query as an output, without any additional text or explanations."
         )       
+    elif content_type == "backup_sql":
+        prompt = (
+            f"Generate a SQL query for Snowflake that creates or replaces a backup table of {fusion_table}. For backup table name use source table name with _BCK postfix. Return only the SQL query as an output, without any additional text or explanations."
+        )        
 
     gemini.configure(api_key=get_google_api_key())
 
@@ -1320,7 +1332,7 @@ def generate_code_experiment(model, time_periods, content_type):
         fusion_table = f"FUSION_STORE.{hpl_table_name}"
     elif content_type == "remove_hyperloop_subsystem_sql":
         fusion_table = "PLACEHOLDER"
-    experiment_table = "ALLIANCE_STORE.EGTL_EXTRACT_DATA_EXPERIMENT"
+    experiment_table = "ALLIANCE_STORE.EGTL_GENERATE_CODE_EXPERIMENT"
     experiment_number = get_record_count_for_model(model, experiment_table) + 1
     experiment_id = get_largest_record_id(experiment_table) + 1
     st.write(f"Starting GENERATE CODE experiment to add Hyperloop subsystem specification in Fusion Store for {model} number {experiment_number}, ID {experiment_id}, type: {content_type}.")
@@ -1385,8 +1397,21 @@ def generate_code_experiment(model, time_periods, content_type):
     end_date = datetime.now(pytz.utc).strftime('%Y-%B-%d %H:%M:%S')
 
     try:
-        check_query = f"SELECT count(1) FROM {fusion_table}"
-        df_check = execute_sql_statement(check_query)
+        if content_type == "add_hyperloop_subsystem_sql":
+            check_query = f"SELECT count(1) FROM {fusion_table}"
+            df_check = execute_sql_statement(check_query)
+            df_correctness_check = check_list_first_element(df_check)
+        elif content_type == "remove_hyperloop_specifications_sql":
+            is_removed = check_table_removed('FUSION_STORE', fusion_table)
+            if is_removed == True:
+                df_correctness_check = "100%"
+            elif is_removed == False:
+                df_correctness_check = "0%"       
+        elif content_type == "backup_sql":
+            check_query = f"SELECT count(1) FROM {fusion_table}_BCK"
+            df_check = execute_sql_statement(check_query)
+            df_correctness_check = check_list_first_element(df_check)
+
         df_correctness_check = check_list_first_element(df_check)
         st.write(f"Correctness check is completed: {df_correctness_check}")      
     except Exception as e:
@@ -1417,21 +1442,17 @@ def get_next_hyperloop_table(result):
     if result is None:
         raise ValueError("Invalid result set from SQL query")
 
-    # Convert result to a single string for easier pattern searching
     result_str = "\n".join([str(row) for row in result])
 
     pattern = r'HYPERLOOP_SUBSYSTEM_(\d+)'
     max_number = 0
 
-    # Find all matches in the result string
     matches = re.findall(pattern, result_str)
     
-    # Iterate through the matches and find the largest number
     for match in matches:
         number = int(match)
         max_number = max(max_number, number)
 
-    # Generate the next table name
     next_table_name = f'HYPERLOOP_SUBSYSTEM_{max_number + 1}'
     return next_table_name
 
@@ -1442,6 +1463,19 @@ def convert_result_to_df(result):
     except Exception as e:
         print(f"Error converting result to DataFrame: {str(e)}")
         return None
+
+def check_table_removed(schema_name, table_name):
+    query = f"""
+        SELECT COUNT(*)
+        FROM {schema_name}.INFORMATION_SCHEMA.TABLES
+        WHERE TABLE_NAME = '{table_name}';
+    """
+    
+    result = execute_sql_statement(query)
+    
+    if result and result[0][0] == 0:
+        return True
+    return False
 
 def run_multiple_egtl_qualitative_experiments(model, defined_scenario, number_of_experiments):
     """
@@ -1946,12 +1980,11 @@ def execute_sql_batch(sql_string):
 
 def check_list_first_element(df_check):
     if isinstance(df_check, list) and len(df_check) > 0 and isinstance(df_check[0], list) and len(df_check[0]) > 0:
-        first_element = df_check[0][0]  # Access the first element
+        first_element = df_check[0][0]
         if isinstance(first_element, int) and first_element > 0:
             return "100%"
         else:
             return "0%"
-    return "Invalid data or empty list"
 
 def load_data_from_snowflake(table_name):
     session = Session.builder.configs(get_snowflake_connection_params()).create()
@@ -3340,6 +3373,6 @@ elif st.session_state['page'] == 'experiment':
 elif st.session_state['page'] == 'advancements':
     render_hyperloop_advancements()   
 elif st.session_state['page'] == 'subsystems':
-    render_hyperloop_advancements()           
+    render_subsystems_report_page()           
 elif st.session_state['page'] == 'utility':
     render_utility_page()    
