@@ -1340,11 +1340,11 @@ def generate_code_experiment(model, time_periods, content_type):
         start_time = time.time()
 
         if model in ["gpt-3.5-turbo", "gpt-4"]:
-            gen_ai_df, prompt_volume, output_volume, df_correctness_check = generate_code_with_openai(model, time_periods, fusion_table, content_type)
+            generated_data, prompt_volume, output_volume = generate_code_with_openai(model, time_periods, fusion_table, content_type)
         elif model == "mistral-small":
-            gen_ai_df, prompt_volume, output_volume, df_correctness_check = generate_code_with_mistral(model, time_periods, fusion_table, content_type)
+            generated_data, prompt_volume, output_volume = generate_code_with_mistral(model, time_periods, fusion_table, content_type)
         elif model == "gemini-1.5-flash":
-            gen_ai_df, prompt_volume, output_volume, df_correctness_check = generate_code_with_gemini(model, time_periods, fusion_table, content_type)
+            generated_data, prompt_volume, output_volume = generate_code_with_gemini(model, time_periods, fusion_table, content_type)
         else:
             st.error("Selected model is not supported.")
             return None, 0, 0
@@ -1352,11 +1352,19 @@ def generate_code_experiment(model, time_periods, content_type):
         genai_response_time = time.time() - start_time
         
         save_start_time = time.time()
-        st.write(gen_ai_df)
-        save_data_to_snowflake(gen_ai_df, fusion_table)
-        save_data_to_snowflake_time = time.time() - save_start_time
+        st.write(generated_data)
         
-        total_time = time.time() - start_time
+
+        try:
+            save_data_to_snowflake_time = time.time() - save_start_time
+            execute_sql_batch(generated_data)
+            total_time = time.time() - start_time
+        except Exception as e:
+            errors_encountered = True
+            error_type = type(e).__name__
+            error_message = str(e)
+            st.error(f"An error occurred during the experiment: {error_message}")
+    
 
     except Exception as e:
         errors_encountered = True
@@ -1886,11 +1894,10 @@ def execute_sql_statement(sql_statement):
     session = Session.builder.configs(get_snowflake_connection_params()).create()
 
     try:
-        # Execute the query and collect the result
         query = session.sql(f"{sql_statement} ;")
-        result = query.collect()  # Collect the query result
+        result = query.collect()
         print(f"Successfully executed SQL query {sql_statement}.")
-        return result  # Return the collected result
+        return result
 
     except Exception as e:
         print(f"An error occurred: {str(e)}")
@@ -1899,6 +1906,16 @@ def execute_sql_statement(sql_statement):
     finally:
         if session:
             session.close()
+
+def execute_sql_batch(sql_string):
+    sql_statements = sql_string.strip().split(';')
+    
+    for sql_statement in sql_statements:
+        sql_statement = sql_statement.strip()
+
+        if sql_statement:
+            execute_sql_statement(sql_statement)
+            print(f"Executed: {sql_statement}")           
 
 def load_data_from_snowflake(table_name):
     session = Session.builder.configs(get_snowflake_connection_params()).create()
