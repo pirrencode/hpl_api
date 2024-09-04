@@ -1573,7 +1573,7 @@ def insert_data_in_generate_code_experiment_table(id,
             ERROR_MESSAGE)
             VALUES ({id}, '{model}', '{start_date}', '{end_date}', {genai_response_time}, 
                     {save_data_to_snowflake_time}, {total_time}, {rows_processed}, 
-                    {prompt_volume}, {output_volume}, {content_type}, '{correctness}', 
+                    {prompt_volume}, {output_volume}, '{content_type}', '{correctness}', 
                     {errors_encountered}, '{error_type}', '{sanitized_error_message}')
         """
         st.write(f"DEBUG: {insert_query}")
