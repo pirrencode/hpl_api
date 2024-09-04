@@ -1340,11 +1340,11 @@ def generate_code_experiment(model, time_periods, content_type):
         start_time = time.time()
 
         if model in ["gpt-3.5-turbo", "gpt-4"]:
-            gen_ai_df, prompt_volume, output_volume, df_correctness_check = generate_code_with_openai(model, time_periods, fusion_table, content_type)
+            generated_data, prompt_volume, output_volume = generate_code_with_openai(model, time_periods, fusion_table, content_type)
         elif model == "mistral-small":
-            gen_ai_df, prompt_volume, output_volume, df_correctness_check = generate_code_with_mistral(model, time_periods, fusion_table, content_type)
+            generated_data, prompt_volume, output_volume = generate_code_with_mistral(model, time_periods, fusion_table, content_type)
         elif model == "gemini-1.5-flash":
-            gen_ai_df, prompt_volume, output_volume, df_correctness_check = generate_code_with_gemini(model, time_periods, fusion_table, content_type)
+            generated_data, prompt_volume, output_volume = generate_code_with_gemini(model, time_periods, fusion_table, content_type)
         else:
             st.error("Selected model is not supported.")
             return None, 0, 0
@@ -1352,11 +1352,19 @@ def generate_code_experiment(model, time_periods, content_type):
         genai_response_time = time.time() - start_time
         
         save_start_time = time.time()
-        st.write(gen_ai_df)
-        save_data_to_snowflake(gen_ai_df, fusion_table)
-        save_data_to_snowflake_time = time.time() - save_start_time
+        st.write(generated_data)
         
-        total_time = time.time() - start_time
+
+        try:
+            save_data_to_snowflake_time = time.time() - save_start_time
+            execute_sql_batch(generated_data)
+            total_time = time.time() - start_time
+        except Exception as e:
+            errors_encountered = True
+            error_type = type(e).__name__
+            error_message = str(e)
+            st.error(f"An error occurred during the experiment: {error_message}")
+    
 
     except Exception as e:
         errors_encountered = True
