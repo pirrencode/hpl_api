@@ -1374,7 +1374,7 @@ def generate_code_experiment(model, time_periods, content_type):
         st.error(f"An error occurred during the experiment: {error_message}")
     
     try:
-        rows_processed = get_table_row_count(fusion_table)
+        rows_processed = time_periods
     except Exception as e:
         errors_encountered = True
         error_type = type(e).__name__
