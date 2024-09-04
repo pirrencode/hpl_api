@@ -2516,7 +2516,7 @@ def view_advancements():
 
 def render_homepage():
     st.title("HDME")
-    st.subheader("v0.2.3-dev")
+    st.subheader("v0.0.3-alpha")
     st.write("""
         Welcome to the Hyperloop Project System Dynamics Dashboard. 
         This application allows you to upload, manage, and visualize data related to various criteria 

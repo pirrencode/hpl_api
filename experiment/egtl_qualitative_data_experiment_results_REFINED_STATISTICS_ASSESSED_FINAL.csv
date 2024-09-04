@@ -1,7 +1,0 @@
-Model,Task difficulty,Total experiments,Succeeded experiments (%),Avg. model work time (ms),Avg. output correctness (%),Avg. prompt size (symbols),Avg. model output size (symbols)
-gemini-1.5-flash,5,40,100,0.65,100,1282.0,33.1
-gpt-3.5-turbo,5,40,100,9.87,100,1459.9,29.51
-gpt-4,5,40,100,9.74,100,1461.0,56.68
-mistral-small,5,40,100,0.54,100,1581.0,19.3
-TOTAL_PER_DATA_INTENSITY_100,5,40,100,5.2,100,1445.98,34.65
-TOTAL,5,160,100,5.2,100,1445.98,34.65
