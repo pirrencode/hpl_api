@@ -1556,10 +1556,21 @@ def insert_data_in_generate_code_experiment_table(id,
         
         insert_query = f"""
             INSERT INTO HPL_SYSTEM_DYNAMICS.ALLIANCE_STORE.EGTL_GENERATE_CODE_EXPERIMENT 
-            (ID, MODEL, EXPERIMENT_TYPE, EXPERIMENT_START_DATE, EXPERIMENT_END_DATE, MODEL_WORK_TIME, 
-             SAVE_DATA_TO_SNOWFLAKE_TIME, EXPERIMENT_TIME_TOTAL, ROWS_PROCESSED, 
-             PROMPT_VOLUME, OUTPUT_VOLUME, CONTENT_TYPE, 
-             CORRECTNESS, ERROR_ENCOUNTERED, ERROR_TYPE, ERROR_MESSAGE)
+            (ID, 
+            MODEL, 
+            EXPERIMENT_START_DATE, 
+            EXPERIMENT_END_DATE, 
+            MODEL_WORK_TIME, 
+            SAVE_DATA_TO_SNOWFLAKE_TIME, 
+            EXPERIMENT_TIME_TOTAL, 
+            ROWS_PROCESSED, 
+            PROMPT_VOLUME, 
+            OUTPUT_VOLUME, 
+            CONTENT_TYPE, 
+            CORRECTNESS, 
+            ERROR_ENCOUNTERED, 
+            ERROR_TYPE, 
+            ERROR_MESSAGE)
             VALUES ({id}, '{model}', '{start_date}', '{end_date}', {genai_response_time}, 
                     {save_data_to_snowflake_time}, {total_time}, {rows_processed}, 
                     {prompt_volume}, {output_volume}, {content_type}, '{correctness}', 
