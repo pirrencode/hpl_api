@@ -2230,10 +2230,8 @@ def calculate_cr_sfy():
     global_max = df["MAX_RISK_SCORE"].max()
 
     cr_sfy = np.array([
-        1 / (np.sum(
-            (df.iloc[t]["RISK_SCORE"] - global_min) / 
-            (global_max - global_min + epsilon)
-        ) + epsilon)
+        (df.iloc[t]["RISK_SCORE"] - global_min) / 
+        (global_max - global_min + epsilon)
         for t in range(len(df))
     ])
 
@@ -2246,8 +2244,6 @@ def calculate_cr_sfy():
         "CR_SFY": cr_sfy
     })
 
-    return df_cr_sfy
-
 def calculate_cr_sac():
 
     session = Session.builder.configs(get_snowflake_connection_params()).create()
@@ -2257,10 +2253,8 @@ def calculate_cr_sac():
     df_result = pd.DataFrame()
     df_result['TIME'] = df_source['TIME']
     
-    # Calculate Social Acceptance criterion
     cr_sac_raw = df_source['POSITIVE_FEEDBACK'] / (df_source['NEGATIVE_FEEDBACK'] + 1e-6)  # Avoid division by zero
     
-    # Normalize CR_SAC to be in the range [0, 1]
     cr_sac_min = cr_sac_raw.min()
     cr_sac_max = cr_sac_raw.max()
     df_result['CR_SAC'] = (cr_sac_raw - cr_sac_min) / (cr_sac_max - cr_sac_min)
@@ -2276,15 +2270,12 @@ def calculate_cr_tfe():
     df_result = pd.DataFrame()
     df_result['TIME'] = df_source['TIME']
 
-    # Calculate CR_TFE using the provided formula
     w1 = 0.5
     w2 = 0.5
     
-    # Formula implementation
     cr_tfe_raw = (w1 * (df_source['CURRENT_TRL'] / df_source['TARGET_TRL']) +
                   w2 * (df_source['ENG_CHALLENGES_RESOLVED'] / df_source['TARGET_ENG_CHALLENGES']))
 
-    # Normalize CR_TFE to be in the range [0, 1]
     cr_tfe_min = cr_tfe_raw.min()
     cr_tfe_max = cr_tfe_raw.max()
     df_result['CR_TFE'] = (cr_tfe_raw - cr_tfe_min) / (cr_tfe_max - cr_tfe_min)
@@ -2303,7 +2294,6 @@ def calculate_cr_reg():
     # Weights
     w1 = w2 = w3 = w4 = w5 = 0.2
     
-    # Formula implementation
     df_result['CR_REG'] = (w1 * df_source['ETHICAL_COMPLIANCE'] +
                            w2 * df_source['LEGAL_COMPLIANCE'] +
                            w3 * df_source['LAND_USAGE_COMPLIANCE'] +
@@ -2335,7 +2325,6 @@ def calculate_cr_ecv():
     calc_data = []
     
     for _, row in cr_ecv_source_df.iterrows():
-        # Convert values to appropriate data types
         time = int(row['TIME'])
         revenue = float(row['REVENUE'])
         opex = float(row['OPEX'])
@@ -2343,19 +2332,16 @@ def calculate_cr_ecv():
         discount_rate = float(row['DISCOUNT_RATE'])
         project_lifetime = int(row['PROJECT_LIFETIME'])
 
-        # Check for invalid project_lifetime
         if project_lifetime <= 0:
             st.error(f"Invalid project lifetime {project_lifetime} for time {time}. Skipping this record.")
             continue
         
-        # Calculate NPV
         try:
             npv = sum((revenue - opex) / ((1 + discount_rate) ** t) for t in range(1, project_lifetime + 1))
         except ZeroDivisionError:
             st.error(f"Discount rate caused a division by zero error at time {time}. Skipping this record.")
             continue
 
-        # Calculate CR_ECV, ensuring it is within the range [0, 1]
         cr_ecv = max(0, min(npv / capex, 1))
         
         calc_data.append({"TIME": time, "CR_ECV": cr_ecv})
