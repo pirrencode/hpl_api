@@ -245,11 +245,11 @@ def generate_cr_ecv_decline_over_time_data(time_periods):
     time = np.arange(time_periods)
     data = {
         "TIME": time,
-        "REVENUE": np.linspace(500000, 400000, time_periods),   # Revenue decreases gradually
-        "OPEX": np.linspace(200000, 300000, time_periods),      # Operational expenditure increases gradually
-        "CAPEX": np.full(time_periods, 1000000),                # Capital expenditure remains constant
-        "DISCOUNT_RATE": np.linspace(0.05, 0.06, time_periods), # Discount rate increases slightly
-        "PROJECT_LIFETIME": np.full(time_periods, 25)           # Project lifetime remains constant
+        "REVENUE": np.linspace(500000, 300000, time_periods),
+        "OPEX": np.linspace(200000, 400000, time_periods),
+        "CAPEX": np.full(time_periods, 1000000),
+        "DISCOUNT_RATE": np.linspace(0.05, 0.07, time_periods),
+        "PROJECT_LIFETIME": np.full(time_periods, 25)
     }
     return pd.DataFrame(data)
 
