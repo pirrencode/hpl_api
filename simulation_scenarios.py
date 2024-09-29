@@ -117,9 +117,9 @@ def generate_cr_usb_data_rapid_decline(time_periods):
     time = np.arange(time_periods)
     data = {
         "TIME": time,
-        "PRODUCTION_OUTPUT": np.linspace(1.5, 0.5, time_periods),  # Production output decreases
-        "USER_EXP_RATIO": np.linspace(1.5, 0.5, time_periods),      # User experience ratio decreases
-        "ACCESSIBILITY_AGEING": np.linspace(1.5, 0.5, time_periods) # Accessibility by aging population decreases
+        "PRODUCTION_OUTPUT": np.linspace(1.0, 0.2, time_periods),  # Production output decreases
+        "USER_EXP_RATIO": np.linspace(1.0, 0.2, time_periods),      # User experience ratio decreases
+        "ACCESSIBILITY_AGEING": np.linspace(1.0, 0.2, time_periods) # Accessibility by aging population decreases
     }
     return pd.DataFrame(data)
 
@@ -265,9 +265,9 @@ def generate_cr_usb_decline_over_time_data(time_periods):
     time = np.arange(time_periods)
     data = {
         "TIME": time,
-        "PRODUCTION_OUTPUT": np.linspace(1.5, 1.2, time_periods),  # Production output decreases slightly
-        "USER_EXP_RATIO": np.linspace(1.5, 1.2, time_periods),      # User experience ratio decreases slightly
-        "ACCESSIBILITY_AGEING": np.linspace(1.5, 1.2, time_periods) # Accessibility by aging population decreases slightly
+        "PRODUCTION_OUTPUT": np.linspace(1.5, 0.7, time_periods),  # Production output decreases slightly
+        "USER_EXP_RATIO": np.linspace(1.5, 0.7, time_periods),      # User experience ratio decreases slightly
+        "ACCESSIBILITY_AGEING": np.linspace(1.5, 0.7, time_periods) # Accessibility by aging population decreases slightly
     }
     return pd.DataFrame(data)
 
