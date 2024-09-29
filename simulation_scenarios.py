@@ -52,10 +52,11 @@ def generate_cr_reg_data_rapid_decline(time_periods):
     time = np.arange(time_periods)
     data = {
         "TIME": time,
-        "EC": np.linspace(0.9, 0.3, time_periods),  # Ethical compliance decreases
-        "LC": np.linspace(0.9, 0.3, time_periods),  # Legal norms compliance decreases
-        "LU": np.linspace(0.9, 0.3, time_periods),  # Land usage compliance decreases
-        "IL": np.linspace(0.9, 0.3, time_periods),  # International laws compliance decreases
+        "ETHICAL_COMPLIANCE": np.linspace(0.9, 0.3, time_periods),
+        "INT_LAW_COMPLIANCE": np.linspace(0.9, 0.3, time_periods),  
+        "LAND_USAGE_COMPLIANCE": np.linspace(0.9, 0.3, time_periods),
+        "LEGAL_COMPLIANCE": np.linspace(0.9, 0.3, time_periods),
+        "TRL_COMPLIANCE": np.linspace(0.5, 0.5, time_periods)
     }
     return pd.DataFrame(data)
 
@@ -175,10 +176,11 @@ def generate_cr_reg_decline_over_time_data(time_periods):
     time = np.arange(time_periods)
     data = {
         "TIME": time,
-        "EC": np.linspace(0.9, 0.8, time_periods),  # Ethical compliance decreases slightly
-        "LC": np.linspace(0.9, 0.8, time_periods),  # Legal norms compliance decreases slightly
-        "LU": np.linspace(0.9, 0.8, time_periods),  # Land usage compliance decreases slightly
-        "IL": np.linspace(0.9, 0.8, time_periods),  # International laws compliance decreases slightly
+        "ETHICAL_COMPLIANCE": np.linspace(0.9, 0.8, time_periods),
+        "INT_LAW_COMPLIANCE": np.linspace(0.9, 0.8, time_periods),  
+        "LAND_USAGE_COMPLIANCE": np.linspace(0.9, 0.8, time_periods),
+        "LEGAL_COMPLIANCE": np.linspace(0.9, 0.8, time_periods),
+        "TRL_COMPLIANCE": np.linspace(0.5, 0.5, time_periods)
     }
     return pd.DataFrame(data)
 
@@ -298,10 +300,11 @@ def generate_cr_reg_rapid_growth_data(time_periods):
     time = np.arange(time_periods)
     data = {
         "TIME": time,
-        "EC": np.linspace(0.7, 0.95, time_periods),  # Ethical compliance increases rapidly
-        "LC": np.linspace(0.7, 0.95, time_periods),  # Legal norms compliance increases rapidly
-        "LU": np.linspace(0.7, 0.95, time_periods),  # Land usage compliance increases rapidly
-        "IL": np.linspace(0.7, 0.95, time_periods),  # International laws compliance increases rapidly
+        "ETHICAL_COMPLIANCE": np.linspace(0.7, 0.95, time_periods),
+        "INT_LAW_COMPLIANCE": np.linspace(0.7, 0.95, time_periods),  
+        "LAND_USAGE_COMPLIANCE": np.linspace(0.7, 0.95, time_periods),
+        "LEGAL_COMPLIANCE": np.linspace(0.7, 0.95, time_periods),
+        "TRL_COMPLIANCE": np.linspace(0.7, 0.95, time_periods)
     }
     return pd.DataFrame(data)
 
@@ -421,10 +424,11 @@ def generate_cr_reg_sustainable_growth_data(time_periods):
     time = np.arange(time_periods)
     data = {
         "TIME": time,
-        "EC": np.linspace(0.8, 0.9, time_periods),  # Ethical compliance increases steadily
-        "LC": np.linspace(0.8, 0.9, time_periods),  # Legal norms compliance increases steadily
-        "LU": np.linspace(0.8, 0.9, time_periods),  # Land usage compliance increases steadily
-        "IL": np.linspace(0.8, 0.9, time_periods),  # International laws compliance increases steadily
+        "ETHICAL_COMPLIANCE": np.linspace(0.6, 0.7, time_periods),
+        "INT_LAW_COMPLIANCE": np.linspace(0.6, 0.7, time_periods),  
+        "LAND_USAGE_COMPLIANCE": np.linspace(0.6, 0.7, time_periods),
+        "LEGAL_COMPLIANCE": np.linspace(0.6, 0.7, time_periods),
+        "TRL_COMPLIANCE": np.linspace(0.6, 0.7, time_periods)
     }
     return pd.DataFrame(data)
 
