@@ -2222,16 +2222,19 @@ def calculate_cr_env():
 
 def calculate_cr_sfy():
     session = Session.builder.configs(get_snowflake_connection_params()).create()
-
-    # Load data from CR_SFY_SOURCE table
     df = session.table("STAGING_STORE.CR_SFY_STAGING").to_pandas()
-    # Calculate CR_SFY for each time period
-    epsilon = 1e-6  # Avoid division by zero
-    cr_sfy = np.array([1 / np.sum((df.iloc[t]["RISK_SCORE"] - df.iloc[t]["MIN_RISK_SCORE"]) / 
-                                  (df.iloc[t]["MAX_RISK_SCORE"] - df.iloc[t]["MIN_RISK_SCORE"] + epsilon))
-                       for t in range(len(df))])
+
+    epsilon = 1e-6
+    cr_sfy = np.array([
+        1 / max(1, np.sum(
+            np.clip((df.iloc[t]["RISK_SCORE"] - df.iloc[t]["MIN_RISK_SCORE"]) / 
+                    (df.iloc[t]["MAX_RISK_SCORE"] - df.iloc[t]["MIN_RISK_SCORE"] + epsilon), 0, 1)
+        ))
+        for t in range(len(df))
+    ])
+
     st.write("CR_SFY is calculated")
-    # Create DataFrame with TIME and CR_SFY
+
     df_cr_sfy = pd.DataFrame({
         "TIME": df["TIME"],
         "CR_SFY": cr_sfy

@@ -50,9 +50,9 @@ def generate_cr_sfy_data_rapid_decline(time_periods):
     time = np.arange(time_periods)
     data = {
         "TIME": time,
-        "R": np.linspace(0.9, 0.2, time_periods),  # Risk score decreases
-        "MinR": np.full(time_periods, 0.2),        # Minimum risk remains low
-        "MaxR": np.full(time_periods, 0.9)         # Maximum risk remains high
+        "R": np.linspace(0.9, 0.2, time_periods),
+        "MinR": np.full(time_periods, 0.2),
+        "MaxR": np.full(time_periods, 0.9)
     }
     return pd.DataFrame(data)
 
@@ -198,9 +198,9 @@ def generate_cr_sfy_decline_over_time_data(time_periods):
     time = np.arange(time_periods)
     data = {
         "TIME": time,
-        "R": np.linspace(0.9, 0.7, time_periods),  # Risk score decreases slightly
-        "MinR": np.full(time_periods, 0.2),        # Minimum risk remains low
-        "MaxR": np.full(time_periods, 0.9)         # Maximum risk remains high
+        "R": np.linspace(0.9, 0.7, time_periods),
+        "MinR": np.full(time_periods, 0.3),
+        "MaxR": np.full(time_periods, 0.9)
     }
     return pd.DataFrame(data)
 
@@ -346,8 +346,8 @@ def generate_cr_sfy_rapid_growth_data(time_periods):
     time = np.arange(time_periods)
     data = {
         "TIME": time,
-        "R": np.linspace(0.7, 0.95, time_periods),  # Risk score decreases rapidly (improved safety)
-        "MinR": np.full(time_periods, 0.2),         # Minimum risk remains low
+        "R": np.linspace(0.65, 0.95, time_periods),  # Risk score decreases rapidly (improved safety)
+        "MinR": np.full(time_periods, 0.3),         # Minimum risk remains low
         "MaxR": np.full(time_periods, 0.9)          # Maximum risk remains high
     }
     return pd.DataFrame(data)
@@ -493,8 +493,8 @@ def generate_cr_sfy_sustainable_growth_data(time_periods):
     time = np.arange(time_periods)
     data = {
         "TIME": time,
-        "R": np.linspace(0.75, 0.85, time_periods),  # Risk score decreases steadily (improved safety)
-        "MinR": np.full(time_periods, 0.2),          # Minimum risk remains low
+        "R": np.linspace(0.55, 0.65, time_periods),  # Risk score decreases steadily (improved safety)
+        "MinR": np.full(time_periods, 0.3),          # Minimum risk remains low
         "MaxR": np.full(time_periods, 0.9)           # Maximum risk remains high
     }
     return pd.DataFrame(data)
