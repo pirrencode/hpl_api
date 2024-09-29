@@ -6,7 +6,7 @@ import tempfile
 import logging
 from io import BytesIO
 from snowflake.snowpark import Session
-from criterion_factors_logic import generate_safety_data, generate_environmental_impact_data, generate_social_acceptance_data, generate_technical_feasibility_data, generate_regulatory_approval_data, generate_quantum_factor_data, generate_economic_viability_data, generate_usability_data, generate_reliability_data, generate_infrastructure_integration_data, generate_scalability_data
+from criterion_factors_logic import generate_safety_data, generate_environmental_impact_data, generate_social_acceptance_data, generate_technical_feasibility_data, generate_regulatory_approval_data, generate_quantum_factor_data, generate_economic_viability_data, generate_usability_data, generate_reliability_data, generate_infrastructure_integration_data, generate_scalability_data, generate_cr_env_using_input_data
 import openai
 import time
 import requests
@@ -2741,14 +2741,13 @@ def visualize_all_success_factors():
             st.plotly_chart(fig)
 
     # --- New Combined Graph CR_SUMMARY ---
-    st.subheader("CR_SUMMARY - Combined Criteria Over Time")
 
     fig_summary = px.line(
         hpl_sd_crs_df, 
         x='TIME', 
         y=criteria,
         labels={'value': 'Criteria Value', 'variable': 'Criteria'},
-        title="CR_SUMMARY - Combined Criteria Over Time"
+        title="Combined Criteria Over Time"
     )
 
     st.plotly_chart(fig_summary)            
@@ -3198,7 +3197,18 @@ def render_scenarios_simulation_page():
             st.write(f"Criterion data preview.")
             st.dataframe(df.head())
             save_data_to_snowflake(df, "ALLIANCE_STORE.HPL_SD_CRS_ALLIANCE")
-            st.write(f"Table population completed. Please proceed to visualization tab")            
+            st.write(f"Table population completed. Please proceed to visualization tab")   
+
+    st.subheader("Select Ranges for Each Criterion")
+    cr_env_lower = st.slider("CR_ENV Lower Bound", min_value=0.0, max_value=100.0, value=10.0)
+    cr_env_upper = st.slider("CR_ENV Upper Bound", min_value=0.0, max_value=100.0, value=50.0)
+
+    if st.button("RUN SIMULATION MODEL"):
+        cr_env_data = generate_cr_env_using_input_data(time_periods, cr_env_lower, cr_env_upper)
+        
+        st.write("Generated CR_ENV Data:")
+        st.line_chart(cr_env_data)    
+
 
     if st.button("⬅️ BACK"):
         st.session_state['page'] = 'home' 
