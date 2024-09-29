@@ -60,15 +60,6 @@ def generate_cr_reg_data_rapid_decline(time_periods):
     }
     return pd.DataFrame(data)
 
-# def generate_cr_qmf_data_rapid_decline(time_periods):
-#     time = np.arange(time_periods)
-#     data = {
-#         "TIME": time,
-#         "S": np.full(time_periods, 0),            # Disruptive technology use remains low
-#         "D": np.linspace(10, 3, time_periods)     # Number of disruptive technologies decreases
-#     }
-#     return pd.DataFrame(data)
-
 def generate_cr_qmf_data_rapid_decline(time_periods):
 
     tech_columns = [
@@ -218,12 +209,36 @@ def generate_cr_reg_decline_over_time_data(time_periods):
     return pd.DataFrame(data)
 
 def generate_cr_qmf_decline_over_time_data(time_periods):
+
+    tech_columns = [
+        'MAGLEV_LEVITATION', 'AMBIENT_INTELLIGENCE', 'GENERATIVE_AI',
+        'AI_MACHINE_LEARNING', 'DIGITAL_TWINS', 'FIVE_G', 
+        'QUANTUM_COMPUTING', 'AUGMENTED_REALITY', 'VIRTUAL_REALITY',
+        'PRINTING_AT_SCALE', 'BLOCKCHAIN', 'SELF_DRIVING_AUTONOMOUS_VEHICLES'
+    ]
+    
     time = np.arange(time_periods)
     data = {
-        "TIME": time,
-        "S": np.full(time_periods, 0),            # Disruptive technology use remains low
-        "D": np.linspace(10, 8, time_periods)     # Number of disruptive technologies decreases gradually
+        "TIME": time
     }
+
+    for t in time:
+        num_true = np.random.randint(8, 11)
+        
+        true_indices = np.random.choice(tech_columns, size=num_true, replace=False)
+        
+        row_data = {tech: False for tech in tech_columns}
+        
+        for tech in true_indices:
+            row_data[tech] = True
+        
+        row_data["TOTAL_DISRUPTIVE_TECH"] = num_true
+        
+        for tech, value in row_data.items():
+            if tech not in data:
+                data[tech] = []
+            data[tech].append(value)
+
     return pd.DataFrame(data)
 
 def generate_cr_ecv_decline_over_time_data(time_periods):
@@ -342,12 +357,35 @@ def generate_cr_reg_rapid_growth_data(time_periods):
     return pd.DataFrame(data)
 
 def generate_cr_qmf_rapid_growth_data(time_periods):
+    tech_columns = [
+        'MAGLEV_LEVITATION', 'AMBIENT_INTELLIGENCE', 'GENERATIVE_AI',
+        'AI_MACHINE_LEARNING', 'DIGITAL_TWINS', 'FIVE_G', 
+        'QUANTUM_COMPUTING', 'AUGMENTED_REALITY', 'VIRTUAL_REALITY',
+        'PRINTING_AT_SCALE', 'BLOCKCHAIN', 'SELF_DRIVING_AUTONOMOUS_VEHICLES'
+    ]
+    
     time = np.arange(time_periods)
     data = {
-        "TIME": time,
-        "S": np.full(time_periods, 1),               # Disruptive technology use is high
-        "D": np.linspace(5, 10, time_periods)        # Number of disruptive technologies increases rapidly
+        "TIME": time
     }
+
+    for t in time:
+        num_true = np.random.randint(5, 12)
+        
+        true_indices = np.random.choice(tech_columns, size=num_true, replace=False)
+        
+        row_data = {tech: False for tech in tech_columns}
+        
+        for tech in true_indices:
+            row_data[tech] = True
+        
+        row_data["TOTAL_DISRUPTIVE_TECH"] = num_true
+        
+        for tech, value in row_data.items():
+            if tech not in data:
+                data[tech] = []
+            data[tech].append(value)
+
     return pd.DataFrame(data)
 
 def generate_cr_ecv_rapid_growth_data(time_periods):
@@ -466,12 +504,35 @@ def generate_cr_reg_sustainable_growth_data(time_periods):
     return pd.DataFrame(data)
 
 def generate_cr_qmf_sustainable_growth_data(time_periods):
+    tech_columns = [
+        'MAGLEV_LEVITATION', 'AMBIENT_INTELLIGENCE', 'GENERATIVE_AI',
+        'AI_MACHINE_LEARNING', 'DIGITAL_TWINS', 'FIVE_G', 
+        'QUANTUM_COMPUTING', 'AUGMENTED_REALITY', 'VIRTUAL_REALITY',
+        'PRINTING_AT_SCALE', 'BLOCKCHAIN', 'SELF_DRIVING_AUTONOMOUS_VEHICLES'
+    ]
+    
     time = np.arange(time_periods)
     data = {
-        "TIME": time,
-        "S": np.full(time_periods, 1),              # Disruptive technology use is high
-        "D": np.linspace(6, 8, time_periods)        # Number of disruptive technologies increases steadily
+        "TIME": time
     }
+
+    for t in time:
+        num_true = np.random.randint(9, 11)
+        
+        true_indices = np.random.choice(tech_columns, size=num_true, replace=False)
+        
+        row_data = {tech: False for tech in tech_columns}
+        
+        for tech in true_indices:
+            row_data[tech] = True
+        
+        row_data["TOTAL_DISRUPTIVE_TECH"] = num_true
+        
+        for tech, value in row_data.items():
+            if tech not in data:
+                data[tech] = []
+            data[tech].append(value)
+
     return pd.DataFrame(data)
 
 def generate_cr_ecv_sustainable_growth_data(time_periods):
