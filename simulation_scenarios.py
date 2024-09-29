@@ -2,6 +2,14 @@ import pandas as pd
 import numpy as np
 
 ####################################
+# USER INPUT SCENARIO
+####################################
+
+def generate_cr_env_using_input_data(time_periods, lower_range, upper_range):
+    """Generate CR_ENV data based on user input ranges."""
+    return np.random.uniform(lower_range, upper_range, time_periods)
+
+####################################
 # RAPID DECLINE SCENARIO
 ####################################
 
