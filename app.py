@@ -2244,6 +2244,8 @@ def calculate_cr_sfy():
         "CR_SFY": cr_sfy
     })
 
+    return df_cr_sfy    
+
 def calculate_cr_sac():
 
     session = Session.builder.configs(get_snowflake_connection_params()).create()
@@ -2325,6 +2327,7 @@ def calculate_cr_ecv():
     calc_data = []
     
     for _, row in cr_ecv_source_df.iterrows():
+
         time = int(row['TIME'])
         revenue = float(row['REVENUE'])
         opex = float(row['OPEX'])
