@@ -248,7 +248,7 @@ def generate_cr_ecv_decline_over_time_data(time_periods):
         "REVENUE": np.linspace(500000, 350000, time_periods),
         "OPEX": np.linspace(200000, 350000, time_periods),
         "CAPEX": np.full(time_periods, 1000000),
-        "DISCOUNT_RATE": np.linspace(0.04, 0.055, time_periods),
+        "DISCOUNT_RATE": np.linspace(0.05, 0.025, time_periods),
         "PROJECT_LIFETIME": np.full(time_periods, 25)
     }
     return pd.DataFrame(data)
@@ -392,10 +392,10 @@ def generate_cr_ecv_rapid_growth_data(time_periods):
     time = np.arange(time_periods)
     data = {
         "TIME": time,
-        "REVENUE": np.linspace(500000, 1000000, time_periods),   # Revenue increases rapidly
-        "OPEX": np.linspace(300000, 200000, time_periods),       # Operational expenditure decreases rapidly
+        "REVENUE": np.linspace(600000, 1000000, time_periods),   # Revenue increases rapidly
+        "OPEX": np.linspace(300000, 150000, time_periods),       # Operational expenditure decreases rapidly
         "CAPEX": np.full(time_periods, 1000000),                 # Capital expenditure remains constant
-        "DISCOUNT_RATE": np.linspace(0.06, 0.05, time_periods),  # Discount rate decreases slightly
+        "DISCOUNT_RATE": np.linspace(0.06, 0.03, time_periods),  # Discount rate decreases slightly
         "PROJECT_LIFETIME": np.full(time_periods, 25)            # Project lifetime remains constant
     }
     return pd.DataFrame(data)
@@ -539,10 +539,10 @@ def generate_cr_ecv_sustainable_growth_data(time_periods):
     time = np.arange(time_periods)
     data = {
         "TIME": time,
-        "REVENUE": np.linspace(500000, 700000, time_periods),   # Revenue increases steadily
-        "OPEX": np.linspace(300000, 250000, time_periods),      # Operational expenditure decreases steadily
+        "REVENUE": np.linspace(400000, 700000, time_periods),   # Revenue increases steadily
+        "OPEX": np.linspace(300000, 200000, time_periods),      # Operational expenditure decreases steadily
         "CAPEX": np.full(time_periods, 1000000),                # Capital expenditure remains constant
-        "DISCOUNT_RATE": np.linspace(0.06, 0.055, time_periods), # Discount rate decreases slightly
+        "DISCOUNT_RATE": np.linspace(0.06, 0.045, time_periods), # Discount rate decreases slightly
         "PROJECT_LIFETIME": np.full(time_periods, 25)           # Project lifetime remains constant
     }
     return pd.DataFrame(data)
