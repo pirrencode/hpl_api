@@ -2225,13 +2225,19 @@ def calculate_cr_sfy():
     df = session.table("STAGING_STORE.CR_SFY_STAGING").to_pandas()
 
     epsilon = 1e-6
+
+    global_min = df["MIN_RISK_SCORE"].min()
+    global_max = df["MAX_RISK_SCORE"].max()
+
     cr_sfy = np.array([
-        1 / max(1, np.sum(
-            np.clip((df.iloc[t]["RISK_SCORE"] - df.iloc[t]["MIN_RISK_SCORE"]) / 
-                    (df.iloc[t]["MAX_RISK_SCORE"] - df.iloc[t]["MIN_RISK_SCORE"] + epsilon), 0, 1)
-        ))
+        1 / (np.sum(
+            (df.iloc[t]["RISK_SCORE"] - global_min) / 
+            (global_max - global_min + epsilon)
+        ) + epsilon)
         for t in range(len(df))
     ])
+
+    cr_sfy = np.clip(cr_sfy, 0, 1)
 
     st.write("CR_SFY is calculated")
 
