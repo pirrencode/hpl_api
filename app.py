@@ -2740,6 +2740,19 @@ def visualize_all_success_factors():
         with cols[col_idx]: 
             st.plotly_chart(fig)
 
+    # --- New Combined Graph CR_SUMMARY ---
+    st.subheader("CR_SUMMARY - Combined Criteria Over Time")
+
+    fig_summary = px.line(
+        hpl_sd_crs_df, 
+        x='TIME', 
+        y=criteria,
+        labels={'value': 'Criteria Value', 'variable': 'Criteria'},
+        title="CR_SUMMARY - Combined Criteria Over Time"
+    )
+
+    st.plotly_chart(fig_summary)            
+
 import plotly.express as px
 
 def calculate_maturity_level(dmmi_df):
