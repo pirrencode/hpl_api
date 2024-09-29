@@ -412,9 +412,9 @@ def generate_cr_usb_rapid_growth_data(time_periods):
     time = np.arange(time_periods)
     data = {
         "TIME": time,
-        "PRODUCTION_OUTPUT": np.linspace(0.5, 1.8, time_periods),  # Production output increases rapidly
-        "USER_EXP_RATIO": np.linspace(0.7, 1.8, time_periods),      # User experience ratio increases rapidly
-        "ACCESSIBILITY_AGEING": np.linspace(0.9, 1.8, time_periods) # Accessibility by aging population increases rapidly
+        "PRODUCTION_OUTPUT": np.linspace(0.4, 1.8, time_periods),  # Production output increases rapidly
+        "USER_EXP_RATIO": np.linspace(0.5, 1.8, time_periods),      # User experience ratio increases rapidly
+        "ACCESSIBILITY_AGEING": np.linspace(0.5, 1.8, time_periods) # Accessibility by aging population increases rapidly
     }
     return pd.DataFrame(data)
 
@@ -559,9 +559,9 @@ def generate_cr_usb_sustainable_growth_data(time_periods):
     time = np.arange(time_periods)
     data = {
         "TIME": time,
-        "PRODUCTION_OUTPUT": np.linspace(1.0, 1.6, time_periods),  # Production output increases steadily
-        "USER_EXP_RATIO": np.linspace(1.0, 1.6, time_periods),      # User experience ratio increases steadily
-        "ACCESSIBILITY_AGEING": np.linspace(1.0, 1.6, time_periods) # Accessibility by aging population increases steadily
+        "PRODUCTION_OUTPUT": np.linspace(0.6, 1.6, time_periods),  # Production output increases steadily
+        "USER_EXP_RATIO": np.linspace(0.6, 1.6, time_periods),      # User experience ratio increases steadily
+        "ACCESSIBILITY_AGEING": np.linspace(0.6, 1.6, time_periods) # Accessibility by aging population increases steadily
     }
     return pd.DataFrame(data)
 
