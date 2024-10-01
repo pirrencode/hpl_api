@@ -3220,7 +3220,7 @@ def render_experiment_page():
     st.title("EGTL EXPERIMENT ⚗️")
 
     # Handling custom time periods logic
-    time_period_raw = st.text_input('Time period:', value='100')
+    time_period_raw = st.text_input('Complexity:', value='100')
     time_periods = int(time_period_raw)   
 
     number_of_experiments_raw = st.text_input('Number of experiments for stream processing:', value='1')
