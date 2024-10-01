@@ -3201,6 +3201,18 @@ def render_scenarios_simulation_page():
     st.subheader("Select Ranges for Each Criterion")
     cr_env_lower = st.slider("CR_ENV Lower Bound", min_value=0.0, max_value=100.0, value=10.0)
     cr_env_upper = st.slider("CR_ENV Upper Bound", min_value=0.0, max_value=100.0, value=50.0)
+    cr_energy_consumed_lower = st.slider("Energy Consumed Lower", min_value=0.0, max_value=10000.0, value=1000.0)
+    cr_energy_consumed_upper = st.slider("Energy Consumed Upper", min_value=0.0, max_value=10000.0, value=5000.0)
+    cr_di_lower = st.slider("CR_DI Lower", min_value=0.0, max_value=100000.0, value=1000.0)
+    cr_di_upper = st.slider("CR_DI Upper", min_value=0.0, max_value=100000.0, value=50000.0)  
+    cr_load_lower = st.slider("CR_LA Lower", min_value=0.0, max_value=1000.0, value=200.0)      
+    cr_load_upper = st.slider("CR_LA Upper", min_value=0.0, max_value=1000.0, value=600.0) 
+    cr_co2_lower = st.slider("CR_C02 Lower", min_value=0.0, max_value=500.0, value=100.0)        
+    cr_co2_upper = st.slider("CR_C02 Upper", min_value=0.0, max_value=500.0, value=250.0) 
+    cr_ms_lower = st.slider("CR_MI Lower", min_value=0.0, max_value=1.0, value=0.2)    
+    cr_ms_upper = st.slider("CR_MI Upper", min_value=0.0, max_value=1.0, value=0.8) 
+    cr_env_imp_lower = st.slider("CR_ENV_IMP Lower", min_value=0.0, max_value=1.0, value=0.3)   
+    cr_env_imp_upper = st.slider("CR_ENV_IMP Upper", min_value=0.0, max_value=1.0, value=0.7)    
 
     if st.button("RUN SIMULATION MODEL"):
         cr_env_data = generate_cr_env_using_input_data(time_periods, cr_env_lower, cr_env_upper)
