@@ -3198,7 +3198,7 @@ def render_scenarios_simulation_page():
             save_data_to_snowflake(df, "ALLIANCE_STORE.HPL_SD_CRS_ALLIANCE")
             st.write(f"Table population completed. Please proceed to visualization tab")   
 
-    st.subheader("Select Ranges for Each Criterion")
+    st.subheader("Select Ranges For Stocks")
     cr_env_lower = st.slider("CR_ENV Lower Bound", min_value=0.0, max_value=100.0, value=10.0)
     cr_env_upper = st.slider("CR_ENV Upper Bound", min_value=0.0, max_value=100.0, value=50.0)
     cr_energy_consumed_lower = st.slider("Energy Consumed Lower", min_value=0.0, max_value=10000.0, value=1000.0)
