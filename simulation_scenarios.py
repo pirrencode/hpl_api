@@ -17,10 +17,10 @@ def generate_cr_env_data_rapid_decline(time_periods):
     time = np.arange(time_periods)
     data = {
         "TIME": time,
-        "ENERGY_CONSUMED": np.round(np.linspace(100, 20, time_periods), 3),
-        "DISTANCE": np.round(np.linspace(1000, 200, time_periods), 3),
-        "LOAD_WEIGHT": np.round(np.linspace(15000, 3000, time_periods), 3),
-        "CO2_EMISSIONS": np.round(np.linspace(500, 100, time_periods), 3),
+        "ENERGY_CONSUMED": np.round(np.linspace(58, 20, time_periods), 3),
+        "DISTANCE": np.round(np.linspace(500, 100, time_periods), 3),
+        "LOAD_WEIGHT": np.round(np.linspace(11300, 3000, time_periods), 3),
+        "CO2_EMISSIONS": np.round(np.linspace(100, 25, time_periods), 3),
         "MATERIAL_SUSTAINABILITY": np.round(np.linspace(0.8, 0.21, time_periods), 3),
         "ENV_IMPACT_SCORE": np.round(np.linspace(0.7, 0.18, time_periods), 3),
     }
@@ -40,8 +40,8 @@ def generate_cr_tfe_data_rapid_decline(time_periods):
     time = np.arange(time_periods)
     data = {
         "TIME": time,
-        "CURRENT_TRL": np.round(np.linspace(9, 6, time_periods), 3),
-        "TARGET_TRL": np.round(np.linspace(9, 7, time_periods), 3),
+        "CURRENT_TRL": np.round(np.linspace(5, 4, time_periods), 3),
+        "TARGET_TRL": np.round(np.linspace(9, 6, time_periods), 3),
         "ENG_CHALLENGES_RESOLVED": np.round(np.linspace(10, 3, time_periods), 3),
         "TARGET_ENG_CHALLENGES": np.round(np.linspace(5, 15, time_periods), 3),
     }
@@ -61,11 +61,11 @@ def generate_cr_reg_data_rapid_decline(time_periods):
     time = np.arange(time_periods)
     data = {
         "TIME": time,
-        "ETHICAL_COMPLIANCE": np.round(np.linspace(0.9, 0.3, time_periods), 3),
-        "INT_LAW_COMPLIANCE": np.round(np.linspace(0.9, 0.3, time_periods), 3),  
-        "LAND_USAGE_COMPLIANCE": np.round(np.linspace(0.9, 0.3, time_periods), 3),
-        "LEGAL_COMPLIANCE": np.round(np.linspace(0.9, 0.3, time_periods), 3),
-        "TRL_COMPLIANCE": np.round(np.linspace(0.6, 0.5, time_periods), 3),
+        "ETHICAL_COMPLIANCE": np.round(np.linspace(0.8, 0.25, time_periods), 3),
+        "INT_LAW_COMPLIANCE": np.round(np.linspace(0.85, 0.2, time_periods), 3),  
+        "LAND_USAGE_COMPLIANCE": np.round(np.linspace(0.95, 0.3, time_periods), 3),
+        "LEGAL_COMPLIANCE": np.round(np.linspace(0.5, 0.3, time_periods), 3),
+        "TRL_COMPLIANCE": np.round(np.linspace(0.5, 0.4, time_periods), 3),
     }
     return pd.DataFrame(data)
 
@@ -106,11 +106,11 @@ def generate_cr_ecv_data_rapid_decline(time_periods):
     time = np.arange(time_periods)
     data = {
         "TIME": time,
-        "REVENUE": np.round(np.linspace(500000, 100000, time_periods), 3),
+        "REVENUE": np.round(np.linspace(700000, 100000, time_periods), 3),
         "OPEX": np.round(np.linspace(200000, 500000, time_periods), 3),
         "CAPEX": np.round(np.full(time_periods, 1000000), 3),
         "DISCOUNT_RATE": np.round(np.linspace(0.05, 0.1, time_periods), 3),
-        "PROJECT_LIFETIME": np.round(np.full(time_periods, time_periods), 3),
+        "PROJECT_LIFETIME": np.round(np.full(time_periods, 980), 3),
     }
     return pd.DataFrame(data)
 
@@ -139,10 +139,10 @@ def generate_cr_inf_data_rapid_decline(time_periods):
     time = np.arange(time_periods)
     data = {
         "TIME": time,
-        "COMMON_INFRA_FEATURES": np.round(np.linspace(1.5, 0.5, time_periods), 3),
+        "COMMON_INFRA_FEATURES": np.round(np.linspace(1.3, 0.4, time_periods), 3),
         "CONSTRUCTION_BARRIERS": np.round(np.linspace(0.5, 1.5, time_periods), 3),
-        "INTERMODAL_CONNECTIONS": np.round(np.linspace(1.5, 0.5, time_periods), 3),
-        "INFRA_ADAPTABILITY_FEATURES": np.round(np.linspace(1.5, 0.5, time_periods), 3),
+        "INTERMODAL_CONNECTIONS": np.round(np.linspace(1.0, 0.2, time_periods), 3),
+        "INFRA_ADAPTABILITY_FEATURES": np.round(np.linspace(1.4, 0.6, time_periods), 3),
     }
     return pd.DataFrame(data)
 
@@ -150,8 +150,8 @@ def generate_cr_scl_data_rapid_decline(time_periods):
     time = np.arange(time_periods)
     data = {
         "TIME": time,
-        "RESOURCE_MILEAGE": np.round(np.linspace(1.5, 0.5, time_periods), 3),
-        "PLANNED_VOLUME": np.round(np.linspace(1.5, 0.5, time_periods), 3),
+        "RESOURCE_MILEAGE": np.round(np.linspace(1.6, 0.3, time_periods), 3),
+        "PLANNED_VOLUME": np.round(np.linspace(1.3, 0.4, time_periods), 3),
         "ADJUSTMENT_COEF_1": np.round(np.linspace(1.5, 0.5, time_periods), 3),
         "ADJUSTMENT_COEF_2": np.round(np.linspace(1.0, 0.25, time_periods), 3),
         "ADJUSTMENT_COEF_3": np.round(np.linspace(0.7, 0.3, time_periods), 3),
@@ -167,9 +167,9 @@ def generate_cr_env_decline_over_time_data(time_periods):
     data = {
         "TIME": time,
         "ENERGY_CONSUMED": np.round(np.linspace(100, 75, time_periods), 3),
-        "DISTANCE": np.round(np.linspace(1000, 810, time_periods), 3),
-        "LOAD_WEIGHT": np.round(np.linspace(15000, 12300, time_periods), 3),
-        "CO2_EMISSIONS": np.round(np.linspace(500, 400, time_periods), 3),
+        "DISTANCE": np.round(np.linspace(20, 17, time_periods), 3),
+        "LOAD_WEIGHT": np.round(np.linspace(8000, 6500, time_periods), 3),
+        "CO2_EMISSIONS": np.round(np.linspace(75, 60, time_periods), 3),
         "MATERIAL_SUSTAINABILITY": np.round(np.linspace(0.8, 0.67, time_periods), 3),
         "ENV_IMPACT_SCORE": np.round(np.linspace(0.7, 0.61, time_periods), 3),
     }
@@ -254,11 +254,11 @@ def generate_cr_ecv_decline_over_time_data(time_periods):
     time = np.arange(time_periods)
     data = {
         "TIME": time,
-        "REVENUE": np.round(np.linspace(500000, 400000, time_periods), 3),
+        "REVENUE": np.round(np.linspace(25000000, 21000000, time_periods), 3),
         "OPEX": np.round(np.linspace(200000, 300000, time_periods), 3),
         "CAPEX": np.round(np.full(time_periods, 1000000), 3),
         "DISCOUNT_RATE": np.round(np.linspace(0.05, 0.04, time_periods), 3),
-        "PROJECT_LIFETIME": np.round(np.full(time_periods, time_periods), 3),
+        "PROJECT_LIFETIME": np.round(np.full(time_periods, 600), 3),
     }
     return pd.DataFrame(data)
 
@@ -314,10 +314,10 @@ def generate_cr_env_rapid_growth_data(time_periods):
     time = np.arange(time_periods)
     data = {
         "TIME": time,
-        "ENERGY_CONSUMED": np.round(np.linspace(100, 150, time_periods), 3),
-        "DISTANCE": np.round(np.linspace(1000, 1500, time_periods), 3),
-        "LOAD_WEIGHT": np.round(np.linspace(1150, 1400, time_periods), 3),
-        "CO2_EMISSIONS": np.round(np.linspace(500, 200, time_periods), 3),
+        "ENERGY_CONSUMED": np.round(np.linspace(35, 15, time_periods), 3),
+        "DISTANCE": np.round(np.linspace(300, 550, time_periods), 3),
+        "LOAD_WEIGHT": np.round(np.linspace(15000, 19000, time_periods), 3),
+        "CO2_EMISSIONS": np.round(np.linspace(50, 20, time_periods), 3),
         "MATERIAL_SUSTAINABILITY": np.round(np.linspace(0.8, 0.90, time_periods), 3),
         "ENV_IMPACT_SCORE": np.round(np.linspace(0.75, 0.95, time_periods), 3),
     }
@@ -327,7 +327,7 @@ def generate_cr_sac_rapid_growth_data(time_periods):
     time = np.arange(time_periods)
     data = {
         "TIME": time,
-        "POSITIVE_FEEDBACK": np.round(np.linspace(1000, 1500, time_periods), 3),
+        "POSITIVE_FEEDBACK": np.round(np.linspace(100, 150, time_periods), 3),
         "NEGATIVE_FEEDBACK": np.round(np.linspace(200, 100, time_periods), 3),
     }
     return pd.DataFrame(data)
@@ -405,7 +405,7 @@ def generate_cr_ecv_rapid_growth_data(time_periods):
         "OPEX": np.round(np.linspace(300000, 150000, time_periods), 3),
         "CAPEX": np.round(np.full(time_periods, 1000000), 3),
         "DISCOUNT_RATE": np.round(np.linspace(0.06, 0.03, time_periods), 3),
-        "PROJECT_LIFETIME": np.round(np.full(time_periods, 25), 3),
+        "PROJECT_LIFETIME": np.round(np.full(time_periods, 480), 3),
     }
     return pd.DataFrame(data)
 
@@ -548,7 +548,7 @@ def generate_cr_ecv_sustainable_growth_data(time_periods):
     time = np.arange(time_periods)
     data = {
         "TIME": time,
-        "REVENUE": np.round(np.linspace(400000, 700000, time_periods), 3),
+        "REVENUE": np.round(np.linspace(3000000, 4200000, time_periods), 3),
         "OPEX": np.round(np.linspace(300000, 200000, time_periods), 3),
         "CAPEX": np.round(np.full(time_periods, 1000000), 3),
         "DISCOUNT_RATE": np.round(np.linspace(0.06, 0.045, time_periods), 3),
