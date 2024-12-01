@@ -17,7 +17,7 @@ import os
 import re
 
 # LOG LEVEL SETUP
-logging.basicConfig(level=logging.INFO)
+logging.basicConfig(level=logging.WARNING)
 
 ##################################
 # CSS Style
