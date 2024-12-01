@@ -327,8 +327,8 @@ def generate_cr_sac_rapid_growth_data(time_periods):
     time = np.arange(time_periods)
     data = {
         "TIME": time,
-        "POSITIVE_FEEDBACK": np.round(np.linspace(100, 150, time_periods), 3),
-        "NEGATIVE_FEEDBACK": np.round(np.linspace(200, 100, time_periods), 3),
+        "POSITIVE_FEEDBACK": np.round(np.linspace(100, 105, time_periods), 3),
+        "NEGATIVE_FEEDBACK": np.round(np.linspace(210, 107, time_periods), 3),
     }
     return pd.DataFrame(data)
 
@@ -474,8 +474,8 @@ def generate_cr_sac_sustainable_growth_data(time_periods):
     time = np.arange(time_periods)
     data = {
         "TIME": time,
-        "POSITIVE_FEEDBACK": np.round(np.linspace(95, 105, time_periods), 3),
-        "NEGATIVE_FEEDBACK": np.round(np.linspace(90, 85, time_periods), 3),
+        "POSITIVE_FEEDBACK": np.round(np.linspace(135, 155, time_periods), 3),
+        "NEGATIVE_FEEDBACK": np.round(np.linspace(90, 75, time_periods), 3),
     }
     return pd.DataFrame(data)
 
@@ -483,9 +483,9 @@ def generate_cr_tfe_sustainable_growth_data(time_periods):
     time = np.arange(time_periods)
     data = {
         "TIME": time,
-        "CURRENT_TRL": np.round(np.linspace(8, 8.8, time_periods), 3),
-        "TARGET_TRL": np.round(np.linspace(8.5, 9, time_periods), 3),
-        "ENG_CHALLENGES_RESOLVED": np.round(np.linspace(9, 11, time_periods), 3),
+        "CURRENT_TRL": np.round(np.linspace(8, 8.5, time_periods), 3),
+        "TARGET_TRL": np.round(np.linspace(8.5, 8.8, time_periods), 3),
+        "ENG_CHALLENGES_RESOLVED": np.round(np.linspace(9, 10, time_periods), 3),
         "TARGET_ENG_CHALLENGES": np.round(np.linspace(13, 12, time_periods), 3),
     }
     return pd.DataFrame(data)
