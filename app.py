@@ -2785,18 +2785,14 @@ def render_upload_data_page():
                 INSERT INTO FUSION_STORE.INPUT_DATA_SAMPLE (INPUT_PARAMETERS, TIME_1)
                 SELECT 
                     COLUMN_NAME AS INPUT_PARAMETERS,
-                    VALUE::FLOAT AS TIME_1
+                    VALUE AS TIME_1
                 FROM (
                     SELECT 
-                        COLUMN_NAME, 
-                        OBJECT_GET(DATA, COLUMN_NAME) AS VALUE
-                    FROM (
-                        SELECT 
-                            OBJECT_KEYS(OBJECT_CONSTRUCT(*)) AS COLUMN_NAME,
-                            OBJECT_CONSTRUCT(*) AS DATA
-                        FROM FUSION_STORE.INPUT_DATA_FUSION
-                        WHERE "TIME" = 1
-                    )
+                        COLUMN_NAME,
+                        VALUE
+                    FROM FUSION_STORE.INPUT_DATA_FUSION,
+                         LATERAL FLATTEN(INPUT => OBJECT_CONSTRUCT(*)) AS FLATTENED
+                    WHERE FLATTENED.KEY = COLUMN_NAME AND TIME = 1
                 )
                 WHERE COLUMN_NAME != 'TIME';
             """
