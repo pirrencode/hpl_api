@@ -128,10 +128,10 @@ def generate_cr_rlb_data_rapid_decline(time_periods):
     time = np.arange(time_periods)
     data = {
         "TIME": time,
-        "DURABILITY": np.round(np.linspace(1.5, 0.5, time_periods), 3),
-        "DIGITAL_RELIABILITY": np.round(np.linspace(1.3, 0.4, time_periods), 3),
-        "WEATHER_DISASTER_RESILIENCE": np.round(np.linspace(1.2, 0.6, time_periods), 3),
-        "POLLUTION_PRODUCED": np.round(np.linspace(0.7, 1.8, time_periods), 3),
+        "DURABILITY": np.round(np.linspace(0.95, 0.5, time_periods), 3),
+        "DIGITAL_RELIABILITY": np.round(np.linspace(0.95, 0.4, time_periods), 3),
+        "WEATHER_DISASTER_RESILIENCE": np.round(np.linspace(0.95, 0.6, time_periods), 3),
+        "POLLUTION_PRODUCED": np.round(np.linspace(0.3, 0.95, time_periods), 3),
     }
     return pd.DataFrame(data)
 
@@ -139,10 +139,10 @@ def generate_cr_inf_data_rapid_decline(time_periods):
     time = np.arange(time_periods)
     data = {
         "TIME": time,
-        "COMMON_INFRA_FEATURES": np.round(np.linspace(1.3, 0.4, time_periods), 3),
-        "CONSTRUCTION_BARRIERS": np.round(np.linspace(0.5, 1.5, time_periods), 3),
-        "INTERMODAL_CONNECTIONS": np.round(np.linspace(1.0, 0.2, time_periods), 3),
-        "INFRA_ADAPTABILITY_FEATURES": np.round(np.linspace(1.4, 0.6, time_periods), 3),
+        "COMMON_INFRA_FEATURES": np.round(np.linspace(0.95, 0.4, time_periods), 3),
+        "CONSTRUCTION_BARRIERS": np.round(np.linspace(0.5, 0.95, time_periods), 3),
+        "INTERMODAL_CONNECTIONS": np.round(np.linspace(0.95, 0.2, time_periods), 3),
+        "INFRA_ADAPTABILITY_FEATURES": np.round(np.linspace(0.95, 0.6, time_periods), 3),
     }
     return pd.DataFrame(data)
 
