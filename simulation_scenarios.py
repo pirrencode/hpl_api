@@ -276,10 +276,10 @@ def generate_cr_rlb_decline_over_time_data(time_periods):
     time = np.arange(time_periods)
     data = {
         "TIME": time,
-        "DURABILITY": np.round(np.linspace(1.5, 1.3, time_periods), 3),
-        "DIGITAL_RELIABILITY": np.round(np.linspace(1.5, 1.2, time_periods), 3),
-        "WEATHER_DISASTER_RESILIENCE": np.round(np.linspace(1.5, 1.4, time_periods), 3),
-        "POLLUTION_PRODUCED": np.round(np.linspace(0.5, 0.6, time_periods), 3),
+        "DURABILITY": np.round(np.linspace(1.5, 0.7, time_periods), 3),
+        "DIGITAL_RELIABILITY": np.round(np.linspace(1.3, 0.55, time_periods), 3),
+        "WEATHER_DISASTER_RESILIENCE": np.round(np.linspace(1.2, 0.75, time_periods), 3),
+        "POLLUTION_PRODUCED": np.round(np.linspace(0.8, 1.6, time_periods), 3),
     }
     return pd.DataFrame(data)
 
@@ -287,10 +287,10 @@ def generate_cr_inf_decline_over_time_data(time_periods):
     time = np.arange(time_periods)
     data = {
         "TIME": time,
-        "COMMON_INFRA_FEATURES": np.round(np.linspace(1.5, 1.2, time_periods), 3),
-        "CONSTRUCTION_BARRIERS": np.round(np.linspace(0.5, 0.6, time_periods), 3),
-        "INTERMODAL_CONNECTIONS": np.round(np.linspace(1.5, 1.2, time_periods), 3),
-        "INFRA_ADAPTABILITY_FEATURES": np.round(np.linspace(1.5, 1.2, time_periods), 3),
+        "COMMON_INFRA_FEATURES": np.round(np.linspace(1.3, 0.65, time_periods), 3),
+        "CONSTRUCTION_BARRIERS": np.round(np.linspace(0.5, 1.2, time_periods), 3),
+        "INTERMODAL_CONNECTIONS": np.round(np.linspace(1.0, 0.4, time_periods), 3),
+        "INFRA_ADAPTABILITY_FEATURES": np.round(np.linspace(1.4, 0.75, time_periods), 3),
     }
     return pd.DataFrame(data)
 
@@ -298,11 +298,11 @@ def generate_cr_scl_decline_over_time_data(time_periods):
     time = np.arange(time_periods)
     data = {
         "TIME": time,
-        "RESOURCE_MILEAGE": np.round(np.linspace(1.5, 1.2, time_periods), 3),
-        "PLANNED_VOLUME": np.round(np.linspace(1.5, 1.2, time_periods), 3),
-        "ADJUSTMENT_COEF_1": np.round(np.linspace(1.5, 1.4, time_periods), 3),
-        "ADJUSTMENT_COEF_2": np.round(np.linspace(0.5, 0.3, time_periods), 3),
-        "ADJUSTMENT_COEF_3": np.round(np.linspace(2.5, 2.3, time_periods), 3),
+        "RESOURCE_MILEAGE": np.round(np.linspace(1.6, 0.5, time_periods), 3),
+        "PLANNED_VOLUME": np.round(np.linspace(1.3, 0.6, time_periods), 3),
+        "ADJUSTMENT_COEF_1": np.round(np.linspace(1.5, 0.7, time_periods), 3),
+        "ADJUSTMENT_COEF_2": np.round(np.linspace(1.0, 0.45, time_periods), 3),
+        "ADJUSTMENT_COEF_3": np.round(np.linspace(0.7, 0.38, time_periods), 3),
     }
     return pd.DataFrame(data)
 
