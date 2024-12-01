@@ -2254,7 +2254,7 @@ def calculate_cr_sac():
     df_result = pd.DataFrame()
     df_result['TIME'] = df_source['TIME']
     
-    cr_sac_raw = df_source['POSITIVE_FEEDBACK'] / (df_source['NEGATIVE_FEEDBACK'] + 1e-6)  # Avoid division by zero
+    cr_sac_raw = df_source['POSITIVE_FEEDBACK'] / (df_source['NEGATIVE_FEEDBACK'] + 1e-6)
     
     cr_sac_min = cr_sac_raw.min()
     cr_sac_max = cr_sac_raw.max()
