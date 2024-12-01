@@ -2781,21 +2781,22 @@ def render_upload_data_page():
             truncate_query = f"TRUNCATE TABLE {input_data_sample_table};"
             session.sql(truncate_query).collect()
 
-            populate_query = f"""
-                INSERT INTO {input_data_sample_table} (INPUT_PARAMETERS, TIME_1)
+            populate_query = """
+                INSERT INTO FUSION_STORE.INPUT_DATA_SAMPLE (INPUT_PARAMETERS, TIME_1)
                 SELECT 
                     COLUMN_NAME AS INPUT_PARAMETERS,
-                    VALUE AS TIME_1
+                    VALUE::FLOAT AS TIME_1
                 FROM (
                     SELECT 
                         COLUMN_NAME, 
-                        VALUE
+                        OBJECT_GET(DATA, COLUMN_NAME) AS VALUE
                     FROM (
-                        SELECT OBJECT_KEYS(OBJECT_CONSTRUCT(*)) AS COLUMN_NAME, 
-                               OBJECT_CONSTRUCT(*) AS DATA
-                        FROM {input_data_sample_table}
-                        WHERE TIME = 1
-                    ) CROSS JOIN LATERAL FLATTEN(INPUT => DATA, PATH => COLUMN_NAME)
+                        SELECT 
+                            OBJECT_KEYS(OBJECT_CONSTRUCT(*)) AS COLUMN_NAME,
+                            OBJECT_CONSTRUCT(*) AS DATA
+                        FROM FUSION_STORE.INPUT_DATA_FUSION
+                        WHERE "TIME" = 1
+                    )
                 )
                 WHERE COLUMN_NAME != 'TIME';
             """
