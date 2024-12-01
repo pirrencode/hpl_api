@@ -254,11 +254,11 @@ def generate_cr_ecv_decline_over_time_data(time_periods):
     time = np.arange(time_periods)
     data = {
         "TIME": time,
-        "REVENUE": np.round(np.linspace(25000000, 21000000, time_periods), 3),
-        "OPEX": np.round(np.linspace(200000, 300000, time_periods), 3),
-        "CAPEX": np.round(np.full(time_periods, 1000000), 3),
-        "DISCOUNT_RATE": np.round(np.linspace(0.05, 0.04, time_periods), 3),
-        "PROJECT_LIFETIME": np.round(np.full(time_periods, 600), 3),
+        "REVENUE": np.round(np.linspace(27000000, 25000000, time_periods), 3),
+        "OPEX": np.round(np.linspace(180000, 280000, time_periods), 3),
+        "CAPEX": np.round(np.full(time_periods, 950000), 3),
+        "DISCOUNT_RATE": np.round(np.linspace(0.06, 0.05, time_periods), 3),
+        "PROJECT_LIFETIME": np.round(np.full(time_periods, 500), 3),
     }
     return pd.DataFrame(data)
 
@@ -266,9 +266,9 @@ def generate_cr_usb_decline_over_time_data(time_periods):
     time = np.arange(time_periods)
     data = {
         "TIME": time,
-        "PRODUCTION_OUTPUT": np.round(np.linspace(1.5, 0.9, time_periods), 3),
-        "USER_EXP_RATIO": np.round(np.linspace(1.3, 0.8, time_periods), 3),
-        "ACCESSIBILITY_AGEING": np.round(np.linspace(1.0, 0.8, time_periods), 3),
+        "PRODUCTION_OUTPUT": np.round(np.linspace(0.93, 0.6, time_periods), 3),
+        "USER_EXP_RATIO": np.round(np.linspace(0.93, 0.6, time_periods), 3),
+        "ACCESSIBILITY_AGEING": np.round(np.linspace(0.8, 0.5, time_periods), 3),
     }
     return pd.DataFrame(data)
 
