@@ -17,12 +17,12 @@ def generate_cr_env_data_rapid_decline(time_periods):
     time = np.arange(time_periods)
     data = {
         "TIME": time,
-        "E": np.linspace(100, 20, time_periods),  # Energy consumed decreases sharply
-        "D": np.linspace(1000, 200, time_periods),  # Distance decreases sharply
-        "L": np.linspace(15000, 3000, time_periods),  # Load decreases sharply
-        "C": np.linspace(500, 100, time_periods),   # CO2 emissions decrease sharply
-        "M": np.linspace(0.8, 0.21, time_periods),   # Material sustainability decreases
-        "Y": np.linspace(0.7, 0.18, time_periods)    # Environmental impact worsens
+        "ENERGY_CONSUMED": np.linspace(100, 20, time_periods),
+        "DISTANCE": np.linspace(1000, 200, time_periods),
+        "LOAD_WEIGHT": np.linspace(15000, 3000, time_periods),
+        "CO2_EMISSIONS": np.linspace(500, 100, time_periods),
+        "MATERIAL_SUSTAINABILITY": np.linspace(0.8, 0.21, time_periods),
+        "ENV_IMPACT_SCORE": np.linspace(0.7, 0.18, time_periods)
     }
     return pd.DataFrame(data)
 
