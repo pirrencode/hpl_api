@@ -3134,7 +3134,7 @@ def generate_decline_over_time_scenario(time_periods):
     scenarios_calculation_to_snowlake(cr_env_df, cr_sac_df, cr_tfe_df, cr_sfy_df, cr_reg_df, cr_qmf_df, cr_ecv_df, cr_usb_df, cr_rlb_df, cr_inf_df, cr_scl_df)
 
 #######################################
-# DECLINE OVERTIME SCENARIO
+# RAPID GROWTH SCENARIO
 #######################################
 
 def generate_rapid_growth_scenario(time_periods):
