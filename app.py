@@ -2768,10 +2768,10 @@ def render_upload_data_page():
         finally:
             session.close()        
 
-    if st.button("📣 REPORT MERGED INPUT DATA"):
+    if st.button("📣 VIEW INPUT DATA IN UNIFIED VIEW"):
         df = load_data_from_snowflake(input_data_table)
         st.write(f"Criterion data preview from {input_data_table}.")
-        st.dataframe(df.head())
+        st.dataframe(df)
 
     if st.button("⬅️ BACK"):
         st.session_state['page'] = 'home'
