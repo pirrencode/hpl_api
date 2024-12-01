@@ -2246,7 +2246,6 @@ def calculate_cr_sfy():
     return df_cr_sfy    
 
 def calculate_cr_sac():
-
     session = Session.builder.configs(get_snowflake_connection_params()).create()
 
     df_source = session.table("STAGING_STORE.CR_SAC_STAGING").to_pandas()
@@ -2254,11 +2253,15 @@ def calculate_cr_sac():
     df_result = pd.DataFrame()
     df_result['TIME'] = df_source['TIME']
     
-    cr_sac_raw = df_source['POSITIVE_FEEDBACK'] / (df_source['NEGATIVE_FEEDBACK'] + 1e-6)
+    w1 = 0.5
+    w2 = 0.5
+
+    cr_sac_raw = w1 + w2 * (
+        (df_source['POSITIVE_FEEDBACK'] - df_source['NEGATIVE_FEEDBACK']) /
+        (df_source['POSITIVE_FEEDBACK'] + df_source['NEGATIVE_FEEDBACK'] + 1e-6)
+    )
     
-    cr_sac_min = cr_sac_raw.min()
-    cr_sac_max = cr_sac_raw.max()
-    df_result['CR_SAC'] = (cr_sac_raw - cr_sac_min) / (cr_sac_max - cr_sac_min)
+    df_result['CR_SAC'] = cr_sac_raw.clip(0, 1)
 
     return df_result
 
