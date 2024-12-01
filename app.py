@@ -2662,6 +2662,8 @@ def render_upload_data_page():
 
     criterion_function = criterion_function_mapping.get(criterion, calculate_cr_sfy)
 
+    input_data_table = "FUSION_STORE.INPUT_DATA_FUSION"
+
     if st.button("🗃️ Generate and Save Data"):
         df = generate_function(time_periods)
         st.write(f"Data generated for {criterion}:")
@@ -2709,9 +2711,9 @@ def render_upload_data_page():
         save_data_to_snowflake(df, "ALLIANCE_STORE.HPL_SD_CRS_ALLIANCE")
         st.write(f"Table population completed. Please proceed to visualization tab")
 
-    if st.button("MERGE ALL INPUT DATA"):
+    if st.button("✅ MERGE ALL INPUT DATA"):
         session = Session.builder.configs(get_snowflake_connection_params()).create()
-        input_data_table = "FUSION_STORE.INPUT_DATA_FUSION"
+        
         try:
             truncate_table = f"TRUNCATE TABLE HPL_SYSTEM_DYNAMICS.{input_data_table};"
             session.sql(truncate_table).collect()
@@ -2766,7 +2768,7 @@ def render_upload_data_page():
         finally:
             session.close()        
 
-    if st.button("🗝 VIEW MERGED INPUT DATA"):
+    if st.button("📣 REPORT MERGED INPUT DATA"):
         df = load_data_from_snowflake(input_data_table)
         st.write(f"Criterion data preview from {input_data_table}.")
         st.dataframe(df.head())
