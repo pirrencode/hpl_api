@@ -2050,7 +2050,6 @@ def save_data_to_snowflake(df, table_name):
         delete_data = session.sql(f"TRUNCATE TABLE IF EXISTS {table_name}").collect()
         logging.info(f"TRUNCATE command result: {delete_data}")
 
-        # Load the data into the Snowflake table
         copy_result = session.sql(f"""
             COPY INTO {table_name}
             FROM @{stage_name}/temp_file.csv
@@ -2709,6 +2708,68 @@ def render_upload_data_page():
         st.dataframe(df.head())
         save_data_to_snowflake(df, "ALLIANCE_STORE.HPL_SD_CRS_ALLIANCE")
         st.write(f"Table population completed. Please proceed to visualization tab")
+
+    if st.button("MERGE ALL INPUT DATA"):
+        session = Session.builder.configs(get_snowflake_connection_params()).create()
+        input_data_table = "FUSION_STORE.INPUT_DATA_FUSION"
+        try:
+            truncate_table = f"TRUNCATE TABLE HPL_SYSTEM_DYNAMICS.{input_data_table};"
+            session.sql(truncate_table).collect()
+            st.info("Target table truncated successfully.")            
+            merge_query = f"""
+                INSERT INTO HPL_SYSTEM_DYNAMICS.{input_data_table} (TIME, 
+                    ENERGY_CONSUMED, DISTANCE, LOAD_WEIGHT, CO2_EMISSIONS, MATERIAL_SUSTAINABILITY, ENV_IMPACT_SCORE,
+                    POSITIVE_FEEDBACK, NEGATIVE_FEEDBACK,
+                    CURRENT_TRL, TARGET_TRL, ENG_CHALLENGES_RESOLVED, TARGET_ENG_CHALLENGES,
+                    RISK_SCORE, MIN_RISK_SCORE, MAX_RISK_SCORE,
+                    ETHICAL_COMPLIANCE, LEGAL_COMPLIANCE, LAND_USAGE_COMPLIANCE, INT_LAW_COMPLIANCE, TRL_COMPLIANCE,
+                    MAGLEV_LEVITATION, AMBIENT_INTELLIGENCE, GENERATIVE_AI, AI_MACHINE_LEARNING, DIGITAL_TWINS, FIVE_G, QUANTUM_COMPUTING,
+                    AUGMENTED_REALITY, VIRTUAL_REALITY, PRINTING_AT_SCALE, BLOCKCHAIN, SELF_DRIVING_AUTONOMOUS_VEHICLES, TOTAL_DISRUPTIVE_TECH,
+                    REVENUE, OPEX, CAPEX, DISCOUNT_RATE, PROJECT_LIFETIME,
+                    PRODUCTION_OUTPUT, USER_EXP_RATIO, ACCESSIBILITY_AGEING,
+                    DURABILITY, DIGITAL_RELIABILITY, WEATHER_DISASTER_RESILIENCE, POLLUTION_PRODUCED,
+                    COMMON_INFRA_FEATURES, CONSTRUCTION_BARRIERS, INTERMODAL_CONNECTIONS, INFRA_ADAPTABILITY_FEATURES,
+                    RESOURCE_MILEAGE, PLANNED_VOLUME, ADJUSTMENT_COEF_1, ADJUSTMENT_COEF_2, ADJUSTMENT_COEF_3)
+                SELECT 
+                    coalesce(env.TIME, sac.TIME, tfe.TIME, sfy.TIME, reg.TIME, qmf.TIME, ecv.TIME, usb.TIME, rlb.TIME, inf.TIME, scl.TIME) AS TIME,
+                    env.ENERGY_CONSUMED, env.DISTANCE, env.LOAD_WEIGHT, env.CO2_EMISSIONS, env.MATERIAL_SUSTAINABILITY, env.ENV_IMPACT_SCORE,
+                    sac.POSITIVE_FEEDBACK, sac.NEGATIVE_FEEDBACK,
+                    tfe.CURRENT_TRL, tfe.TARGET_TRL, tfe.ENG_CHALLENGES_RESOLVED, tfe.TARGET_ENG_CHALLENGES,
+                    sfy.RISK_SCORE, sfy.MIN_RISK_SCORE, sfy.MAX_RISK_SCORE,
+                    reg.ETHICAL_COMPLIANCE, reg.LEGAL_COMPLIANCE, reg.LAND_USAGE_COMPLIANCE, reg.INT_LAW_COMPLIANCE, reg.TRL_COMPLIANCE,
+                    qmf.MAGLEV_LEVITATION, qmf.AMBIENT_INTELLIGENCE, qmf.GENERATIVE_AI, qmf.AI_MACHINE_LEARNING, qmf.DIGITAL_TWINS, qmf.FIVE_G, qmf.QUANTUM_COMPUTING,
+                    qmf.AUGMENTED_REALITY, qmf.VIRTUAL_REALITY, qmf.PRINTING_AT_SCALE, qmf.BLOCKCHAIN, qmf.SELF_DRIVING_AUTONOMOUS_VEHICLES, qmf.TOTAL_DISRUPTIVE_TECH,
+                    ecv.REVENUE, ecv.OPEX, ecv.CAPEX, ecv.DISCOUNT_RATE, ecv.PROJECT_LIFETIME,
+                    usb.PRODUCTION_OUTPUT, usb.USER_EXP_RATIO, usb.ACCESSIBILITY_AGEING,
+                    rlb.DURABILITY, rlb.DIGITAL_RELIABILITY, rlb.WEATHER_DISASTER_RESILIENCE, rlb.POLLUTION_PRODUCED,
+                    inf.COMMON_INFRA_FEATURES, inf.CONSTRUCTION_BARRIERS, inf.INTERMODAL_CONNECTIONS, inf.INFRA_ADAPTABILITY_FEATURES,
+                    scl.RESOURCE_MILEAGE, scl.PLANNED_VOLUME, scl.ADJUSTMENT_COEF_1, scl.ADJUSTMENT_COEF_2, scl.ADJUSTMENT_COEF_3
+                FROM 
+                    HPL_SYSTEM_DYNAMICS.FUSION_STORE.CR_ENV_SOURCE env
+                FULL OUTER JOIN HPL_SYSTEM_DYNAMICS.FUSION_STORE.CR_SAC_SOURCE sac ON env.TIME = sac.TIME
+                FULL OUTER JOIN HPL_SYSTEM_DYNAMICS.FUSION_STORE.CR_TFE_SOURCE tfe ON env.TIME = tfe.TIME
+                FULL OUTER JOIN HPL_SYSTEM_DYNAMICS.FUSION_STORE.CR_SFY_SOURCE sfy ON env.TIME = sfy.TIME
+                FULL OUTER JOIN HPL_SYSTEM_DYNAMICS.FUSION_STORE.CR_REG_SOURCE reg ON env.TIME = reg.TIME
+                FULL OUTER JOIN HPL_SYSTEM_DYNAMICS.FUSION_STORE.CR_QMF_SOURCE qmf ON env.TIME = qmf.TIME
+                FULL OUTER JOIN HPL_SYSTEM_DYNAMICS.FUSION_STORE.CR_ECV_SOURCE ecv ON env.TIME = ecv.TIME
+                FULL OUTER JOIN HPL_SYSTEM_DYNAMICS.FUSION_STORE.CR_USB_SOURCE usb ON env.TIME = usb.TIME
+                FULL OUTER JOIN HPL_SYSTEM_DYNAMICS.FUSION_STORE.CR_RLB_SOURCE rlb ON env.TIME = rlb.TIME
+                FULL OUTER JOIN HPL_SYSTEM_DYNAMICS.FUSION_STORE.CR_INF_SOURCE inf ON env.TIME = inf.TIME
+                FULL OUTER JOIN HPL_SYSTEM_DYNAMICS.FUSION_STORE.CR_SCL_SOURCE scl ON env.TIME = scl.TIME;
+            """
+
+            session.sql(merge_query).collect()
+            st.success(f"Input data successfully merged into {input_data_table}!")
+
+        except Exception as e:
+            st.error(f"An error occurred while merging data: {e}")
+        finally:
+            session.close()        
+
+    if st.button("🗝 VIEW MERGED INPUT DATA"):
+        df = load_data_from_snowflake(input_data_table)
+        st.write(f"Criterion data preview from {input_data_table}.")
+        st.dataframe(df.head())
 
     if st.button("⬅️ BACK"):
         st.session_state['page'] = 'home'
