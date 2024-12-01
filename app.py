@@ -2514,7 +2514,7 @@ def view_advancements():
 
 def render_homepage():
     st.title("HDME")
-    st.subheader("v0.3.2-alpha")
+    st.subheader("v0.3.3-alpha")
     st.write("""
         Welcome to the Hyperloop Project System Dynamics Dashboard. 
         This application allows you to upload, manage, and visualize data related to various criteria 
@@ -2663,6 +2663,7 @@ def render_upload_data_page():
     criterion_function = criterion_function_mapping.get(criterion, calculate_cr_sfy)
 
     input_data_table = "FUSION_STORE.INPUT_DATA_FUSION"
+    input_data_sample_table = "FUSION_STORE.INPUT_DATA_SAMPLE"
 
     if st.button("🗃️ Generate and Save Data"):
         df = generate_function(time_periods)
@@ -2772,6 +2773,45 @@ def render_upload_data_page():
         df = load_data_from_snowflake(input_data_table)
         st.write(f"Criterion data preview from {input_data_table}.")
         st.dataframe(df)
+
+    if st.button("🔬SHOW INPUT DATA SAMPLE FOR A SINGLE TIME PERIOD"):
+
+        session = Session.builder.configs(get_snowflake_connection_params()).create()
+        try:
+            truncate_query = f"TRUNCATE TABLE {input_data_sample_table};"
+            session.sql(truncate_query).collect()
+
+            populate_query = f"""
+                INSERT INTO {input_data_sample_table} (INPUT_PARAMETERS, TIME_1)
+                SELECT 
+                    COLUMN_NAME AS INPUT_PARAMETERS,
+                    VALUE AS TIME_1
+                FROM (
+                    SELECT 
+                        COLUMN_NAME, 
+                        VALUE
+                    FROM (
+                        SELECT OBJECT_KEYS(OBJECT_CONSTRUCT(*)) AS COLUMN_NAME, 
+                               OBJECT_CONSTRUCT(*) AS DATA
+                        FROM {input_data_sample_table}
+                        WHERE TIME = 1
+                    ) CROSS JOIN LATERAL FLATTEN(INPUT => DATA, PATH => COLUMN_NAME)
+                )
+                WHERE COLUMN_NAME != 'TIME';
+            """
+
+            session.sql(populate_query).collect()
+
+            st.success(f"Data successfully populated in {input_data_sample_table} for TIME = 1.")
+
+            df = load_data_from_snowflake(input_data_sample_table)
+            st.write(f"Sample data preview from {input_data_sample_table}.")
+            st.dataframe(df)
+
+        except Exception as e:
+            st.error(f"An error occurred: {str(e)}")
+        finally:
+            session.close()        
 
     if st.button("⬅️ BACK"):
         st.session_state['page'] = 'home'
