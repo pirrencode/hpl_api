@@ -74,8 +74,9 @@ To execute unit tests, use:
     ```bash
     pytest tests/unit/{unit_test_name}.py
 
-# Repository Structure
+## Repository Structure
 
+```plaintext
 hpl_api/
 │
 ├── app.py                   # Main application file
@@ -87,7 +88,8 @@ hpl_api/
 ├── tests/
 │   ├── unit/                # Unit tests directory
 │   └── integration/         # Integration tests directory
-└── README.md            
+└── README.md                # Project README file
+       
 
 # Contributors
 Aleksejs Vesjolijs
