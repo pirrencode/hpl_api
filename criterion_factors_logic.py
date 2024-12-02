@@ -159,9 +159,9 @@ def generate_economic_viability_data(time_periods):
 def generate_usability_data(time_periods):
     data = {
         "TIME": list(range(time_periods)),
-        "PRODUCTION_OUTPUT": [round(random.uniform(0.5, 1.5), 2) for _ in range(time_periods)],  # p: values between 0.5 and 1.5
-        "USER_EXP_RATIO": [round(random.uniform(0.5, 1.5), 2) for _ in range(time_periods)],     # e: values between 0.5 and 1.5
-        "ACCESSIBILITY_AGEING": [round(random.uniform(0.5, 1.5), 2) for _ in range(time_periods)] # a: values between 0.5 and 1.5
+        "PRODUCTION_OUTPUT": [round(random.uniform(0.5, 1.5), 2) for _ in range(time_periods)],  
+        "USER_EXP_RATIO": [round(random.uniform(0.5, 1.5), 2) for _ in range(time_periods)],    
+        "ACCESSIBILITY_AGEING": [round(random.uniform(0.5, 1.5), 2) for _ in range(time_periods)]
     }
     
     df = pd.DataFrame(data)
@@ -171,10 +171,10 @@ def generate_usability_data(time_periods):
 def generate_reliability_data(time_periods):
     data = {
         "TIME": list(range(time_periods)),
-        "DURABILITY": [round(random.uniform(0.5, 1.5), 2) for _ in range(time_periods)],            # d: values between 0.5 and 1.5
-        "DIGITAL_RELIABILITY": [round(random.uniform(0.5, 1.5), 2) for _ in range(time_periods)],   # c: values between 0.5 and 1.5
-        "WEATHER_DISASTER_RESILIENCE": [round(random.uniform(0.5, 1.5), 2) for _ in range(time_periods)], # w: values between 0.5 and 1.5
-        "POLLUTION_PRODUCED": [round(random.uniform(0.5, 1.5), 2) for _ in range(time_periods)]    # u: values between 0.5 and 1.5
+        "DURABILITY": [round(random.uniform(0.5, 1.5), 2) for _ in range(time_periods)],
+        "DIGITAL_RELIABILITY": [round(random.uniform(0.5, 1.5), 2) for _ in range(time_periods)],
+        "WEATHER_DISASTER_RESILIENCE": [round(random.uniform(0.5, 1.5), 2) for _ in range(time_periods)],
+        "POLLUTION_PRODUCED": [round(random.uniform(0.5, 1.5), 2) for _ in range(time_periods)]
     }
     
     df = pd.DataFrame(data)
@@ -183,10 +183,10 @@ def generate_reliability_data(time_periods):
 def generate_infrastructure_integration_data(time_periods):
     data = {
         "TIME": list(range(time_periods)),
-        "COMMON_INFRA_FEATURES": [round(random.uniform(0.5, 1.5), 2) for _ in range(time_periods)],  # C: values between 0.5 and 1.5
-        "CONSTRUCTION_BARRIERS": [round(random.uniform(0.5, 1.5), 2) for _ in range(time_periods)],  # E: values between 0.5 and 1.5
-        "INTERMODAL_CONNECTIONS": [round(random.uniform(0.5, 1.5), 2) for _ in range(time_periods)], # M: values between 0.5 and 1.5
-        "INFRA_ADAPTABILITY_FEATURES": [round(random.uniform(0.5, 1.5), 2) for _ in range(time_periods)] # A: values between 0.5 and 1.5
+        "COMMON_INFRA_FEATURES": [round(random.uniform(0.5, 1.5), 2) for _ in range(time_periods)],
+        "CONSTRUCTION_BARRIERS": [round(random.uniform(0.5, 1.5), 2) for _ in range(time_periods)], 
+        "INTERMODAL_CONNECTIONS": [round(random.uniform(0.5, 1.5), 2) for _ in range(time_periods)],
+        "INFRA_ADAPTABILITY_FEATURES": [round(random.uniform(0.5, 1.5), 2) for _ in range(time_periods)]
     }
     
     df = pd.DataFrame(data)
@@ -195,11 +195,11 @@ def generate_infrastructure_integration_data(time_periods):
 def generate_scalability_data(time_periods):
     data = {
         "TIME": list(range(time_periods)),
-        "RESOURCE_MILEAGE": [round(random.uniform(0.5, 1.5), 2) for _ in range(time_periods)],    # L1: values between 0.5 and 1.5
-        "PLANNED_VOLUME": [round(random.uniform(0.5, 1.5), 2) for _ in range(time_periods)],      # Q: values between 0.5 and 1.5
-        "ADJUSTMENT_COEF_1": [round(random.uniform(0.5, 1.5), 2) for _ in range(time_periods)],   # K1: values between 0.5 and 1.5
-        "ADJUSTMENT_COEF_2": [round(random.uniform(0.5, 1.5), 2) for _ in range(time_periods)],   # K2: values between 0.5 and 1.5
-        "ADJUSTMENT_COEF_3": [round(random.uniform(0.5, 1.5), 2) for _ in range(time_periods)]    # K3: values between 0.5 and 1.5
+        "RESOURCE_MILEAGE": [round(random.uniform(0.5, 1.5), 2) for _ in range(time_periods)],
+        "PLANNED_VOLUME": [round(random.uniform(0.5, 1.5), 2) for _ in range(time_periods)],
+        "ADJUSTMENT_COEF_1": [round(random.uniform(0.5, 1.5), 2) for _ in range(time_periods)],
+        "ADJUSTMENT_COEF_2": [round(random.uniform(0.5, 1.5), 2) for _ in range(time_periods)],
+        "ADJUSTMENT_COEF_3": [round(random.uniform(0.5, 1.5), 2) for _ in range(time_periods)]
     }
     
     df = pd.DataFrame(data)

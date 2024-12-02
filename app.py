@@ -2274,9 +2274,6 @@ def calculate_cr_tfe():
     df_result = pd.DataFrame()
     df_result['TIME'] = df_source['TIME']
 
-    # w1 = 0.5
-    # w2 = 0.5
-    
     tfe_values = []
     for _, row in df_source.iterrows():
         current_trl = row["CURRENT_TRL"]
@@ -2301,7 +2298,6 @@ def calculate_cr_reg():
     df_result = pd.DataFrame()
     df_result['TIME'] = df_source['TIME']
 
-    # Weights
     w1 = w2 = w3 = w4 = w5 = 0.2
     
     df_result['CR_REG'] = (w1 * df_source['ETHICAL_COMPLIANCE'] +
@@ -2461,7 +2457,6 @@ def calculate_cr_scl():
 def populate_hpl_sd_crs():
     session = Session.builder.configs(get_snowflake_connection_params()).create()
 
-    # Load data from each CALC_CR_* table
     cr_env_df = session.table("STAGING_STORE.CALC_CR_ENV_STAGING").to_pandas()
     cr_sac_df = session.table("STAGING_STORE.CALC_CR_SAC_STAGING").to_pandas()
     cr_tfe_df = session.table("STAGING_STORE.CALC_CR_TFE_STAGING").to_pandas()
@@ -2474,7 +2469,6 @@ def populate_hpl_sd_crs():
     cr_inf_df = session.table("STAGING_STORE.CALC_CR_INF_STAGING").to_pandas()
     cr_scl_df = session.table("STAGING_STORE.CALC_CR_SCL_STAGING").to_pandas()
 
-    # Start with the first DataFrame and merge sequentially, keeping only TIME and the relevant criterion column
     combined_df = cr_env_df[['TIME', 'CR_ENV']]\
         .merge(cr_sac_df[['TIME', 'CR_SAC']], on="TIME", how="outer")\
         .merge(cr_tfe_df[['TIME', 'CR_TFE']], on="TIME", how="outer")\
@@ -2487,17 +2481,14 @@ def populate_hpl_sd_crs():
         .merge(cr_inf_df[['TIME', 'CR_INF']], on="TIME", how="outer")\
         .merge(cr_scl_df[['TIME', 'CR_SCL']], on="TIME", how="outer")
 
-    # Ensure there are no extra columns
     expected_columns = ['TIME', 'CR_ENV', 'CR_SAC', 'CR_TFE', 'CR_SFY', 'CR_REG', 'CR_QMF', 'CR_ECV', 'CR_USB', 'CR_RLB', 'CR_INF', 'CR_SCL']
     combined_df = combined_df[expected_columns]
 
-    # Check for any unexpected columns
     if list(combined_df.columns) != expected_columns:
         st.error("The DataFrame columns do not match the expected structure.")
         st.write("DataFrame columns:", combined_df.columns)
         return
 
-    # Fill any NaN values that may have been introduced during the outer joins
     combined_df.fillna(0, inplace=True)
 
     st.write("DEBUG: ALL")
@@ -2523,9 +2514,9 @@ def view_advancements():
 
 def render_homepage():
     st.title("HDME")
-    st.subheader("v0.3.3-alpha")
+    st.subheader("v0.4.0-alpha")
     st.write("""
-        Welcome to the Hyperloop Project System Dynamics Dashboard. 
+        Welcome to the prototype of Hyperloop Project System Dynamics Dashboard. 
         This application allows you to upload, manage, and visualize data related to various criteria 
         of the Hyperloop Project's system dynamics.
     """)
@@ -2574,7 +2565,6 @@ def render_homepage():
 def render_upload_data_page():
     st.title("Upload data to ecosystem")
 
-    # Criterion selection
     criterion = st.selectbox("Select Criterion", ["Safety", 
                                                   "Environmental Impact", 
                                                   "Social Acceptance", 
@@ -2588,7 +2578,6 @@ def render_upload_data_page():
                                                   "Scalability",
                                                   ])
 
-    # Handling custom time periods logic
     time_period_raw = st.text_input('Time period:', value='100')
     time_periods = int(time_period_raw)   
 
@@ -2845,8 +2834,6 @@ def visualize_all_success_factors():
         with cols[col_idx]: 
             st.plotly_chart(fig)
 
-    # --- New Combined Graph CR_SUMMARY ---
-
     fig_summary = px.line(
         hpl_sd_crs_df, 
         x='TIME', 
@@ -2904,8 +2891,8 @@ def visualize_ddmi_factors(dmmi_df):
     
     for i, factor in enumerate(factors):
         fig = px.line(dmmi_df, x='TIME', y=factor, title=f"{factor} over Time")
-        col_idx = i % 4  # Get column index: 0, 1, 2, 3
-        with cols[col_idx]:  # Place the figure in the corresponding column
+        col_idx = i % 4
+        with cols[col_idx]:
             st.plotly_chart(fig)
 
 def render_ddmi_dashboard():
@@ -3277,7 +3264,7 @@ def render_scenarios_simulation_page():
     st.title("Simulation Scenarios 🌍")
 
     st.write("Please select time periods for simulation (seconds).")
-    # Handling custom time periods logic
+
     time_period_raw = st.text_input('Time period:', value='100')
     time_periods = int(time_period_raw)   
 
@@ -3337,7 +3324,6 @@ def render_scenarios_simulation_page():
 def render_experiment_page():
     st.title("EGTL EXPERIMENT ⚗️")
 
-    # Handling custom time periods logic
     time_period_raw = st.text_input('Complexity:', value='100')
     time_periods = int(time_period_raw)   
 
@@ -3505,11 +3491,9 @@ def get_hyperloop_tables():
     sql_statement = "SHOW TABLES IN SCHEMA FUSION_STORE"
     tables = execute_sql_statement(sql_statement)
 
-    # Assuming tables are returned as a list of dictionaries and 'name' is one of the keys
     df = pd.DataFrame(tables)
     pattern = r'HYPERLOOP_SUBSYSTEM_(\d+)'
 
-    # Filter tables that match the pattern
     hyperloop_tables = df[df['name'].str.match(pattern)]
     return hyperloop_tables['name'].tolist()
 
