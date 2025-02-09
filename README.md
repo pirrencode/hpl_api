@@ -8,7 +8,7 @@ The **Hyperloop Decision Making Ecosystem (HDME)** is a robust platform designed
 
 ---
 
-## HDME Research Publications
+## Research Publications on HDME
 
 The HDME project has been featured in several peer-reviewed research publications, demonstrating its scientific and practical contributions:
 
@@ -27,10 +27,10 @@ The HDME project has been featured in several peer-reviewed research publication
    - Built-in functionality for exploring various decision-making parameters.
 
 2. **EGTL Model Integration**:
-   - Implements the E(G)TL Model for data transformation and efficient decision-making.
+   - Implements the E(G)TL Model for data transformation and efficient real-time decision-making.
 
 3. **Simulation Scenarios**:
-   - Predefined simulation scenarios for analyzing key metrics such as social acceptance (SAC), technological feasibility (TFE), and economic viability.
+   - Simulation scenarios for analyzing key metrics, for example social acceptance (SAC), technological feasibility (TFE), and other.
 
 4. **Database Management**:
    - Structured table creation DDL scripts for EGTL stores:
@@ -80,15 +80,19 @@ To execute unit tests, use:
 hpl_api/
 │
 ├── app.py                   # Main application file
-├── simulation_scenarios.py  # Predefined simulation scenarios
+├── simulation_scenarios.py  # Simulation modeling scenarios
+├── criterion_factors_logic.py  # Fusion Store criterion calculation logic
 ├── requirements.txt         # Python dependencies
-├── swf_fusion_store.sql     # SQL for fusion store creation
-├── swf_staging_store.sql    # SQL for staging store creation
-├── swf_alliance_store.sql   # SQL for alliance store creation
+├── swf_fusion_store.sql     # SQL for Fusion store creation
+├── swf_staging_store.sql    # SQL for Staging store creation
+├── swf_alliance_store.sql   # SQL for Alliance store creation
 ├── tests/
-│   ├── unit/                # Unit tests directory
-│   └── integration/         # Integration tests directory
-└── README.md                # Project README file
+│   ├── unit/                # Unit tests
+│   └── integration/         # Integration tests
+└── README.md                # Project description
+└── CHANGELOG.md                # Version changes
+└── BACKLOG.md                # Pending tasks for completion
+└── LICENSE                # HDME licensing information
        
 
 # Contributors
