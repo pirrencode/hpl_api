@@ -1,5 +1,6 @@
 import pandas as pd
 import numpy as np
+from scipy.stats import beta
 
 ####################################
 # USER INPUT SCENARIO
@@ -13,7 +14,7 @@ def generate_cr_env_using_input_data(time_periods, lower_range, upper_range):
 # RAPID DECLINE SCENARIO
 ####################################
 
-def generate_cr_env_data_rapid_decline(time_periods):
+def generate_cr_env_data_rapid_decline(time_periods, diff=0.1, n=10000):
     time = np.arange(time_periods)
     data = {
         "TIME": time,
@@ -24,19 +25,62 @@ def generate_cr_env_data_rapid_decline(time_periods):
         "MATERIAL_SUSTAINABILITY": np.round(np.linspace(0.8, 0.21, time_periods), 3),
         "ENV_IMPACT_SCORE": np.round(np.linspace(0.7, 0.18, time_periods), 3),
     }
+    df = pd.DataFrame(data)
 
-    return pd.DataFrame(data)
+    for col in ["ENERGY_CONSUMED", "DISTANCE", "LOAD_WEIGHT", "CO2_EMISSIONS", "MATERIAL_SUSTAINABILITY", "ENV_IMPACT_SCORE"]:
+        df[f"{col}_lower"] = df[col] * (1 - diff)
+        df[f"{col}_upper"] = df[col] * (1 + diff)
 
-def generate_cr_sac_data_rapid_decline(time_periods):
+    def beta_pert_random(min_val, max_val, mode, n, lmbda=4):
+        """Monte Carlo Beta-PERT simulation."""
+        alpha = 1 + lmbda * (mode - min_val) / (max_val - min_val)
+        beta_param = 1 + lmbda * (max_val - mode) / (max_val - min_val)
+        samples = beta.rvs(alpha, beta_param, size=n, scale=(max_val - min_val)) + min_val
+        return np.mean(samples)
+
+    result_data = {col: [] for col in df.columns if not col.endswith(("_lower", "_upper"))}
+
+    for _, row in df.iterrows():
+        for col in ["ENERGY_CONSUMED", "DISTANCE", "LOAD_WEIGHT", "CO2_EMISSIONS", "MATERIAL_SUSTAINABILITY", "ENV_IMPACT_SCORE"]:
+            pert_mean = beta_pert_random(row[f"{col}_lower"], row[f"{col}_upper"], row[col], n)
+            result_data[col].append(pert_mean)
+
+        result_data["TIME"].append(row["TIME"])
+
+    return pd.DataFrame(result_data)
+
+def generate_cr_sac_data_rapid_decline(time_periods, diff=0.1, n=10000):
     time = np.arange(time_periods)
     data = {
         "TIME": time,
         "POSITIVE_FEEDBACK": np.round(np.linspace(100, 20, time_periods), 3),
         "NEGATIVE_FEEDBACK": np.round(np.linspace(100, 800, time_periods), 3),
     }
-    return pd.DataFrame(data)
+    df = pd.DataFrame(data)
 
-def generate_cr_tfe_data_rapid_decline(time_periods):
+    for col in ["POSITIVE_FEEDBACK", "NEGATIVE_FEEDBACK"]:
+        df[f"{col}_lower"] = df[col] * (1 - diff)
+        df[f"{col}_upper"] = df[col] * (1 + diff)
+
+    def beta_pert_random(min_val, max_val, mode, n, lmbda=4):
+        """Monte Carlo Beta-PERT simulation."""
+        alpha = 1 + lmbda * (mode - min_val) / (max_val - min_val)
+        beta_param = 1 + lmbda * (max_val - mode) / (max_val - min_val)
+        samples = beta.rvs(alpha, beta_param, size=n, scale=(max_val - min_val)) + min_val
+        return np.mean(samples)
+
+    result_data = {col: [] for col in df.columns if not col.endswith(("_lower", "_upper"))}
+
+    for _, row in df.iterrows():
+        for col in ["POSITIVE_FEEDBACK", "NEGATIVE_FEEDBACK"]:
+            pert_mean = beta_pert_random(row[f"{col}_lower"], row[f"{col}_upper"], row[col], n)
+            result_data[col].append(pert_mean)
+
+        result_data["TIME"].append(row["TIME"])
+
+    return pd.DataFrame(result_data)
+
+def generate_cr_tfe_data_rapid_decline(time_periods, diff=0.1, n=10000):
     time = np.arange(time_periods)
     data = {
         "TIME": time,
@@ -45,9 +89,31 @@ def generate_cr_tfe_data_rapid_decline(time_periods):
         "ENG_CHALLENGES_RESOLVED": np.round(np.linspace(10, 3, time_periods), 3),
         "TARGET_ENG_CHALLENGES": np.round(np.linspace(5, 15, time_periods), 3),
     }
-    return pd.DataFrame(data)
+    df = pd.DataFrame(data)
 
-def generate_cr_sfy_data_rapid_decline(time_periods):
+    for col in ["CURRENT_TRL", "TARGET_TRL", "ENG_CHALLENGES_RESOLVED", "TARGET_ENG_CHALLENGES"]:
+        df[f"{col}_lower"] = df[col] * (1 - diff)
+        df[f"{col}_upper"] = df[col] * (1 + diff)
+
+    def beta_pert_random(min_val, max_val, mode, n, lmbda=4):
+        """Monte Carlo Beta-PERT simulation."""
+        alpha = 1 + lmbda * (mode - min_val) / (max_val - min_val)
+        beta_param = 1 + lmbda * (max_val - mode) / (max_val - min_val)
+        samples = beta.rvs(alpha, beta_param, size=n, scale=(max_val - min_val)) + min_val
+        return np.mean(samples)
+
+    result_data = {col: [] for col in df.columns if not col.endswith(("_lower", "_upper"))}
+
+    for _, row in df.iterrows():
+        for col in ["CURRENT_TRL", "TARGET_TRL", "ENG_CHALLENGES_RESOLVED", "TARGET_ENG_CHALLENGES"]:
+            pert_mean = beta_pert_random(row[f"{col}_lower"], row[f"{col}_upper"], row[col], n)
+            result_data[col].append(pert_mean)
+
+        result_data["TIME"].append(row["TIME"])
+
+    return pd.DataFrame(result_data)
+
+def generate_cr_sfy_data_rapid_decline(time_periods, diff=0.1, n=10000):
     time = np.arange(time_periods)
     data = {
         "TIME": time,
@@ -55,9 +121,31 @@ def generate_cr_sfy_data_rapid_decline(time_periods):
         "MIN_RISK_SCORE": np.round(np.full(time_periods, 0.19), 3),
         "MAX_RISK_SCORE": np.round(np.full(time_periods, 0.92), 3),
     }
-    return pd.DataFrame(data)
+    df = pd.DataFrame(data)
 
-def generate_cr_reg_data_rapid_decline(time_periods):
+    for col in ["RISK_SCORE"]:
+        df[f"{col}_lower"] = df[col] * (1 - diff)
+        df[f"{col}_upper"] = df[col] * (1 + diff)
+
+    def beta_pert_random(min_val, max_val, mode, n, lmbda=4):
+        """Monte Carlo Beta-PERT simulation."""
+        alpha = 1 + lmbda * (mode - min_val) / (max_val - min_val)
+        beta_param = 1 + lmbda * (max_val - mode) / (max_val - min_val)
+        samples = beta.rvs(alpha, beta_param, size=n, scale=(max_val - min_val)) + min_val
+        return np.mean(samples)
+
+    result_data = {col: [] for col in df.columns if not col.endswith(("_lower", "_upper"))}
+
+    for _, row in df.iterrows():
+        pert_mean = beta_pert_random(row["RISK_SCORE_lower"], row["RISK_SCORE_upper"], row["RISK_SCORE"], n)
+        result_data["RISK_SCORE"].append(pert_mean)
+        result_data["MIN_RISK_SCORE"].append(row["MIN_RISK_SCORE"])
+        result_data["MAX_RISK_SCORE"].append(row["MAX_RISK_SCORE"])
+        result_data["TIME"].append(row["TIME"])
+
+    return pd.DataFrame(result_data)
+
+def generate_cr_reg_data_rapid_decline(time_periods, diff=0.1, n=10000):
     time = np.arange(time_periods)
     data = {
         "TIME": time,
@@ -67,7 +155,29 @@ def generate_cr_reg_data_rapid_decline(time_periods):
         "LEGAL_COMPLIANCE": np.round(np.linspace(0.5, 0.3, time_periods), 3),
         "TRL_COMPLIANCE": np.round(np.linspace(0.5, 0.4, time_periods), 3),
     }
-    return pd.DataFrame(data)
+    df = pd.DataFrame(data)
+
+    for col in ["ETHICAL_COMPLIANCE", "INT_LAW_COMPLIANCE", "LAND_USAGE_COMPLIANCE", "LEGAL_COMPLIANCE", "TRL_COMPLIANCE"]:
+        df[f"{col}_lower"] = df[col] * (1 - diff)
+        df[f"{col}_upper"] = df[col] * (1 + diff)
+
+    def beta_pert_random(min_val, max_val, mode, n, lmbda=4):
+        """Monte Carlo Beta-PERT simulation."""
+        alpha = 1 + lmbda * (mode - min_val) / (max_val - min_val)
+        beta_param = 1 + lmbda * (max_val - mode) / (max_val - min_val)
+        samples = beta.rvs(alpha, beta_param, size=n, scale=(max_val - min_val)) + min_val
+        return np.mean(samples)
+
+    result_data = {col: [] for col in df.columns if not col.endswith(("_lower", "_upper"))}
+
+    for _, row in df.iterrows():
+        for col in ["ETHICAL_COMPLIANCE", "INT_LAW_COMPLIANCE", "LAND_USAGE_COMPLIANCE", "LEGAL_COMPLIANCE", "TRL_COMPLIANCE"]:
+            pert_mean = beta_pert_random(row[f"{col}_lower"], row[f"{col}_upper"], row[col], n)
+            result_data[col].append(pert_mean)
+
+        result_data["TIME"].append(row["TIME"])
+
+    return pd.DataFrame(result_data)
 
 def generate_cr_qmf_data_rapid_decline(time_periods):
 
@@ -102,7 +212,8 @@ def generate_cr_qmf_data_rapid_decline(time_periods):
 
     return pd.DataFrame(data)
 
-def generate_cr_ecv_data_rapid_decline(time_periods):
+def generate_cr_ecv_data_rapid_decline(time_periods, diff=0.1, n=10000):
+    
     time = np.arange(time_periods)
     data = {
         "TIME": time,
@@ -112,9 +223,31 @@ def generate_cr_ecv_data_rapid_decline(time_periods):
         "DISCOUNT_RATE": np.round(np.linspace(0.05, 0.1, time_periods), 3),
         "PROJECT_LIFETIME": np.round(np.full(time_periods, 980), 3),
     }
-    return pd.DataFrame(data)
+    df = pd.DataFrame(data)
+    
+    for col in ["REVENUE", "OPEX", "CAPEX", "DISCOUNT_RATE", "PROJECT_LIFETIME"]:
+        df[f"{col}_lower"] = df[col] * (1 - diff)
+        df[f"{col}_upper"] = df[col] * (1 + diff)
 
-def generate_cr_usb_data_rapid_decline(time_periods):
+    def beta_pert_random(min_val, max_val, mode, n, lmbda=4):
+        """Monte Carlo Beta-PERT simulation."""
+        alpha = 1 + lmbda * (mode - min_val) / (max_val - min_val)
+        beta_param = 1 + lmbda * (max_val - mode) / (max_val - min_val)
+        samples = beta.rvs(alpha, beta_param, size=n, scale=(max_val - min_val)) + min_val
+        return np.mean(samples)
+
+    result_data = {col: [] for col in df.columns if not col.endswith(("_lower", "_upper"))}
+
+    for _, row in df.iterrows():
+        for col in ["REVENUE", "OPEX", "CAPEX", "DISCOUNT_RATE", "PROJECT_LIFETIME"]:
+            pert_mean = beta_pert_random(row[f"{col}_lower"], row[f"{col}_upper"], row[col], n)
+            result_data[col].append(pert_mean)
+
+        result_data["TIME"].append(row["TIME"])
+
+    return pd.DataFrame(result_data)
+
+def generate_cr_usb_data_rapid_decline(time_periods, diff=0.1, n=10000):
     time = np.arange(time_periods)
     data = {
         "TIME": time,
@@ -122,9 +255,31 @@ def generate_cr_usb_data_rapid_decline(time_periods):
         "USER_EXP_RATIO": np.round(np.linspace(1.0, 0.2, time_periods), 3),
         "ACCESSIBILITY_AGEING": np.round(np.linspace(1.0, 0.3, time_periods), 3),
     }
-    return pd.DataFrame(data)
+    df = pd.DataFrame(data)
 
-def generate_cr_rlb_data_rapid_decline(time_periods):
+    for col in ["PRODUCTION_OUTPUT", "USER_EXP_RATIO", "ACCESSIBILITY_AGEING"]:
+        df[f"{col}_lower"] = df[col] * (1 - diff)
+        df[f"{col}_upper"] = df[col] * (1 + diff)
+
+    def beta_pert_random(min_val, max_val, mode, n, lmbda=4):
+        """Monte Carlo Beta-PERT simulation."""
+        alpha = 1 + lmbda * (mode - min_val) / (max_val - min_val)
+        beta_param = 1 + lmbda * (max_val - mode) / (max_val - min_val)
+        samples = beta.rvs(alpha, beta_param, size=n, scale=(max_val - min_val)) + min_val
+        return np.mean(samples)
+
+    result_data = {col: [] for col in df.columns if not col.endswith(("_lower", "_upper"))}
+
+    for _, row in df.iterrows():
+        for col in ["PRODUCTION_OUTPUT", "USER_EXP_RATIO", "ACCESSIBILITY_AGEING"]:
+            pert_mean = beta_pert_random(row[f"{col}_lower"], row[f"{col}_upper"], row[col], n)
+            result_data[col].append(pert_mean)
+
+        result_data["TIME"].append(row["TIME"])
+
+    return pd.DataFrame(result_data)
+
+def generate_cr_rlb_data_rapid_decline(time_periods, diff=0.1, n=10000):
     time = np.arange(time_periods)
     data = {
         "TIME": time,
@@ -133,9 +288,31 @@ def generate_cr_rlb_data_rapid_decline(time_periods):
         "WEATHER_DISASTER_RESILIENCE": np.round(np.linspace(0.95, 0.6, time_periods), 3),
         "POLLUTION_PRODUCED": np.round(np.linspace(0.3, 0.95, time_periods), 3),
     }
-    return pd.DataFrame(data)
+    df = pd.DataFrame(data)
 
-def generate_cr_inf_data_rapid_decline(time_periods):
+    for col in ["DURABILITY", "DIGITAL_RELIABILITY", "WEATHER_DISASTER_RESILIENCE", "POLLUTION_PRODUCED"]:
+        df[f"{col}_lower"] = df[col] * (1 - diff)
+        df[f"{col}_upper"] = df[col] * (1 + diff)
+
+    def beta_pert_random(min_val, max_val, mode, n, lmbda=4):
+        """Monte Carlo Beta-PERT simulation."""
+        alpha = 1 + lmbda * (mode - min_val) / (max_val - min_val)
+        beta_param = 1 + lmbda * (max_val - mode) / (max_val - min_val)
+        samples = beta.rvs(alpha, beta_param, size=n, scale=(max_val - min_val)) + min_val
+        return np.mean(samples)
+
+    result_data = {col: [] for col in df.columns if not col.endswith(("_lower", "_upper"))}
+
+    for _, row in df.iterrows():
+        for col in ["DURABILITY", "DIGITAL_RELIABILITY", "WEATHER_DISASTER_RESILIENCE", "POLLUTION_PRODUCED"]:
+            pert_mean = beta_pert_random(row[f"{col}_lower"], row[f"{col}_upper"], row[col], n)
+            result_data[col].append(pert_mean)
+
+        result_data["TIME"].append(row["TIME"])
+
+    return pd.DataFrame(result_data)
+
+def generate_cr_inf_data_rapid_decline(time_periods, diff=0.1, n=10000):
     time = np.arange(time_periods)
     data = {
         "TIME": time,
@@ -144,9 +321,31 @@ def generate_cr_inf_data_rapid_decline(time_periods):
         "INTERMODAL_CONNECTIONS": np.round(np.linspace(0.95, 0.2, time_periods), 3),
         "INFRA_ADAPTABILITY_FEATURES": np.round(np.linspace(0.95, 0.6, time_periods), 3),
     }
-    return pd.DataFrame(data)
+    df = pd.DataFrame(data)
 
-def generate_cr_scl_data_rapid_decline(time_periods):
+    for col in ["COMMON_INFRA_FEATURES", "CONSTRUCTION_BARRIERS", "INTERMODAL_CONNECTIONS", "INFRA_ADAPTABILITY_FEATURES"]:
+        df[f"{col}_lower"] = df[col] * (1 - diff)
+        df[f"{col}_upper"] = df[col] * (1 + diff)
+
+    def beta_pert_random(min_val, max_val, mode, n, lmbda=4):
+        """Monte Carlo Beta-PERT simulation."""
+        alpha = 1 + lmbda * (mode - min_val) / (max_val - min_val)
+        beta_param = 1 + lmbda * (max_val - mode) / (max_val - min_val)
+        samples = beta.rvs(alpha, beta_param, size=n, scale=(max_val - min_val)) + min_val
+        return np.mean(samples)
+
+    result_data = {col: [] for col in df.columns if not col.endswith(("_lower", "_upper"))}
+
+    for _, row in df.iterrows():
+        for col in ["COMMON_INFRA_FEATURES", "CONSTRUCTION_BARRIERS", "INTERMODAL_CONNECTIONS", "INFRA_ADAPTABILITY_FEATURES"]:
+            pert_mean = beta_pert_random(row[f"{col}_lower"], row[f"{col}_upper"], row[col], n)
+            result_data[col].append(pert_mean)
+
+        result_data["TIME"].append(row["TIME"])
+
+    return pd.DataFrame(result_data)
+
+def generate_cr_scl_data_rapid_decline(time_periods, diff=0.1, n=10000):
     time = np.arange(time_periods)
     data = {
         "TIME": time,
@@ -156,7 +355,29 @@ def generate_cr_scl_data_rapid_decline(time_periods):
         "ADJUSTMENT_COEF_2": np.round(np.linspace(0.95, 0.25, time_periods), 3),
         "ADJUSTMENT_COEF_3": np.round(np.linspace(0.7, 0.3, time_periods), 3),
     }
-    return pd.DataFrame(data)
+    df = pd.DataFrame(data)
+
+    for col in ["RESOURCE_MILEAGE", "PLANNED_VOLUME", "ADJUSTMENT_COEF_1", "ADJUSTMENT_COEF_2", "ADJUSTMENT_COEF_3"]:
+        df[f"{col}_lower"] = df[col] * (1 - diff)
+        df[f"{col}_upper"] = df[col] * (1 + diff)
+
+    def beta_pert_random(min_val, max_val, mode, n, lmbda=4):
+        """Monte Carlo Beta-PERT simulation."""
+        alpha = 1 + lmbda * (mode - min_val) / (max_val - min_val)
+        beta_param = 1 + lmbda * (max_val - mode) / (max_val - min_val)
+        samples = beta.rvs(alpha, beta_param, size=n, scale=(max_val - min_val)) + min_val
+        return np.mean(samples)
+
+    result_data = {col: [] for col in df.columns if not col.endswith(("_lower", "_upper"))}
+
+    for _, row in df.iterrows():
+        for col in ["RESOURCE_MILEAGE", "PLANNED_VOLUME", "ADJUSTMENT_COEF_1", "ADJUSTMENT_COEF_2", "ADJUSTMENT_COEF_3"]:
+            pert_mean = beta_pert_random(row[f"{col}_lower"], row[f"{col}_upper"], row[col], n)
+            result_data[col].append(pert_mean)
+
+        result_data["TIME"].append(row["TIME"])
+
+    return pd.DataFrame(result_data)
 
 ####################################
 # DECLINE OVER TIME SCENARIO
