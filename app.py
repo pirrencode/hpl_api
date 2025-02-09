@@ -2514,7 +2514,7 @@ def view_advancements():
 
 def render_homepage():
     st.title("HDME")
-    st.subheader("v0.4.0-alpha")
+    st.subheader("v0.5.0-alpha")
     st.write("""
         Welcome to the prototype of Hyperloop Project System Dynamics Dashboard. 
         This application allows you to upload, manage, and visualize data related to various criteria 
@@ -3089,21 +3089,21 @@ from simulation_scenarios import (
 # RAPID DECLINE SCENARIO
 #######################################
 
-def generate_rapid_decline_scenario(time_periods):
+def generate_rapid_decline_scenario(time_periods,diff,n):
 
     st.write("Executed rapid decline scenario for simulation model.")
 
-    cr_env_df = generate_cr_env_data_rapid_decline(time_periods)
-    cr_sac_df = generate_cr_sac_data_rapid_decline(time_periods)
-    cr_tfe_df = generate_cr_tfe_data_rapid_decline(time_periods)
-    cr_sfy_df = generate_cr_sfy_data_rapid_decline(time_periods)
-    cr_reg_df = generate_cr_reg_data_rapid_decline(time_periods)
+    cr_env_df = generate_cr_env_data_rapid_decline(time_periods,diff,n)
+    cr_sac_df = generate_cr_sac_data_rapid_decline(time_periods,diff,n)
+    cr_tfe_df = generate_cr_tfe_data_rapid_decline(time_periods,diff,n)
+    cr_sfy_df = generate_cr_sfy_data_rapid_decline(time_periods,diff,n)
+    cr_reg_df = generate_cr_reg_data_rapid_decline(time_periods,diff,n)
     cr_qmf_df = generate_cr_qmf_data_rapid_decline(time_periods)
-    cr_ecv_df = generate_cr_ecv_data_rapid_decline(time_periods)
-    cr_usb_df = generate_cr_usb_data_rapid_decline(time_periods)
-    cr_rlb_df = generate_cr_rlb_data_rapid_decline(time_periods)
-    cr_inf_df = generate_cr_inf_data_rapid_decline(time_periods)
-    cr_scl_df = generate_cr_scl_data_rapid_decline(time_periods)
+    cr_ecv_df = generate_cr_ecv_data_rapid_decline(time_periods,diff,n)
+    cr_usb_df = generate_cr_usb_data_rapid_decline(time_periods,diff,n)
+    cr_rlb_df = generate_cr_rlb_data_rapid_decline(time_periods,diff,n)
+    cr_inf_df = generate_cr_inf_data_rapid_decline(time_periods,diff,n)
+    cr_scl_df = generate_cr_scl_data_rapid_decline(time_periods,diff,n)
 
     scenarios_calculation_to_snowlake(cr_env_df, cr_sac_df, cr_tfe_df, cr_sfy_df, cr_reg_df, cr_qmf_df, cr_ecv_df, cr_usb_df, cr_rlb_df, cr_inf_df, cr_scl_df)
 
@@ -3111,21 +3111,21 @@ def generate_rapid_decline_scenario(time_periods):
 # DECLINE OVERTIME SCENARIO
 #######################################
 
-def generate_decline_over_time_scenario(time_periods):
+def generate_decline_over_time_scenario(time_periods,diff,n):
 
     st.write("Executed decline over time scenario for simulation model.")
 
-    cr_env_df = generate_cr_env_decline_over_time_data(time_periods)
-    cr_sac_df = generate_cr_sac_decline_over_time_data(time_periods)
-    cr_tfe_df = generate_cr_tfe_decline_over_time_data(time_periods)
-    cr_sfy_df = generate_cr_sfy_decline_over_time_data(time_periods)
-    cr_reg_df = generate_cr_reg_decline_over_time_data(time_periods)
-    cr_qmf_df = generate_cr_qmf_decline_over_time_data(time_periods)
-    cr_ecv_df = generate_cr_ecv_decline_over_time_data(time_periods)
-    cr_usb_df = generate_cr_usb_decline_over_time_data(time_periods)
-    cr_rlb_df = generate_cr_rlb_decline_over_time_data(time_periods)
-    cr_inf_df = generate_cr_inf_decline_over_time_data(time_periods)
-    cr_scl_df = generate_cr_scl_decline_over_time_data(time_periods)
+    cr_env_df = generate_cr_env_decline_over_time_data(time_periods,diff,n)
+    cr_sac_df = generate_cr_sac_decline_over_time_data(time_periods,diff,n)
+    cr_tfe_df = generate_cr_tfe_decline_over_time_data(time_periods,diff,n)
+    cr_sfy_df = generate_cr_sfy_decline_over_time_data(time_periods,diff,n)
+    cr_reg_df = generate_cr_reg_decline_over_time_data(time_periods,diff,n)
+    cr_qmf_df = generate_cr_qmf_decline_over_time_data(time_periods,diff,n)
+    cr_ecv_df = generate_cr_ecv_decline_over_time_data(time_periods,diff,n)
+    cr_usb_df = generate_cr_usb_decline_over_time_data(time_periods,diff,n)
+    cr_rlb_df = generate_cr_rlb_decline_over_time_data(time_periods,diff,n)
+    cr_inf_df = generate_cr_inf_decline_over_time_data(time_periods,diff,n)
+    cr_scl_df = generate_cr_scl_decline_over_time_data(time_periods,diff,n)
 
     scenarios_calculation_to_snowlake(cr_env_df, cr_sac_df, cr_tfe_df, cr_sfy_df, cr_reg_df, cr_qmf_df, cr_ecv_df, cr_usb_df, cr_rlb_df, cr_inf_df, cr_scl_df)
 
@@ -3133,21 +3133,21 @@ def generate_decline_over_time_scenario(time_periods):
 # RAPID GROWTH SCENARIO
 #######################################
 
-def generate_rapid_growth_scenario(time_periods):
+def generate_rapid_growth_scenario(time_periods,diff,n):
 
     st.write("Executed rapid growth scenario for simulation model.")    
 
-    cr_env_df = generate_cr_env_rapid_growth_data(time_periods)
-    cr_sac_df = generate_cr_sac_rapid_growth_data(time_periods)
-    cr_tfe_df = generate_cr_tfe_rapid_growth_data(time_periods)
-    cr_sfy_df = generate_cr_sfy_rapid_growth_data(time_periods)
-    cr_reg_df = generate_cr_reg_rapid_growth_data(time_periods)
-    cr_qmf_df = generate_cr_qmf_rapid_growth_data(time_periods)
-    cr_ecv_df = generate_cr_ecv_rapid_growth_data(time_periods)
-    cr_usb_df = generate_cr_usb_rapid_growth_data(time_periods)
-    cr_rlb_df = generate_cr_rlb_rapid_growth_data(time_periods)
-    cr_inf_df = generate_cr_inf_rapid_growth_data(time_periods)
-    cr_scl_df = generate_cr_scl_rapid_growth_data(time_periods)
+    cr_env_df = generate_cr_env_rapid_growth_data(time_periods,diff,n)
+    cr_sac_df = generate_cr_sac_rapid_growth_data(time_periods,diff,n)
+    cr_tfe_df = generate_cr_tfe_rapid_growth_data(time_periods,diff,n)
+    cr_sfy_df = generate_cr_sfy_rapid_growth_data(time_periods,diff,n)
+    cr_reg_df = generate_cr_reg_rapid_growth_data(time_periods,diff,n)
+    cr_qmf_df = generate_cr_qmf_rapid_growth_data(time_periods,diff,n)
+    cr_ecv_df = generate_cr_ecv_rapid_growth_data(time_periods,diff,n)
+    cr_usb_df = generate_cr_usb_rapid_growth_data(time_periods,diff,n)
+    cr_rlb_df = generate_cr_rlb_rapid_growth_data(time_periods,diff,n)
+    cr_inf_df = generate_cr_inf_rapid_growth_data(time_periods,diff,n)
+    cr_scl_df = generate_cr_scl_rapid_growth_data(time_periods,diff,n)
 
     scenarios_calculation_to_snowlake(cr_env_df, cr_sac_df, cr_tfe_df, cr_sfy_df, cr_reg_df, cr_qmf_df, cr_ecv_df, cr_usb_df, cr_rlb_df, cr_inf_df, cr_scl_df)      
 
@@ -3155,21 +3155,21 @@ def generate_rapid_growth_scenario(time_periods):
 # SUSTAINABLE GROWTH SCENARIO
 #######################################
 
-def generate_sustainable_growth_scenario(time_periods):
+def generate_sustainable_growth_scenario(time_periods,diff,n):
 
     st.write("Executed sustainable growth scenario for simulation model.")   
 
-    cr_env_df = generate_cr_env_sustainable_growth_data(time_periods)
-    cr_sac_df = generate_cr_sac_sustainable_growth_data(time_periods)
-    cr_tfe_df = generate_cr_tfe_sustainable_growth_data(time_periods)
-    cr_sfy_df = generate_cr_sfy_sustainable_growth_data(time_periods)
-    cr_reg_df = generate_cr_reg_sustainable_growth_data(time_periods)
-    cr_qmf_df = generate_cr_qmf_sustainable_growth_data(time_periods)
-    cr_ecv_df = generate_cr_ecv_sustainable_growth_data(time_periods)
-    cr_usb_df = generate_cr_usb_sustainable_growth_data(time_periods)
-    cr_rlb_df = generate_cr_rlb_sustainable_growth_data(time_periods)
-    cr_inf_df = generate_cr_inf_sustainable_growth_data(time_periods)
-    cr_scl_df = generate_cr_scl_sustainable_growth_data(time_periods)
+    cr_env_df = generate_cr_env_sustainable_growth_data(time_periods,diff,n)
+    cr_sac_df = generate_cr_sac_sustainable_growth_data(time_periods,diff,n)
+    cr_tfe_df = generate_cr_tfe_sustainable_growth_data(time_periods,diff,n)
+    cr_sfy_df = generate_cr_sfy_sustainable_growth_data(time_periods,diff,n)
+    cr_reg_df = generate_cr_reg_sustainable_growth_data(time_periods,diff,n)
+    cr_qmf_df = generate_cr_qmf_sustainable_growth_data(time_periods,diff,n)
+    cr_ecv_df = generate_cr_ecv_sustainable_growth_data(time_periods,diff,n)
+    cr_usb_df = generate_cr_usb_sustainable_growth_data(time_periods,diff,n)
+    cr_rlb_df = generate_cr_rlb_sustainable_growth_data(time_periods,diff,n)
+    cr_inf_df = generate_cr_inf_sustainable_growth_data(time_periods,diff,n)
+    cr_scl_df = generate_cr_scl_sustainable_growth_data(time_periods,diff,n)
 
     scenarios_calculation_to_snowlake(cr_env_df, cr_sac_df, cr_tfe_df, cr_sfy_df, cr_reg_df, cr_qmf_df, cr_ecv_df, cr_usb_df, cr_rlb_df, cr_inf_df, cr_scl_df)    
 
@@ -3266,22 +3266,26 @@ def render_scenarios_simulation_page():
     st.write("Please select time periods for simulation (seconds).")
 
     time_period_raw = st.text_input('Time period:', value='100')
-    time_periods = int(time_period_raw)   
+    time_periods = int(time_period_raw) 
+    diff_raw = st.text_input('Precision for Monte Carlo, default = 0.1:', value='0.1')
+    diff = float(diff_raw)
+    n_raw = st.text_input('Monte Carlo n simulations, default = 10 000:', value='10000')
+    n = int(n_raw)
 
     col1, col2 = st.columns(2)
     with col1:
         if st.button("RAPID DECLINE 📉"):
-            generate_rapid_decline_scenario(time_periods)
+            generate_rapid_decline_scenario(time_periods,diff,n)
 
         if st.button("SUSTAINABLE GROWTH 🌱"):
-            generate_sustainable_growth_scenario(time_periods)
+            generate_sustainable_growth_scenario(time_periods,diff,n)
     
     with col2:
         if st.button("DECLINE OVER TIME ⏳"):
-            generate_decline_over_time_scenario(time_periods)
+            generate_decline_over_time_scenario(time_periods,diff,n)
 
         if st.button("RAPID GROWTH 🚀"):
-            generate_rapid_growth_scenario(time_periods)
+            generate_rapid_growth_scenario(time_periods,diff,n)
 
     with col1:
         if st.button("UPDATE SUCCESS FACTORS TABLE 💃"):
