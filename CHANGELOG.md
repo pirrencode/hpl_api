@@ -1,17 +1,17 @@
 # Hyperloop decision making ecosystem changelog
 
-##v0.3.2-alpha
+## v0.3.2-alpha
 
 - Implemented demo of unique simulation scenarious UI.
 - Added merge all input data functionality in Fusion store.
 - View all input data is enabled.
 - Fixed micro- and macro- errors in simulation scenarious.
 
-##v0.3.1-alpha
+## v0.3.1-alpha
 
 - Added EGTL experiments results.
 
-##v0.3.0-alpha
+## v0.3.0-alpha
 
 - Alpha version of application released.
 - Implemented data extraction experiment to handle code generation (Fusion).
