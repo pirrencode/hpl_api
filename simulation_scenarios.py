@@ -455,8 +455,8 @@ def generate_cr_tfe_decline_over_time_data(time_periods, diff, n):
         "TIME": time,
         "CURRENT_TRL": np.round(np.linspace(9, 7, time_periods), 3),
         "TARGET_TRL": np.round(np.linspace(9, 8, time_periods), 3),
-        "ENG_CHALLENGES_RESOLVED": np.round(np.linspace(10, 8, time_periods), 3),
-        "TARGET_ENG_CHALLENGES": np.round(np.linspace(5, 7, time_periods), 3),
+        "ENG_CHALLENGES_RESOLVED": np.round(np.linspace(7, 6, time_periods), 3),
+        "TARGET_ENG_CHALLENGES": np.round(np.linspace(10, 11, time_periods), 3),
     }
     df = pd.DataFrame(data)
 
