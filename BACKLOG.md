@@ -1,3 +1,3 @@
 #Backlog:
-1. Further improve generation logic and dynamics correctness.
+1. Update system dynamics.
 2. Remove DEBUG level outputs.
