@@ -1,5 +1,10 @@
 # Hyperloop decision making ecosystem changelog
 
+## v0.5.0-alpha
+
+- UI update for simulation scenarios modeling.
+- Added Monte Carlo BETA-PERT simulations for sample granulations to all scenarios.
+
 ## v0.3.2-alpha
 
 - Implemented demo of unique simulation scenarious UI.
