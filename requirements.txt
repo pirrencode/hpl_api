@@ -7,4 +7,5 @@ pyarrow>=8.0.0
 pytz
 plotly
 openai
+scipy
 git+https://github.com/google/generative-ai-python
