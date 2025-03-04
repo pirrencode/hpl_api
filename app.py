@@ -2206,16 +2206,6 @@ def calculate_cr_env():
     :param w4: Weight for environmental impact score
     :return: DataFrame correlating to the CALC_CR_ENV schema
     """
-    # session = Session.builder.configs(get_snowflake_connection_params()).create()
-    # df_source = session.table("STAGING_STORE.CR_ENV_STAGING").to_pandas()
-
-    # w1, w2, w3, w4 = 0.25, 0.25, 0.25, 0.25
-    # df_result = pd.DataFrame()
-    # df_result['TIME'] = df_source['TIME']
-    # df_result['CR_ENV'] = (w1 * (df_source['ENERGY_CONSUMED'] / (df_source['DISTANCE'] * df_source['LOAD_WEIGHT'])) +
-    #                        w2 * (df_source['CO2_EMISSIONS'] / (df_source['DISTANCE'] * df_source['LOAD_WEIGHT'])) +
-    #                        w3 * df_source['MATERIAL_SUSTAINABILITY'] +
-    #                        w4 * df_source['ENV_IMPACT_SCORE'])
 
     session = Session.builder.configs(get_snowflake_connection_params()).create()
     df_source = session.table("STAGING_STORE.CR_ENV_STAGING").to_pandas()
@@ -2294,16 +2284,7 @@ def calculate_cr_tfe():
     df_result = pd.DataFrame()
     df_result['TIME'] = df_source['TIME']
 
-    # tfe_values = []
-    # for _, row in df_source.iterrows():
-    #     current_trl = row["CURRENT_TRL"]
-    #     target_trl = row["TARGET_TRL"]
-    #     resolved = row["ENG_CHALLENGES_RESOLVED"]
-    #     target = row["TARGET_ENG_CHALLENGES"]
-
     raw_tfe = 0.5 * (df_source['CURRENT_TRL'] / df_source['TARGET_TRL']) + 0.5 * (df_source['ENG_CHALLENGES_RESOLVED'] / df_source['TARGET_ENG_CHALLENGES'])
-    # tfe = max(0, min(raw_tfe, 1))
-    # tfe_values.append(tfe)
 
     df_result['CR_TFE'] = raw_tfe
 
@@ -2421,29 +2402,6 @@ def calculate_cr_rlb():
     df_result = pd.DataFrame(calc_data)
     
     return df_result
-
-# def calculate_cr_inf():
-#     session = Session.builder.configs(get_snowflake_connection_params()).create()
-    
-#     cr_inf_source_df = session.table("STAGING_STORE.CR_INF_STAGING").to_pandas()
-#     st.write("CR_INF_SOURCE DataFrame Loaded")
-    
-#     calc_data = []
-    
-#     for _, row in cr_inf_source_df.iterrows():
-#         time = int(row['TIME'])
-#         C = float(row['COMMON_INFRA_FEATURES'])
-#         E = float(row['CONSTRUCTION_BARRIERS'])
-#         M = float(row['INTERMODAL_CONNECTIONS'])
-#         A = float(row['INFRA_ADAPTABILITY_FEATURES'])
-
-#         cr_inf = max(0, min((C + E + M + A) / 4, 1))
-        
-#         calc_data.append({"TIME": time, "CR_INF": cr_inf})
-    
-#     df_result = pd.DataFrame(calc_data)
-    
-#     return df_result
 
 def calculate_cr_inf():
 
