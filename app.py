@@ -2294,16 +2294,16 @@ def calculate_cr_tfe():
     df_result = pd.DataFrame()
     df_result['TIME'] = df_source['TIME']
 
-    tfe_values = []
-    for _, row in df_source.iterrows():
-        current_trl = row["CURRENT_TRL"]
-        target_trl = row["TARGET_TRL"]
-        resolved = row["ENG_CHALLENGES_RESOLVED"]
-        target = row["TARGET_ENG_CHALLENGES"]
+    # tfe_values = []
+    # for _, row in df_source.iterrows():
+    #     current_trl = row["CURRENT_TRL"]
+    #     target_trl = row["TARGET_TRL"]
+    #     resolved = row["ENG_CHALLENGES_RESOLVED"]
+    #     target = row["TARGET_ENG_CHALLENGES"]
 
-        raw_tfe = 0.5 * (current_trl / target_trl) + 0.5 * (resolved / target)
-        # tfe = max(0, min(raw_tfe, 1))
-        # tfe_values.append(tfe)
+    raw_tfe = 0.5 * (df_source['CURRENT_TRL'] / df_source['TARGET_TRL']) + 0.5 * (df_source['ENG_CHALLENGES_RESOLVED'] / df_source['TARGET_ENG_CHALLENGES'])
+    # tfe = max(0, min(raw_tfe, 1))
+    # tfe_values.append(tfe)
 
     df_result['CR_TFE'] = raw_tfe
 
