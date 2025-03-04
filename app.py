@@ -2206,16 +2206,39 @@ def calculate_cr_env():
     :param w4: Weight for environmental impact score
     :return: DataFrame correlating to the CALC_CR_ENV schema
     """
+    # session = Session.builder.configs(get_snowflake_connection_params()).create()
+    # df_source = session.table("STAGING_STORE.CR_ENV_STAGING").to_pandas()
+
+    # w1, w2, w3, w4 = 0.25, 0.25, 0.25, 0.25
+    # df_result = pd.DataFrame()
+    # df_result['TIME'] = df_source['TIME']
+    # df_result['CR_ENV'] = (w1 * (df_source['ENERGY_CONSUMED'] / (df_source['DISTANCE'] * df_source['LOAD_WEIGHT'])) +
+    #                        w2 * (df_source['CO2_EMISSIONS'] / (df_source['DISTANCE'] * df_source['LOAD_WEIGHT'])) +
+    #                        w3 * df_source['MATERIAL_SUSTAINABILITY'] +
+    #                        w4 * df_source['ENV_IMPACT_SCORE'])
+
     session = Session.builder.configs(get_snowflake_connection_params()).create()
     df_source = session.table("STAGING_STORE.CR_ENV_STAGING").to_pandas()
-
+    
     w1, w2, w3, w4 = 0.25, 0.25, 0.25, 0.25
+    
+    df_source['I_SL'] = df_source['ENERGY_CONSUMED'] / (df_source['DISTANCE'] * df_source['LOAD_WEIGHT'])
+    df_source['K_SL'] = df_source['CO2_EMISSIONS'] / (df_source['DISTANCE'] * df_source['LOAD_WEIGHT'])
+    
+    min_I_SL, max_I_SL = dc, df_source['I_SL'].max()
+    min_K_SL, max_K_SL = df_source['K_SL'].min(), df_source['K_SL'].max()
+    
+    df_source['I_SL_norm'] = (df_source['I_SL'] - min_I_SL) / (max_I_SL - min_I_SL)
+    df_source['K_SL_norm'] = (df_source['K_SL'] - min_K_SL) / (max_K_SL - min_K_SL)
+    
     df_result = pd.DataFrame()
     df_result['TIME'] = df_source['TIME']
-    df_result['CR_ENV'] = (w1 * (df_source['ENERGY_CONSUMED'] / (df_source['DISTANCE'] * df_source['LOAD_WEIGHT'])) +
-                           w2 * (df_source['CO2_EMISSIONS'] / (df_source['DISTANCE'] * df_source['LOAD_WEIGHT'])) +
-                           w3 * df_source['MATERIAL_SUSTAINABILITY'] +
-                           w4 * df_source['ENV_IMPACT_SCORE'])
+    df_result['CR_ENV'] = (
+        w1 * (1 - df_source['I_SL_norm']) +
+        w2 * (1 - df_source['K_SL_norm']) +
+        w3 * df_source['MATERIAL_SUSTAINABILITY'] +
+        w4 * df_source['ENV_IMPACT_SCORE']
+    )
 
     return df_result
 
