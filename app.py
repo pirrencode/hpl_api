@@ -2373,9 +2373,9 @@ def calculate_cr_ecv():
         
         calc_data.append({"TIME": time, "CR_ECV": cr_ecv})
     
-    calc_df = pd.DataFrame(calc_data)
+    df_result = pd.DataFrame(calc_data)
     
-    return calc_df
+    return df_result
 
 def calculate_cr_usb():
     session = Session.builder.configs(get_snowflake_connection_params()).create()
@@ -2395,9 +2395,9 @@ def calculate_cr_usb():
         
         calc_data.append({"TIME": time, "CR_USB": cr_usb})
     
-    calc_df = pd.DataFrame(calc_data)
+    df_result = pd.DataFrame(calc_data)
      
-    return calc_df
+    return df_result
 
 def calculate_cr_rlb():
     session = Session.builder.configs(get_snowflake_connection_params()).create()
@@ -2418,32 +2418,62 @@ def calculate_cr_rlb():
         
         calc_data.append({"TIME": time, "CR_RLB": cr_rlb})
     
-    calc_df = pd.DataFrame(calc_data)
+    df_result = pd.DataFrame(calc_data)
     
-    return calc_df
+    return df_result
+
+# def calculate_cr_inf():
+#     session = Session.builder.configs(get_snowflake_connection_params()).create()
+    
+#     cr_inf_source_df = session.table("STAGING_STORE.CR_INF_STAGING").to_pandas()
+#     st.write("CR_INF_SOURCE DataFrame Loaded")
+    
+#     calc_data = []
+    
+#     for _, row in cr_inf_source_df.iterrows():
+#         time = int(row['TIME'])
+#         C = float(row['COMMON_INFRA_FEATURES'])
+#         E = float(row['CONSTRUCTION_BARRIERS'])
+#         M = float(row['INTERMODAL_CONNECTIONS'])
+#         A = float(row['INFRA_ADAPTABILITY_FEATURES'])
+
+#         cr_inf = max(0, min((C + E + M + A) / 4, 1))
+        
+#         calc_data.append({"TIME": time, "CR_INF": cr_inf})
+    
+#     df_result = pd.DataFrame(calc_data)
+    
+#     return df_result
 
 def calculate_cr_inf():
+
     session = Session.builder.configs(get_snowflake_connection_params()).create()
-    
     cr_inf_source_df = session.table("STAGING_STORE.CR_INF_STAGING").to_pandas()
-    st.write("CR_INF_SOURCE DataFrame Loaded")
+    
+    w1, w2, w3, w4 = 0.25, 0.25, 0.25, 0.25
+    
+    C_max = cr_inf_source_df['COMMON_INFRA_FEATURES'].max()
+    E_max = cr_inf_source_df['CONSTRUCTION_BARRIERS'].max()
+    M_max = cr_inf_source_df['INTERMODAL_CONNECTIONS'].max()
+    A_max = cr_inf_source_df['INFRA_ADAPTABILITY_FEATURES'].max()
     
     calc_data = []
     
     for _, row in cr_inf_source_df.iterrows():
         time = int(row['TIME'])
-        C = float(row['COMMON_INFRA_FEATURES'])
-        E = float(row['CONSTRUCTION_BARRIERS'])
-        M = float(row['INTERMODAL_CONNECTIONS'])
-        A = float(row['INFRA_ADAPTABILITY_FEATURES'])
-
-        cr_inf = max(0, min((C + E + M + A) / 4, 1))
+        C = float(row['COMMON_INFRA_FEATURES']) / C_max if C_max else 0
+        E = float(row['CONSTRUCTION_BARRIERS']) / E_max if E_max else 0
+        M = float(row['INTERMODAL_CONNECTIONS']) / M_max if M_max else 0
+        A = float(row['INFRA_ADAPTABILITY_FEATURES']) / A_max if A_max else 0
+        
+        cr_inf = max(0, min((w1 * C + w2 * E + w3 * M + w4 * A), 1))
         
         calc_data.append({"TIME": time, "CR_INF": cr_inf})
     
-    calc_df = pd.DataFrame(calc_data)
+    df_result = pd.DataFrame(calc_data)
     
-    return calc_df
+    return df_result
+
 
 def calculate_cr_scl():
     session = Session.builder.configs(get_snowflake_connection_params()).create()
