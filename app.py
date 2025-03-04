@@ -2477,27 +2477,28 @@ def calculate_cr_inf():
 
 def calculate_cr_scl():
     session = Session.builder.configs(get_snowflake_connection_params()).create()
-    
     cr_scl_source_df = session.table("STAGING_STORE.CR_SCL_STAGING").to_pandas()
-    st.write("CR_SCL_SOURCE DataFrame Loaded")
+    
+    L_max = cr_scl_source_df['RESOURCE_MILEAGE'].max()
+    Q_max = cr_scl_source_df['PLANNED_VOLUME'].max()
     
     calc_data = []
     
     for _, row in cr_scl_source_df.iterrows():
         time = int(row['TIME'])
-        L1 = float(row['RESOURCE_MILEAGE'])
-        Q = float(row['PLANNED_VOLUME'])
+        L = float(row['RESOURCE_MILEAGE']) / L_max if L_max else 0
+        Q = float(row['PLANNED_VOLUME']) / Q_max if Q_max else 0
         K1 = float(row['ADJUSTMENT_COEF_1'])
         K2 = float(row['ADJUSTMENT_COEF_2'])
         K3 = float(row['ADJUSTMENT_COEF_3'])
-
-        cr_scl = max(0, min((L1 * Q * K1 * K2 * K3) ** (1/3), 1))
+        
+        cr_scl = max(0, min((L * Q * ((K1 + K2 + K3) / 3)), 1))
         
         calc_data.append({"TIME": time, "CR_SCL": cr_scl})
     
-    calc_df = pd.DataFrame(calc_data)
+    df_result = pd.DataFrame(calc_data)
     
-    return calc_df
+    return df_result
 
 
 #############################################
