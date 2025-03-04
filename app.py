@@ -2275,16 +2275,13 @@ def calculate_cr_sac():
 
     df_result = pd.DataFrame()
     df_result['TIME'] = df_source['TIME']
-    
-    w1 = 0.5
-    w2 = 0.5
 
-    cr_sac_raw = w1 + w2 * (
+    cr_sac_raw = 0.5 + (
         (df_source['POSITIVE_FEEDBACK'] - df_source['NEGATIVE_FEEDBACK']) /
-        (df_source['POSITIVE_FEEDBACK'] + df_source['NEGATIVE_FEEDBACK'] + 1e-6)
+        (2 * (df_source['POSITIVE_FEEDBACK'] + df_source['NEGATIVE_FEEDBACK']))
     )
     
-    df_result['CR_SAC'] = cr_sac_raw.clip(0, 1)
+    df_result['CR_SAC'] = cr_sac_raw
 
     return df_result
 
@@ -2304,11 +2301,11 @@ def calculate_cr_tfe():
         resolved = row["ENG_CHALLENGES_RESOLVED"]
         target = row["TARGET_ENG_CHALLENGES"]
 
-        raw_tfe = (current_trl / target_trl) * (resolved / target)
-        tfe = max(0, min(raw_tfe, 1))
-        tfe_values.append(tfe)
+        raw_tfe = 0.5 * (current_trl / target_trl) + 0.5 * (resolved / target)
+        # tfe = max(0, min(raw_tfe, 1))
+        # tfe_values.append(tfe)
 
-    df_result['CR_TFE'] = tfe_values
+    df_result['CR_TFE'] = raw_tfe
 
     return df_result
 
