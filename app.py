@@ -2225,7 +2225,7 @@ def calculate_cr_env():
     df_source['I_SL'] = df_source['ENERGY_CONSUMED'] / (df_source['DISTANCE'] * df_source['LOAD_WEIGHT'])
     df_source['K_SL'] = df_source['CO2_EMISSIONS'] / (df_source['DISTANCE'] * df_source['LOAD_WEIGHT'])
     
-    min_I_SL, max_I_SL = dc, df_source['I_SL'].max()
+    min_I_SL, max_I_SL = df_source['I_SL'].min(), df_source['I_SL'].max()
     min_K_SL, max_K_SL = df_source['K_SL'].min(), df_source['K_SL'].max()
     
     df_source['I_SL_norm'] = (df_source['I_SL'] - min_I_SL) / (max_I_SL - min_I_SL)
