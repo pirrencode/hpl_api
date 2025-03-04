@@ -87,7 +87,7 @@ def generate_cr_tfe_data_rapid_decline(time_periods, diff, n):
         "CURRENT_TRL": np.round(np.linspace(5, 4, time_periods), 3),
         "TARGET_TRL": np.round(np.linspace(9, 6, time_periods), 3),
         "ENG_CHALLENGES_RESOLVED": np.round(np.linspace(10, 3, time_periods), 3),
-        "TARGET_ENG_CHALLENGES": np.round(np.linspace(5, 15, time_periods), 3),
+        "TARGET_ENG_CHALLENGES": np.round(np.linspace(10.5, 15, time_periods), 3),
     }
     df = pd.DataFrame(data)
 
